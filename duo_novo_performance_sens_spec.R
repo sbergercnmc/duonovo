@@ -245,55 +245,6 @@ rownames(duo_novo_performance_false_pos) <- c("false_pos_f", "false_pos_m",
 
 
 
-df <- as.data.frame(duo_novo_performance_false_pos)
-df <- cbind(RowNames = rownames(df), df)
-write_csv(df, file = "C:\\Users\\lboukas\\duo_novo_inherited_variants.csv")
-
-df <- as.data.frame(duo_novo_performance_vs_short_read_dn2)
-df <- cbind(RowNames = rownames(df), df)
-write_csv(df, file = "C:\\Users\\lboukas\\duo_novo_SRdenovo_variants.csv")
-
-
-
-
-
-
-
-
-performance_to_plot <- duo_novo_performance2[, -c(2, 10, 11)] #exclude these with too few or too many de novos from the full trio
-
-
-pdf(file = "duo_novo_performance2.pdf", height = 3, width = 3, pointsize = 8)
-plot(seq(1, 30, by = 2), performance_to_plot[1, ][order(performance_to_plot[1, ], decreasing = TRUE)], pch = 19, 
-     cex = 0.75, bty = 'l', col = "dark orange", ylim = c(0, 1), xlab = "duos", xlim = c(0.8, 31.2),
-     ylab = "% of true de novo variants", xaxt = 'n', yaxt = 'n')
-points(seq(1.5, 30.5, by = 2), performance_to_plot[2, ][order(performance_to_plot[1, ], decreasing = TRUE)], pch = 19, 
-     cex = 0.75, bty = 'l', col = "deep pink")
-points(seq(2, 31, by = 2), performance_to_plot[3, ][order(performance_to_plot[1, ], decreasing = TRUE)], pch = 19, 
-       cex = 0.75, bty = 'l', col = "forest green")
-abline(v = seq(2.5, 29.5, by = 2), lty = "longdash")
-axis(2, at = c(0, 0.5, 1))
-legend <- legend("topright", legend = c("called de novo", "called not de novo", "uncertain call"), 
-                 pch = 19, bty = 'n', cex = 0.84, col = c("dark orange", "deep pink", 
-                                                          "forest green"))
-dev.off()
-
-#######################
-
-
-
-
-
-
-
-###
-sapply(subdirs, function(xx) {
-  file_path_de_novo <- paste0("C:\\Users\\lboukas\\ground_truth_de_novo_SR_", xx, ".rda")
-  load(file = file_path_de_novo)
-  
-  length(trio_de_novo)
-})
-
 
 
 
