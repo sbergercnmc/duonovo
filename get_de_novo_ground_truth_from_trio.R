@@ -8,9 +8,9 @@ if (length(args) == 0) {
   stop("No directory specified", call. = FALSE)
 }
 
-subdirs <- c("PMGRC-107-107-0", "PMGRC-323-323-0", "PMGRC-423-423-0", "PMGRC-5-5-0",
-             "PMGRC-191-191-0", "PMGRC-332-332-0", "PMGRC-43-43-0", "PMGRC-615-615-0",
-             "PMGRC-291-291-0", "PMGRC-351-351-0", "PMGRC-445-445-0", "PMGRC-645-645-0",
+subdirs <- c("PMGRC-107-107-0", "PMGRC-323-323-0", "PMGRC-5-5-0",
+             "PMGRC-191-191-0", "PMGRC-615-615-0",
+             "PMGRC-291-291-0", "PMGRC-351-351-0", "PMGRC-645-645-0",
              "PMGRC-296-296-0", "PMGRC-372-372-0", "PMGRC-482-482-0", "PMGRC-661-661-0",
              "PMGRC-320-320-0", "PMGRC-417-417-0", "PMGRC-522-522-0", "PMGRC-770-770-0")
 

@@ -69,34 +69,4 @@ axis(2, at = c(0, 0.25, 0.5, 0.75))
 abline(0, 1, col = rgb(0,0,0,0.5))
 ######
 
-###
-pdf(file = "duo_novo_performance_parent_hom.pdf", height = 2.2, width = 4.4, pointsize = 8)
-par(mfrow = c(1, 2))
-duo_novo_performance_to_plot <- duo_novo_performance_pos_f_hom
-
-precision <- duo_novo_performance_to_plot["precision", ]
-number_called <- duo_novo_performance_to_plot["total_assessed", ]
-
-plot(number_called, precision, pch = 19, 
-     cex = 0.75, bty = 'l', col = "dark orange", xlim = c(0, max(number_called)), ylim = c(0, 1),
-     yaxt = 'n', xaxt = 'n', ylab = "positive predictive value", xlab = "# de novos called", 
-     main = "father-proband duos")
-axis(1, at = c(0, 5, 10))
-axis(2, at = c(0, 0.45, 0.9))
-
-
-
-duo_novo_performance_to_plot <- duo_novo_performance_pos_m_hom
-
-precision <- duo_novo_performance_to_plot["precision", ]
-number_called <- duo_novo_performance_to_plot["total_assessed", ]
-
-plot(number_called, precision, pch = 19, 
-     cex = 0.75, bty = 'l', col = "dark orange", xlim = c(0, max(number_called)), ylim = c(0, 1),
-     yaxt = 'n', xaxt = 'n', ylab = "positive predictive value", xlab = "# de novos called", 
-     main = "mother-proband duos")
-axis(1, at = c(0, 5, 10))
-axis(2, at = c(0, 0.45, 0.9))
-dev.off()
-
 
