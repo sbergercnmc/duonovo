@@ -32,6 +32,6 @@ de_novo_candidates2 <- duoNovo(hap_granges, combined_PS, "1|0", 10000, 2000,
 
 file_name_id <- sub("_.*", "", all_vcfs[vcf_index])
 save(list = c("de_novo_candidates1", "de_novo_candidates2"),
-     file = paste0("de_novo_candidates/alt_father_output_candidate_de_novo_", file_name_id, ".rda"))
+     file = paste0("de_novo_candidates/father_candidate_de_novo_", file_name_id, ".rda"))
 
 
