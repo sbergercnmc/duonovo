@@ -4,6 +4,7 @@ subdirs <- c("PMGRC-107-107-0", "PMGRC-323-323-0", "PMGRC-5-5-0",
              "PMGRC-296-296-0", "PMGRC-372-372-0", "PMGRC-482-482-0", "PMGRC-661-661-0",
              "PMGRC-320-320-0", "PMGRC-417-417-0", "PMGRC-522-522-0", "PMGRC-770-770-0")
 
+###as a first sanity check, count number of de novo variants per trio (detected via SRS)
 de_novo_count <- sapply(subdirs, function(xx) {
   file_path_de_novo <- paste0("C:\\Users\\lboukas\\ground_truth_de_novo_SR_", xx, ".rda")
   load(file = file_path_de_novo)
@@ -104,7 +105,7 @@ rownames(duo_novo_performance_vs_short_read_dn) <- c("de_novo_either", "not_test
 
 
 
-############# This computes the percentages after excluding variants not tested
+############# This computes the sensitivity percentages after excluding variants not tested
 ############# in either duo because of QC 
 duo_novo_performance_vs_short_read_dn2 <- sapply(subdirs, function(xx) {
   file_path_duo_novo <- paste0("C:\\Users\\lboukas\\alt_father_output_candidate_de_novo_", xx, ".rda")
@@ -186,6 +187,7 @@ rownames(duo_novo_performance_vs_short_read_dn2) <- c("de_novo_either", "uncerta
 
 #################################################
 #################################################
+###compute false positive rate
 duo_novo_performance_false_pos <- sapply(subdirs, function(xx) {
   file_path_duo_novo <- paste0("C:\\Users\\lboukas\\alt_father_output_candidate_de_novo_", xx, ".rda")
   load(file = file_path_duo_novo)
