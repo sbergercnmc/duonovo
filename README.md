@@ -24,7 +24,7 @@ possible).
 The development version of duoNovo can be installed as follows:
 
 ``` r
-devtools::install_github("leandrosboukas/duoNovo")
+devtools::install_github("sbergercnmc/duoNovo")
 ```
 
 duoNovo is simple to use. All it requires is a VCF containing phased
