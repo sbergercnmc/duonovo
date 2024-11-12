@@ -6,7 +6,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of duoNovo is to identify de novo variants from single
+duoNovo is an R package that identifies de novo variants from single
 parent-proband duos, that is, without having to sequence both biological
 parents. duoNovo uses phased variant calls generated via long-read
 sequencing followed by variant calling and read-backed phasing (for
@@ -21,7 +21,7 @@ possible).
 
 ## Installation
 
-The development version of duoNovo can be installed as follows:
+duoNovo can be installed as follows:
 
 ``` r
 devtools::install_github("sbergercnmc/duoNovo")
