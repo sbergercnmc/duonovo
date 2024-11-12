@@ -39,6 +39,8 @@ if (!requireNamespace("devtools", quietly = TRUE)) {
 devtools::install_github("sbergercnmc/duoNovo", dependencies = TRUE)
 ```
 
+## Run duoNovo
+
 duoNovo is simple to use. All it requires is a VCF containing phased
 variant calls. Optionally, a VCF containing variant calls from
 short-read sequencing can be used, in case one wants to only classify
@@ -47,7 +49,7 @@ calls from short-read sequencing. Some additional parameters which can
 optionally be adjusted are described below. The following is a simple
 example of how to run duoNovo.
 
-## Prepare Input VCF from Long-Read Sequencing Data
+### Prepare Input VCF from Long-Read Sequencing Data
 
 The first step is to prepare the input VCF file from long-read
 sequencing data. Below are steps to generate a suitable VCF:
@@ -68,7 +70,7 @@ sequencing data. Below are steps to generate a suitable VCF:
 Optionally, a VCF from short-read sequencing data can also be prepared
 using steps 1 and 2 above.
 
-## Run duoNovo
+### Running duoNovo
 
 The following shows how to run duoNovo, assuming we have a VCF
 “duo_proband_father.longread.hiphase.vcf.gz” from long-read sequencing,
