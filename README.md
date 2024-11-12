@@ -24,7 +24,19 @@ possible).
 duoNovo can be installed as follows:
 
 ``` r
-devtools::install_github("sbergercnmc/duoNovo")
+# Step 1: Install Bioconductor dependencies
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+    install.packages("BiocManager")
+}
+BiocManager::install(c("VariantAnnotation", "GenomicRanges", "IRanges", "S4Vectors"))
+
+# Step 2: Install devtools if not already installed
+if (!requireNamespace("devtools", quietly = TRUE)) {
+    install.packages("devtools")
+}
+
+# Step 3: Install duoNovo from GitHub
+devtools::install_github("leandrosboukas/duoNovo", dependencies = TRUE)
 ```
 
 duoNovo is simple to use. All it requires is a VCF containing phased
