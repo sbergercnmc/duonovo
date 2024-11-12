@@ -47,6 +47,26 @@ calls from short-read sequencing. Some additional parameters which can
 optionally be adjusted are described below. The following is a simple
 example of how to run duoNovo.
 
+## Prepare Input VCF from Long-Read Sequencing Data
+
+The first step is to prepare the input VCF file from long-read
+sequencing data. Below are steps to generate a suitable VCF:
+
+1.  **Call Variants**: Generate gVCF files separately for the proband
+    and the parent. A variant caller such as **DeepVariant** can be used
+    for this step.
+
+2.  **Joint Calling**: Run the generated gVCF files through **GLnexus**
+    to produce a joint-called VCF file for the duo.
+
+3.  **Phase Variants**: Use **HiPhase** (available at [HiPhase
+    GitHub](https://github.com/PacificBiosciences/HiPhase)) to phase the
+    variants. This step will annotate each phased variant with a phasing
+    set ID, which is required for reconstruction of haplotypes with
+    `duoNovo`.
+
+## Run duoNovo
+
 ``` r
 library(duoNovo)
 duoNovo_results <- duoNovo(
