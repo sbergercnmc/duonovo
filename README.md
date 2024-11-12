@@ -70,7 +70,7 @@ sequencing data. Below are steps to generate a suitable VCF:
 Optionally, a VCF from short-read sequencing data can also be prepared
 using steps 1 and 2 above.
 
-### Running duoNovo
+### Run duoNovo to classify candidate variants
 
 The following shows how to run duoNovo, assuming we have a VCF
 “duo_proband_father.longread.hiphase.vcf.gz” from long-read sequencing,
