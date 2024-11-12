@@ -36,7 +36,7 @@ if (!requireNamespace("devtools", quietly = TRUE)) {
 }
 
 # Step 3: Install duoNovo from GitHub
-devtools::install_github("leandrosboukas/duoNovo", dependencies = TRUE)
+devtools::install_github("sbergercnmc/duoNovo", dependencies = TRUE)
 ```
 
 duoNovo is simple to use. All it requires is a VCF containing phased
