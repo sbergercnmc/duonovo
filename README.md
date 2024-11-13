@@ -80,7 +80,7 @@ sequencing.
 ``` r
 library(duoNovo)
 duoNovo_results <- duoNovo(
-  "duo_proband_father.longread.hiphase.vcf.gz", 
+  LRS_phased_vcf_file_path = "duo_proband_father.longread.hiphase.vcf.gz", 
   depth_cutoff = 20, 
   GQ_cutoff = 30,
   proband_phasing = "1|0", 
@@ -89,7 +89,7 @@ duoNovo_results <- duoNovo(
   boundary_cutoff = 2000, 
   distance_cutoff = 40,
   candidate_variants_concordant_with_SRS = TRUE,
-  "duo_proband_father.shortRead.vcf.gz"
+  SRS_vcf_file_path = "duo_proband_father.shortRead.vcf.gz"
 )
 ```
 
@@ -126,5 +126,5 @@ Below is a detailed description of each argument of `duoNovo()`:
 - **candidate_variants_concordant_with_SRS**: Logical value specifying
   if candidate variants should be concordant with short-read sequencing
   (default is `TRUE` or `FALSE`).
-- **SRS_phased_vcf_file_path**: File path to the VCF containing variant
-  calls from short-read sequencing of the duo.
+- **SRS_vcf_file_path**: File path to the VCF containing variant calls
+  from short-read sequencing of the duo.
