@@ -15,6 +15,7 @@ BugReports: https://github.com/leandrosboukas/duoNovo/issues
 Imports: 
     VariantAnnotation,
     matrixStats,
+    SummarizedExperiment,
     GenomicRanges,
     IRanges,
     S4Vectors

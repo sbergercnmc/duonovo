@@ -35,8 +35,16 @@ if (!requireNamespace("devtools", quietly = TRUE)) {
     install.packages("devtools")
 }
 
+# Or alternatively using remotes
+if (!requireNamespace("remotes", quietly = TRUE)) {
+    install.packages("remotes")
+}
+
 # Step 3: Install duoNovo from GitHub
 devtools::install_github("sbergercnmc/duoNovo", dependencies = TRUE)
+
+# Or alternatively
+remotes::install_github("sbergercnmc/duoNovo", dependencies = TRUE)
 ```
 
 ## Run duoNovo

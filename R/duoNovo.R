@@ -17,11 +17,12 @@
 #' @return A `GRangesList` containing three elements: `de_novo`, `not_de_novo`, and `uncertain`.
 #' @details The function ultimately works by detecting identical by descent haplotype blocks, to determine whether each candidate variant of interest is de novo, using the genotype of only one parent. If requested, concordance with short-read sequencing can be checked.
 #'
+#' @importFrom matrixStats colMins
 #' @importFrom S4Vectors queryHits subjectHits
+#' @importFrom SummarizedExperiment rowRanges
 #' @import GenomicRanges
 #' @import IRanges
 #' @import VariantAnnotation
-#' @import matrixStats
 #' @export
 #'
 #' @examples
@@ -44,7 +45,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
 
   message("Importing LRS VCF file...")
   vcf <- readVcf(LRS_phased_vcf_file_path, genome = "hg38")
-  vcf_granges <- rowRanges(vcf)
+  vcf_granges <- SummarizedExperiment::rowRanges(vcf)
   vcf_metadata <- geno(vcf)
 
   proband_column <- grep(proband_column_identifier, samples(header(vcf)))
@@ -93,7 +94,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   if (candidate_variants_concordant_with_SRS == TRUE) {
     message("Importing SRS VCF file...")
     vcf_SR <- readVcf(SRS_vcf_file_path, genome = "hg38")
-    vcf_granges_SR <- rowRanges(vcf_SR)
+    vcf_granges_SR <- SummarizedExperiment::rowRanges(vcf_SR)
     vcf_metadata_SR <- geno(vcf_SR)
 
     proband_column <- grep(proband_column_identifier, samples(header(vcf_SR)))
