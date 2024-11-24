@@ -13,6 +13,7 @@
 #' @param distance_cutoff A numeric value specifying the minimum hamming distance cutoff to determine that a proband-parent haplotype block are not identical by descent.
 #' @param candidate_variants_concordant_with_SRS Logical value specifying if candidate variants should be concordant with short-read sequencing (default is `TRUE` or `FALSE`).
 #' @param SRS_vcf_file_path File path to the vcf containing variant calls from short-read sequencing of the duo.
+#' @param reference Reference genome name (e.g. hg38) used in the vcfs.
 #'
 #' @return A `GRangesList` containing three elements: `de_novo`, `not_de_novo`, and `uncertain`.
 #' @details The function ultimately works by detecting identical by descent haplotype blocks, to determine whether each candidate variant of interest is de novo, using the genotype of only one parent. If requested, concordance with short-read sequencing can be checked.
