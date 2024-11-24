@@ -1,6 +1,7 @@
 #!/usr/bin/bash
+#Sample script to generate a joint called trio phased vcf from a proband and 2 parent GVCF and BAMS
+#useful for testing duoNovo's output against trio based de novo calling
 
-module load bcftools
 
 if [[ -z $(which bcftools 2> /dev/null) ]]; then
    echo Dependency not met:  bcftools not found in path.  Please install bcftools or ensure bcftools is in executable PATH.
@@ -43,7 +44,7 @@ PARENT2GVCF="$5"
 PARENT2BAM="$6"
 REF="$7"
 OUTPUT="$8"
-THREADS=${7:-$(nproc)}
+THREADS=${9:-$(nproc)}
 TMPDIR=$(dirname $OUTPUT)
 
 
@@ -105,7 +106,7 @@ glnexus_cli --config DeepVariant_unfiltered --dir $TMPDIR/tmp_$PROBAND\_tmp_$$ -
                          bcftools view --write-index -Oz -o $OUTPUT\_tmpTRIO_$$\_.vcf.gz
 
 rm -rf $TMPDIR/tmp_$PROBAND\_tmp_$$
-# bcftools index /scratch/sberger/pmgrc_lr_data/inputs/$PROBAND/duo_mother.vcf.gz  NOT needed in newer versions of bcftools which accept --write-index parameter
+# bcftools index /scratch/sberger/pmgrc_lr_data/inputs/$PROBAND/duo_mother.vcf.gz  # NOT needed in newer versions of bcftools which accept --write-index parameter
 
 hiphase --bam $PROBANDBAM --bam $PARENTBAM  \
             --sample-name $PROBAND \
