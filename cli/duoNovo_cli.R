@@ -58,3 +58,5 @@ duoNovo_results <- duoNovo(
   SRS_vcf_file_path = args$SRS_vcf_file_path,
   reference = args$ref
 )
+
+duoNovo_results
