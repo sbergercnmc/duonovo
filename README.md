@@ -97,7 +97,7 @@ duoNovo_results <- duoNovo(
   boundary_cutoff = 2000, 
   distance_cutoff = 40,
   candidate_variants_concordant_with_SRS = TRUE,
-  SRS_vcf_file_path = "duo_proband_father.shortRead.vcf.gz" ,
+  SRS_vcf_file_path = "duo_proband_father.shortRead.vcf.gz",
   reference = "hg38"
 )
 ```
