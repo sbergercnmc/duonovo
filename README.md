@@ -98,6 +98,7 @@ duoNovo_results <- duoNovo(
   distance_cutoff = 40,
   candidate_variants_concordant_with_SRS = TRUE,
   SRS_vcf_file_path = "duo_proband_father.shortRead.vcf.gz"
+  reference = "hg38"
 )
 ```
 
@@ -136,3 +137,4 @@ Below is a detailed description of each argument of `duoNovo()`:
   (default is `TRUE` or `FALSE`).
 - **SRS_vcf_file_path**: File path to the VCF containing variant calls
   from short-read sequencing of the duo.
+- **reference**: name of reference genome used, e.g. hg38

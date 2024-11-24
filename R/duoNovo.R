@@ -30,12 +30,12 @@
 #' #          proband_phasing = "1|0", proband_column_identifier = "-0$",
 #' #          PS_width_cutoff = 10000, boundary_cutoff = 10000, distance_cutoff = 2000,
 #' #          candidate_variants_concordant_with_SRS = TRUE,
-#' #          SRS_vcf_file_path = my_SRS_file_path)
+#' #          SRS_vcf_file_path = my_SRS_file_path, reference = "hg38")
 duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                     proband_phasing, proband_column_identifier,
                     PS_width_cutoff = 10000, boundary_cutoff = 2000, distance_cutoff = 40,
                     candidate_variants_concordant_with_SRS = TRUE,
-                    SRS_vcf_file_path) {
+                    SRS_vcf_file_path, reference="hg38") {
   if (!file.exists(LRS_phased_vcf_file_path)) {
     stop("The LRS VCF file path does not exist: ", LRS_phased_vcf_file_path)
   }
@@ -44,7 +44,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   }
 
   message("Importing LRS VCF file...")
-  vcf <- readVcf(LRS_phased_vcf_file_path, genome = "hg38")
+  vcf <- readVcf(LRS_phased_vcf_file_path, genome = reference)
   vcf_granges <- SummarizedExperiment::rowRanges(vcf)
   vcf_metadata <- geno(vcf)
 
@@ -93,7 +93,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   # Optional: Restrict to candidate variants concordant with short-read sequencing
   if (candidate_variants_concordant_with_SRS == TRUE) {
     message("Importing SRS VCF file...")
-    vcf_SR <- readVcf(SRS_vcf_file_path, genome = "hg38")
+    vcf_SR <- readVcf(SRS_vcf_file_path, genome = reference)
     vcf_granges_SR <- SummarizedExperiment::rowRanges(vcf_SR)
     vcf_metadata_SR <- geno(vcf_SR)
 

@@ -80,7 +80,8 @@ duoNovo_results <- duoNovo(
   boundary_cutoff = 2000, 
   distance_cutoff = 40,
   candidate_variants_concordant_with_SRS = TRUE,
-  SRS_vcf_file_path = "duo_proband_father.shortRead.vcf.gz"
+  SRS_vcf_file_path = "duo_proband_father.shortRead.vcf.gz",
+  reference = "hg38"
 )
 ```
 
@@ -98,4 +99,5 @@ Below is a detailed description of each argument of `duoNovo()`:
 - **distance_cutoff**: A numeric value specifying the minimum Hamming distance cutoff to determine that a proband-parent haplotype block is not identical by descent.
 - **candidate_variants_concordant_with_SRS**: Logical value specifying if candidate variants should be concordant with short-read sequencing (default is `TRUE` or `FALSE`).
 - **SRS_vcf_file_path**: File path to the VCF containing variant calls from short-read sequencing of the duo.
+- **reference**: Name of reference genome (e.g. hg38) used by the vcf.
 
