@@ -112,7 +112,7 @@ hiphase --bam $PROBANDBAM --bam $PARENTBAM  \
             --sample-name $PROBAND \
             --sample-name $PARENT1 \
             --sample-name $PARENT2 \
-            --threads $THREADS
+            --threads $THREADS \
             --vcf  $OUTPUT\_tmpTRIO_$$\_.vcf.gz \
             --output-vcf $OUTPUT \
             --reference $REF

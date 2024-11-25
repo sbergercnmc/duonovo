@@ -91,7 +91,7 @@ else
     hiphase --bam $PROBANDBAM --bam $PARENTBAM  \
              --sample-name $PROBAND \
              --sample-name $PARENT \
-             --threads $THREADS
+             --threads $THREADS \
              --vcf  $OUTPUT\_tmpDUO_$$\_.vcf.gz \
              --output-vcf $OUTPUT \
              --reference $REF
