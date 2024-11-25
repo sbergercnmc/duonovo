@@ -39,7 +39,7 @@ if (! is.null(args$SRS_vcf_file_path)){
    args$use_SRS <- TRUE
 }
 
-# print some progress messages to stderr if "quietly" wasn't requested
+# print values of command line parameters to stderr if "quietly" wasn't requested
 if ( args$verbose ) { 
     write(paste(names(args),args, sep=" --> "), stderr() )
 }
