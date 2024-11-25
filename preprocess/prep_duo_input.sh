@@ -23,12 +23,12 @@ if [[ -z "$6" ]]; then #allows a task ID to be passed to command line if not run
   echo Usage: prep_duo_input.sh PROBAND_GVCF PROBAND_BAM PARENT_GVCF PARENT_BAM REFERENCE_FASTA OUTPUT_VCF [THREADS:default nproc]
   echo Requires: bcftools, glnexus_cli, hiphase
   echo Inputs:
-  echo PROBAND_GVCF: g.vcf file from the proband (can be g.vcf or g.vcf.gz)
-  echo PROBAND_BAM: bam (or cram) file from the proband
-  echo PARENT_GVCF: g.vcf file from the parent (can be g.vcg or g.vcf.gz)
-  echo PARENT_BAM: bam (or cram) file from the proband
+  echo PROBAND_GVCF: g.vcf file from the proband \(can be g.vcf or g.vcf.gz\)
+  echo PROBAND_BAM: bam \(or cram\) file from the proband
+  echo PARENT_GVCF: g.vcf file from the parent \(can be g.vcg or g.vcf.gz\)
+  echo PARENT_BAM: bam \(or cram\) file from the proband
   echo REFERENCE_FASTA: reference fasta file for the aligned sequences
-  echo OUTPUT_VCF: vcf file to be created, a joint called (glnexus DeepVariant_unfiltered) duo vcf with both samples with phasing added from hiphase
+  echo OUTPUT_VCF: vcf file to be created, a joint called \(glnexus DeepVariant_unfiltered\) duo vcf with both samples with phasing added from hiphase
   echo optional  THREADS: number of thread to use for glnexus and hiphase.  Default is is nproc - $(nproc)
   echo optional  TMP_DIRECTORY: Folder to store glnexus temporary files.  This this be deleted before and after the script.
 else
