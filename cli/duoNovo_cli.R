@@ -8,7 +8,7 @@ parser <- ArgumentParser()
 
 # specify our desired options 
 # by default ArgumentParser will add an help option 
-parser$add_argument("-v", "--verbose", action="store_true",  default=TRUE,  help="Print extra output [default TRUE]")
+parser$add_argument("-v", "--verbose", action="store_true",  default=TRUE,  help="Print extra output/parameter values [default TRUE]")
 parser$add_argument("-q", "--quietly", action="store_false", dest="verbose", help="Print little output")
 parser$add_argument("-d", "--depth_cutoff", type="integer", default=20, 
                      help="Depth cutoff for variant evaluation [default %(default)d]",
