@@ -105,7 +105,7 @@ glnexus_cli --config DeepVariant_unfiltered --dir $TMPDIR/tmp_GLNEXUS_$PROBAND\_
 
 # bcftools index /scratch/sberger/pmgrc_lr_data/inputs/$PROBAND/duo_mother.vcf.gz  # NOT needed in newer versions of bcftools which accept --write-index parameter
 
-hiphase --bam $PROBANDBAM --bam $PARENTBAM  \
+hiphase --bam $PROBANDBAM --bam $PARENT1BAM  --bam $PARENT2BAM \
             --sample-name $PROBAND \
             --sample-name $PARENT1 \
             --sample-name $PARENT2 \
@@ -114,5 +114,5 @@ hiphase --bam $PROBANDBAM --bam $PARENTBAM  \
             --output-vcf $OUTPUT \
             --reference $REF
 
-rm -f $TMPDIR
+rm -rf $TMPDIR
 
