@@ -30,7 +30,6 @@ if [[ -z "$6" ]]; then #allows a task ID to be passed to command line if not run
   echo REFERENCE_FASTA: reference fasta file for the aligned sequences
   echo OUTPUT_VCF: vcf file to be created, a joint called \(glnexus DeepVariant_unfiltered\) duo vcf with both samples with phasing added from hiphase
   echo optional  THREADS: number of thread to use for glnexus and hiphase.  Default is is nproc - $(nproc)
-  echo optional  TMP_DIRECTORY: Folder to store glnexus temporary files.  This this be deleted before and after the script.
 else
 
   PROBANDGVCF="$1"
@@ -40,7 +39,6 @@ else
   REF="$5"
   OUTPUT="$6"
   THREADS=${7:-$(nproc)}
-  TMPDIR=$(dirname $OUTPUT)
 
 
    if [ ! -f "$PROBANDGVCF" ]; then
@@ -78,24 +76,22 @@ else
       exit
   fi
 
-
-   rm -rf $TMPDIR/tmp_$PROBAND\_tmp_$$
+   TMPDIR=$(dirname $OUTPUT)/tmp_duo_$PROBAND\_$PARENT\_$$
 
    mkdir -p $TMPDIR
-   glnexus_cli --config DeepVariant_unfiltered --dir $TMPDIR/tmp_$PROBAND\_tmp_$$ --threads $THREADS $PROBANDGVCF $PARENTGVCF | \
-                         bcftools view --write-index -Oz -o $OUTPUT\_tmpDUO_$$\_.vcf.gz
+   glnexus_cli --config DeepVariant_unfiltered --dir $TMPDIR/tmp_GLNEXUS_$PROBAND\_$PARENT\_$$ --threads $THREADS $PROBANDGVCF $PARENTGVCF | \
+                         bcftools view --write-index -Oz -o $TMPDIR/unphased_duo_$PROBAND\_$PARENT.vcf.gz
 
-   rm -rf $TMPDIR/tmp_$PROBAND\_tmp_$$
     # bcftools index /scratch/sberger/pmgrc_lr_data/inputs/$PROBAND/duo_mother.vcf.gz  NOT needed in newer versions of bcftools which accept --write-index parameter
 
     hiphase --bam $PROBANDBAM --bam $PARENTBAM  \
              --sample-name $PROBAND \
              --sample-name $PARENT \
              --threads $THREADS \
-             --vcf  $OUTPUT\_tmpDUO_$$\_.vcf.gz \
+             --vcf $TMPDIR/unphased_duo_$PROBAND\_$PARENT.vcf.gz \
              --output-vcf $OUTPUT \
              --reference $REF
 
-   rm -rf $OUTPUT\_tmpDUO_$$\_.vcf
+   rm -rf $TMPDIR
 
 fi

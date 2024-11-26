@@ -27,12 +27,11 @@ if [[ -z "$8" ]]; then #allows a task ID to be passed to command line if not run
   echo PROBAND_BAM: bam \(or cram\) file from the proband
   echo PARENT1_GVCF: g.vcf file from the parent1 \(can be g.vcg or g.vcf.gz\)
   echo PARENT1_BAM: bam \(or cram\) file from the parent1
-  echo PARENT2_GVCF: g.vcf file from the parent1 (can be g.vcg or g.vcf.gz)
+  echo PARENT2_GVCF: g.vcf file from the parent1 \(can be g.vcg or g.vcf.gz\)
   echo PARENT2_BAM: bam \(or cram\) file from the parent1
   echo REFERENCE_FASTA: reference fasta file for the aligned sequences
   echo OUTPUT_VCF: vcf file to be created, a joint called \(glnexus DeepVariant_unfiltered\) duo vcf with both samples with phasing added from hiphase
   echo optional  THREADS: number of thread to use for glnexus and hiphase.  Default is is nproc - $(nproc)
-  echo optional  TMP_DIRECTORY: Folder to store glnexus temporary files.  This this be deleted before and after the script.
   exit
 fi
 
@@ -45,7 +44,6 @@ PARENT2BAM="$6"
 REF="$7"
 OUTPUT="$8"
 THREADS=${9:-$(nproc)}
-TMPDIR=$(dirname $OUTPUT)
 
 
 if [ ! -f "$PROBANDGVCF" ]; then
@@ -99,13 +97,12 @@ if [[ -z "$PARENT2" ]]; then
 fi
 
 
-rm -rf $TMPDIR/tmp_$PROBAND\_tmp_$$
+TMPDIR=$(dirname $OUTPUT)/tmp_trio_$PROBAND\_$PARENT1\_$PARENT2\_$$
 
 mkdir -p $TMPDIR
-glnexus_cli --config DeepVariant_unfiltered --dir $TMPDIR/tmp_$PROBAND\_tmp_$$ --threads $THREADS $PROBANDGVCF $PARENT1GVCF $PARENT2GVCF | \
-                         bcftools view --write-index -Oz -o $OUTPUT\_tmpTRIO_$$\_.vcf.gz
+glnexus_cli --config DeepVariant_unfiltered --dir $TMPDIR/tmp_GLNEXUS_$PROBAND\_$PARENT1\_$PARENT2_$$ --threads $THREADS $PROBANDGVCF $PARENT1GVCF $PARENT2GVCF | \
+                         bcftools view --write-index -Oz -o $TMPDIR/unphased_tmpTRIO_$PROBAND\_$PARENT1\_$PARENT2\_$$.vcf.gz
 
-rm -rf $TMPDIR/tmp_$PROBAND\_tmp_$$
 # bcftools index /scratch/sberger/pmgrc_lr_data/inputs/$PROBAND/duo_mother.vcf.gz  # NOT needed in newer versions of bcftools which accept --write-index parameter
 
 hiphase --bam $PROBANDBAM --bam $PARENTBAM  \
@@ -113,9 +110,9 @@ hiphase --bam $PROBANDBAM --bam $PARENTBAM  \
             --sample-name $PARENT1 \
             --sample-name $PARENT2 \
             --threads $THREADS \
-            --vcf  $OUTPUT\_tmpTRIO_$$\_.vcf.gz \
+            --vcf $TMPDIR/unphased_tmpTRIO_$PROBAND\_$PARENT1\_$PARENT2\_$$.vcf.gz \
             --output-vcf $OUTPUT \
             --reference $REF
 
-rm -f $OUTPUT\_tmpTRIO_$$\_.vcf.gz
+rm -f $TMPDIR
 
