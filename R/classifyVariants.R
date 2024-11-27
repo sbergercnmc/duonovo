@@ -74,24 +74,24 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
 
     # Count the types of variant pair comparisons for each haplotype pair
     counts_het_hom[, i] <- c(
-      sum(hap_mat[, "hap11"] %in% het & hap_mat[, "hap12"] %in% hom, na.rm = TRUE),
-      sum(hap_mat[, "hap11"] %in% het & hap_mat[, "hap22"] %in% hom, na.rm = TRUE),
-      sum(hap_mat[, "hap21"] %in% het & hap_mat[, "hap12"] %in% hom, na.rm = TRUE),
-      sum(hap_mat[, "hap21"] %in% het & hap_mat[, "hap22"] %in% hom, na.rm = TRUE)
+      sum(hap11 %in% het & hap12 %in% hom, na.rm = TRUE),
+      sum(hap11 %in% het & hap22 %in% hom, na.rm = TRUE),
+      sum(hap21 %in% het & hap12 %in% hom, na.rm = TRUE),
+      sum(hap21 %in% het & hap22 %in% hom, na.rm = TRUE)
     )
 
     counts_het_het[, i] <- c(
-      sum(hap_mat[, "hap11"] %in% het & hap_mat[, "hap12"] %in% het, na.rm = TRUE),
-      sum(hap_mat[, "hap11"] %in% het & hap_mat[, "hap22"] %in% het, na.rm = TRUE),
-      sum(hap_mat[, "hap21"] %in% het & hap_mat[, "hap12"] %in% het, na.rm = TRUE),
-      sum(hap_mat[, "hap21"] %in% het & hap_mat[, "hap22"] %in% het, na.rm = TRUE)
+      sum(hap11 %in% het & hap12 %in% het, na.rm = TRUE),
+      sum(hap11 %in% het & hap22 %in% het, na.rm = TRUE),
+      sum(hap21 %in% het & hap12 %in% het, na.rm = TRUE),
+      sum(hap21 %in% het & hap22 %in% het, na.rm = TRUE)
     )
 
     counts_hom_het[, i] <- c(
-      sum(hap_mat[, "hap11"] %in% hom & hap_mat[, "hap12"] %in% het, na.rm = TRUE),
-      sum(hap_mat[, "hap11"] %in% hom & hap_mat[, "hap22"] %in% het, na.rm = TRUE),
-      sum(hap_mat[, "hap21"] %in% hom & hap_mat[, "hap12"] %in% het, na.rm = TRUE),
-      sum(hap_mat[, "hap21"] %in% hom & hap_mat[, "hap22"] %in% het, na.rm = TRUE)
+      sum(hap11 %in% hom & hap12 %in% het, na.rm = TRUE),
+      sum(hap11 %in% hom & hap22 %in% het, na.rm = TRUE),
+      sum(hap21 %in% hom & hap12 %in% het, na.rm = TRUE),
+      sum(hap21 %in% hom & hap22 %in% het, na.rm = TRUE)
     )
   }
 
