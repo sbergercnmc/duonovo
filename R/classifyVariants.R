@@ -104,13 +104,13 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
 
   hamming_distance_mins <- colMins(hamming_distance_mat)
 
-  hamming_distance_mins_1vs1 <- colMins(hamming_distance_mat[, 1, drop = FALSE])
-  hamming_distance_mins_1vs2 <- colMins(hamming_distance_mat[, 2, drop = FALSE])
-  hamming_distance_mins_2vs1 <- colMins(hamming_distance_mat[, 3, drop = FALSE])
-  hamming_distance_mins_2vs2 <- colMins(hamming_distance_mat[, 4, drop = FALSE])
+  hamming_distance_mins_1vs1 <- colMins(hamming_distance_mat[1, , drop = FALSE])
+  hamming_distance_mins_1vs2 <- colMins(hamming_distance_mat[2, , drop = FALSE])
+  hamming_distance_mins_2vs1 <- colMins(hamming_distance_mat[3, , drop = FALSE])
+  hamming_distance_mins_2vs2 <- colMins(hamming_distance_mat[4, , drop = FALSE])
 
-  hamming_distance_mins_hap1 <- colMins(hamming_distance_mat[, 1:2])
-  hamming_distance_mins_hap2 <- colMins(hamming_distance_mat[, 3:4])
+  hamming_distance_mins_hap1 <- colMins(hamming_distance_mat[1:2, ])
+  hamming_distance_mins_hap2 <- colMins(hamming_distance_mat[3:4, ])
 
   clean_inheritance_hap1vs1 <- which(hamming_distance_mins_1vs1 == 0 & hamming_distance_mins_1vs2 > 0 &
                                         hamming_distance_mins_hap2 > distance_cutoff)

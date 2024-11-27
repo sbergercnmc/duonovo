@@ -185,8 +185,13 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   output_sorted <- sort(output)
   
   message("Writing classified variants to VCF file...")
-  # Create a DataFrame for info columns, adding the classifications
   info <- DataFrame(
+    phasing_proband = output_sorted$phasing1,
+    phasing_parent = output_sorted$phasing2,
+    depth_proband = output_sorted$depth1,
+    depth_parent = output_sorted$depth2,
+    GQ_proband = output_sorted$GQ1,
+    GQ_parent = output_sorted$GQ2,
     duoNovo_classification = output_sorted$duoNovo_classification,
     hamming_distance_other_parent_hap = output_sorted$hamming_distance_other_parent_hap,
     supporting_counts_het_hom = output_sorted$supporting_counts_het_hom,
@@ -194,9 +199,11 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     supporting_counts_hom_het = output_sorted$supporting_counts_hom_het
   )
   
-  # Create the VCF object and save it to the current directory
-  vcf_out <- VCF(rowRanges = output_sorted, info = info)
+  # Create a VCF object
+  vcf_out <- VCF(
+    rowRanges = output_sorted,
+    info = info
+  )  
   writeVcf(vcf_out, output_vcf_path)
-  
   return(output_sorted)
 }
