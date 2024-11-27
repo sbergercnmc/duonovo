@@ -256,7 +256,7 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     } else {
       de_novo22 <- GRanges()
     }
-    de_novo <- c(de_novo11, de_novo12)
+    de_novo <- c(de_novo21, de_novo22)
 
     if (!is.null(hap11_inherited) | !is.null(hap12_inherited)){
       not_de_novo_indices <- c(hap11_inherited, hap12_inherited)
