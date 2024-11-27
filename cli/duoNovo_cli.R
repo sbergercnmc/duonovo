@@ -43,7 +43,7 @@ if (! is.null(args$SRS_vcf_file_path)){
 
 candidateCoords <- NULL
 if (!is.null(args$candidate_variant_coordinates)){
-     candidateCoords <- strsplit(args$candidate_variant_coordinates , '[,;]+')
+     candidateCoords <- unlist(strsplit(args$candidate_variant_coordinates , '[,;]+'))
 }
 
 if (is.null(args$output_vcf) ) {
