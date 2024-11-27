@@ -116,9 +116,9 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     hap11_inherited <- unlist(hap11_variants_by_hap_block)
     hap11_hamming_distance_other_parent_hap <- rep(hamming_distance_mins_hap2[clean_inheritance_hap1vs1],
                                                    lengths(hap11_variants_by_hap_block))
-    hap11_supporting_counts_het_hom <- rep(counts_het_hom[1, clean_inheritance_hap1vs1], lengths(hap11_variants_by_hap_block))
-    hap11_supporting_counts_het_het <- rep(counts_het_het[1, clean_inheritance_hap1vs1], lengths(hap11_variants_by_hap_block))
-    hap11_supporting_counts_hom_het <- rep(counts_hom_het[1, clean_inheritance_hap1vs1], lengths(hap11_variants_by_hap_block))
+    hap11_supporting_counts_het_hom <- rep(counts_het_hom[clean_inheritance_hap1vs1], lengths(hap11_variants_by_hap_block))
+    hap11_supporting_counts_het_het <- rep(counts_het_het[clean_inheritance_hap1vs1], lengths(hap11_variants_by_hap_block))
+    hap11_supporting_counts_hom_het <- rep(counts_hom_het[clean_inheritance_hap1vs1], lengths(hap11_variants_by_hap_block))
   } else {
     hap11_inherited <- NULL
   }
@@ -129,9 +129,9 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     hap12_inherited <- unlist(hap12_variants_by_hap_block)
     hap12_hamming_distance_other_parent_hap <- rep(hamming_distance_mins_hap2[clean_inheritance_hap1vs2],
                                                    lengths(hap12_variants_by_hap_block))
-    hap12_supporting_counts_het_hom <- rep(counts_het_hom[2, clean_inheritance_hap1vs2], lengths(hap12_variants_by_hap_block))
-    hap12_supporting_counts_het_het <- rep(counts_het_het[2, clean_inheritance_hap1vs2], lengths(hap12_variants_by_hap_block))
-    hap12_supporting_counts_hom_het <- rep(counts_hom_het[2, clean_inheritance_hap1vs2], lengths(hap12_variants_by_hap_block))
+    hap12_supporting_counts_het_hom <- rep(counts_het_hom[clean_inheritance_hap1vs2], lengths(hap12_variants_by_hap_block))
+    hap12_supporting_counts_het_het <- rep(counts_het_het[clean_inheritance_hap1vs2], lengths(hap12_variants_by_hap_block))
+    hap12_supporting_counts_hom_het <- rep(counts_hom_het[clean_inheritance_hap1vs2], lengths(hap12_variants_by_hap_block))
   } else {
     hap12_inherited <- NULL
   }
@@ -142,9 +142,9 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     hap21_inherited <- unlist(hap21_variants_by_hap_block)
     hap21_hamming_distance_other_parent_hap <- rep(hamming_distance_mins_hap1[clean_inheritance_hap2vs1],
                                                    lengths(hap21_variants_by_hap_block))
-    hap21_supporting_counts_het_hom <- rep(counts_het_hom[3, clean_inheritance_hap2vs1], lengths(hap21_variants_by_hap_block))
-    hap21_supporting_counts_het_het <- rep(counts_het_het[3, clean_inheritance_hap2vs1], lengths(hap21_variants_by_hap_block))
-    hap21_supporting_counts_hom_het <- rep(counts_hom_het[3, clean_inheritance_hap2vs1], lengths(hap21_variants_by_hap_block))
+    hap21_supporting_counts_het_hom <- rep(counts_het_hom[clean_inheritance_hap2vs1], lengths(hap21_variants_by_hap_block))
+    hap21_supporting_counts_het_het <- rep(counts_het_het[clean_inheritance_hap2vs1], lengths(hap21_variants_by_hap_block))
+    hap21_supporting_counts_hom_het <- rep(counts_hom_het[clean_inheritance_hap2vs1], lengths(hap21_variants_by_hap_block))
   } else {
     hap21_inherited <- NULL
   }
@@ -155,9 +155,9 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     hap22_inherited <- unlist(hap22_variants_by_hap_block)
     hap22_hamming_distance_other_parent_hap <- rep(hamming_distance_mins_hap1[clean_inheritance_hap2vs2],
                                                    lengths(hap22_variants_by_hap_block))
-    hap22_supporting_counts_het_hom <- rep(counts_het_hom[4, clean_inheritance_hap2vs2], lengths(hap22_variants_by_hap_block))
-    hap22_supporting_counts_het_het <- rep(counts_het_het[4, clean_inheritance_hap2vs2], lengths(hap22_variants_by_hap_block))
-    hap22_supporting_counts_hom_het <- rep(counts_hom_het[4, clean_inheritance_hap2vs2], lengths(hap22_variants_by_hap_block))
+    hap22_supporting_counts_het_hom <- rep(counts_het_hom[clean_inheritance_hap2vs2], lengths(hap22_variants_by_hap_block))
+    hap22_supporting_counts_het_het <- rep(counts_het_het[clean_inheritance_hap2vs2], lengths(hap22_variants_by_hap_block))
+    hap22_supporting_counts_hom_het <- rep(counts_hom_het[clean_inheritance_hap2vs2], lengths(hap22_variants_by_hap_block))
   } else {
     hap22_inherited <- NULL
   }
