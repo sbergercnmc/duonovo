@@ -21,12 +21,12 @@
 #'       Counts representing variant pairs used to calculate Hamming distance.
 #'   }
 #' @examples
-#' classifyVariants(candidate_variant_granges = candidate_variants,
-#'                  phasing_orientation = "left",
-#'                  haplotype_granges = haplotypes,
-#'                  haplotype_boundary_coordinate_granges = haplotype_boundaries,
-#'                  boundary_cutoff = 2000,
-#'                  distance_cutoff = 40)
+#' # classifyVariants(candidate_variant_granges = candidate_variants,
+#' #                phasing_orientation = "left",
+#' #                 haplotype_granges = haplotypes,
+#' #                haplotype_boundary_coordinate_granges = haplotype_boundaries,
+#' #                  boundary_cutoff = 2000,
+#' #                  distance_cutoff = 40)
 #'
 #' @export
 classifyVariants <- function(candidate_variant_granges, phasing_orientation = c("left", "right"),
