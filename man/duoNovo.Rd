@@ -8,13 +8,15 @@ duoNovo(
   LRS_phased_vcf_file_path,
   depth_cutoff = 20,
   GQ_cutoff = 30,
-  proband_phasing,
   proband_column_identifier,
   PS_width_cutoff = 10000,
   boundary_cutoff = 2000,
   distance_cutoff = 40,
   candidate_variants_concordant_with_SRS = TRUE,
-  SRS_vcf_file_path
+  SRS_vcf_file_path,
+  reference = "hg38",
+  candidate_variant_coordinates = NULL,
+  output_vcf_path
 )
 }
 \arguments{
@@ -23,8 +25,6 @@ duoNovo(
 \item{depth_cutoff}{A numeric value specifying the minimum sequencing depth for variants to be included in the analysis. The same cutoff applies to both proband and parent variants, for both LRS and SRS (if used).}
 
 \item{GQ_cutoff}{A numeric value specifying the minimum GQ (genotype quality) for variants to be included in the analysis. The same cutoff applies to both proband and parent variants, for both LRS and SRS (if used).}
-
-\item{proband_phasing}{A character string indicating the phasing of the proband, either "1|0" or "0|1".}
 
 \item{proband_column_identifier}{A character corresponding to an identifier for the proband column in the metadata matrices. Should be the same for both the LRS vcf and (if used) the SRS vcf.}
 
@@ -37,6 +37,12 @@ duoNovo(
 \item{candidate_variants_concordant_with_SRS}{Logical value specifying if candidate variants should be concordant with short-read sequencing (default is \code{TRUE} or \code{FALSE}).}
 
 \item{SRS_vcf_file_path}{File path to the vcf containing variant calls from short-read sequencing of the duo.}
+
+\item{reference}{Reference genome name (e.g. hg38) used in the vcfs.}
+
+\item{candidate_variant_coordinates}{List of coordinates for specific variants of interest.}
+
+\item{output_vcf_path}{File path for output vcf.}
 }
 \value{
 A \code{GRangesList} containing three elements: \code{de_novo}, \code{not_de_novo}, and \code{uncertain}.
@@ -53,5 +59,5 @@ The function ultimately works by detecting identical by descent haplotype blocks
 #          proband_phasing = "1|0", proband_column_identifier = "-0$",
 #          PS_width_cutoff = 10000, boundary_cutoff = 10000, distance_cutoff = 2000,
 #          candidate_variants_concordant_with_SRS = TRUE,
-#          SRS_vcf_file_path = my_SRS_file_path)
+#          SRS_vcf_file_path = my_SRS_file_path, reference = "hg38")
 }

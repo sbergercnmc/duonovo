@@ -14,12 +14,13 @@
 #' @param SRS_vcf_file_path File path to the vcf containing variant calls from short-read sequencing of the duo.
 #' @param reference Reference genome name (e.g. hg38) used in the vcfs.
 #' @param candidate_variant_coordinates List of coordinates for specific variants of interest.
+#' @param output_vcf_path File path for output vcf.
 #'
 #' @return A `GRangesList` containing three elements: `de_novo`, `not_de_novo`, and `uncertain`.
 #' @details The function ultimately works by detecting identical by descent haplotype blocks, to determine whether each candidate variant of interest is de novo, using the genotype of only one parent. If requested, concordance with short-read sequencing can be checked.
 #'
 #' @importFrom matrixStats colMins 
-#' @importFrom S4Vectors queryHits subjectHits
+#' @importFrom S4Vectors queryHits subjectHits DataFrame
 #' @importFrom SummarizedExperiment rowRanges
 #' @import GenomicRanges
 #' @import IRanges
@@ -37,7 +38,8 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                     PS_width_cutoff = 10000, boundary_cutoff = 2000, distance_cutoff = 40,
                     candidate_variants_concordant_with_SRS = TRUE,
                     SRS_vcf_file_path, reference = "hg38", 
-                    candidate_variant_coordinates = NULL) {
+                    candidate_variant_coordinates = NULL, 
+                    output_vcf_path) {
   if (!file.exists(LRS_phased_vcf_file_path)) {
     stop("The LRS VCF file path does not exist: ", LRS_phased_vcf_file_path)
   }
@@ -166,5 +168,22 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                                            boundary_cutoff = boundary_cutoff, distance_cutoff = distance_cutoff)
   
   duo_novo_classifications <- c(classifications_left, classifications_right)
-  duo_novo_classifications
+  output <- duo_novo_classifications
+  output_sorted <- sort(output)
+  
+  message("Writing classified variants to VCF file...")
+  # Create a DataFrame for info columns, adding the classifications
+  info <- DataFrame(
+    duoNovo_classification = output_sorted$duoNovo_classification,
+    hamming_distance_other_parent_hap = output_sorted$hamming_distance_other_parent_hap,
+    supporting_counts_het_hom = output_sorted$supporting_counts_het_hom,
+    supporting_counts_het_het = output_sorted$supporting_counts_het_het,
+    supporting_counts_hom_het = output_sorted$supporting_counts_hom_het
+  )
+  
+  # Create the VCF object and save it to the current directory
+  vcf_out <- VCF(rowRanges = output_sorted, info = info)
+  writeVcf(vcf_out, output_vcf_path)
+  
+  return(output_sorted)
 }
