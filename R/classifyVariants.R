@@ -50,9 +50,9 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
   haplotype_granges_no_denovo <- haplotype_granges[-unique(queryHits(findOverlaps(haplotype_granges,
                                                                                   candidate_variant_granges)))]
 
-  counts_het_hom <- matrix(NA, nrow = 4, ncol = length(seq_along(indices)))
-  counts_het_het <- matrix(NA, nrow = 4, ncol = length(seq_along(indices)))
-  counts_hom_het <- matrix(NA, nrow = 4, ncol = length(seq_along(indices)))
+  counts_het_hom <- rep(NA, length(seq_along(indices)))
+  counts_het_het <- rep(NA, length(seq_along(indices)))
+  counts_hom_het <- rep(NA, length(seq_along(indices)))
   het <- c("0|1", "1|0", "0|2", "2|0", "1|2", "2|1",
            "0|3", "3|0", "1|3", "3|1", "2|3", "3|2", "0|4", "4|0", "1|4", "4|1", "2|4", "4|2", "3|4", "4|3")
   hom <- c("0/0", "1/1", "2/2", "3/3", "4/4")
@@ -73,26 +73,13 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     haplotypes[[i]] <- hap_mat
 
     # Count the types of variant pair comparisons for each haplotype pair
-    counts_het_hom[, i] <- c(
-      sum(hap11 %in% het & hap12 %in% hom, na.rm = TRUE),
-      sum(hap11 %in% het & hap22 %in% hom, na.rm = TRUE),
-      sum(hap21 %in% het & hap12 %in% hom, na.rm = TRUE),
-      sum(hap21 %in% het & hap22 %in% hom, na.rm = TRUE)
-    )
+    counts_het_hom[i] <- sum((variant_granges$phasing1 %in% het) &
+                                 (variant_granges$phasing2 %in% hom), na.rm = TRUE)
+    counts_het_het[i] <- sum((variant_granges$phasing1 %in% het) &
+                                 (variant_granges$phasing2 %in% het), na.rm = TRUE)
 
-    counts_het_het[, i] <- c(
-      sum(hap11 %in% het & hap12 %in% het, na.rm = TRUE),
-      sum(hap11 %in% het & hap22 %in% het, na.rm = TRUE),
-      sum(hap21 %in% het & hap12 %in% het, na.rm = TRUE),
-      sum(hap21 %in% het & hap22 %in% het, na.rm = TRUE)
-    )
-
-    counts_hom_het[, i] <- c(
-      sum(hap11 %in% hom & hap12 %in% het, na.rm = TRUE),
-      sum(hap11 %in% hom & hap22 %in% het, na.rm = TRUE),
-      sum(hap21 %in% hom & hap12 %in% het, na.rm = TRUE),
-      sum(hap21 %in% hom & hap22 %in% het, na.rm = TRUE)
-    )
+    counts_hom_het[i] <- sum((variant_granges$phasing1 %in% hom) &
+                                 (variant_granges$phasing2 %in% het), na.rm = TRUE)
   }
 
   hamming_distance_mat <- sapply(haplotypes, function(xx)
