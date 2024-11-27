@@ -270,7 +270,7 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
       not_de_novo <- GRanges()
     }
 
-    if (length(uncertain) > 0){
+    if (!is.null(uncertain)){
       uncertain <- candidate_variant_granges[uncertain]
       uncertain$duoNovo_classification <- "uncertain"
       uncertain$hamming_distance_other_parent_hap <- NA
