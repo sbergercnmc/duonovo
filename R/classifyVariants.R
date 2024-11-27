@@ -238,9 +238,9 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
       de_novo21$duoNovo_classification <- "de novo"
       #add columns for supporting evidence of de novo classification
       de_novo21$hamming_distance_other_parent_hap <- hap21_hamming_distance_other_parent_hap
-      de_novo21$supporting_counts_het_hom <- hap11_supporting_counts_het_hom
-      de_novo21$supporting_counts_het_het <- hap11_supporting_counts_het_het
-      de_novo21$supporting_counts_hom_het <- hap11_supporting_counts_hom_het
+      de_novo21$supporting_counts_het_hom <- hap21_supporting_counts_het_hom
+      de_novo21$supporting_counts_het_het <- hap21_supporting_counts_het_het
+      de_novo21$supporting_counts_hom_het <- hap21_supporting_counts_hom_het
     } else {
       de_novo21 <- GRanges()
     }
