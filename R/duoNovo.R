@@ -100,18 +100,24 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
       ))
     
     candidate_variant_indices <- unique(queryHits(findOverlaps(hap_granges, candidate_variant_granges)))
-    candidate_variant_granges_combined <- hap_granges[candidate_variant_indices]
-    candidate_variant_granges_left <- candidate_variant_granges_combined[
-      which(candidate_variant_granges_combined$phasing1 == "1|0")]
-    candidate_variant_granges_right <- candidate_variant_granges_combined[
-      which(candidate_variant_granges_combined$phasing1 == "0|1")]
-    
+    ranges_to_subset <- hap_granges[candidate_variant_indices]
+    candidate_variant_indices_left <- which(ranges_to_subset$phasing1 == "1|0" & ranges_to_subset$phasing2 == "0/0")  
+    candidate_variant_indices_right <- which(ranges_to_subset$phasing1 == "0|1" & ranges_to_subset$phasing2 == "0/0")
   } else { # Otherwise, identify candidate de novo variants directly from genotypes
-    candidate_variant_indices_left <- which(hap_granges$phasing1 == "1|0" & hap_granges$phasing2 == "0/0")  
-    candidate_variant_indices_right <- which(hap_granges$phasing1 == "0|1" & hap_granges$phasing2 == "0/0")
-    candidate_variant_granges_left <- hap_granges[candidate_variant_indices_left]
-    candidate_variant_granges_right <- hap_granges[candidate_variant_indices_right]
+    ranges_to_subset <- hap_granges
+    candidate_variant_indices_left <- which(ranges_to_subset$phasing1 == "1|0" & ranges_to_subset$phasing2 == "0/0")  
+    candidate_variant_indices_right <- which(ranges_to_subset$phasing1 == "0|1" & ranges_to_subset$phasing2 == "0/0")
   }
+  if (length(candidate_variant_indices_left) > 0){
+    candidate_variant_granges_left <- ranges_to_subset[candidate_variant_indices_left]
+  } else {
+    candidate_variant_granges_left <- GRanges()
+  }
+  if (length(candidate_variant_indices_right) > 0){
+    candidate_variant_granges_right <- ranges_to_subset[candidate_variant_indices_right]
+  } else {
+    candidate_variant_granges_right <- GRanges()
+  }  
   
   # Optional: Restrict to candidate variants concordant with short-read sequencing
   if (candidate_variants_concordant_with_SRS == TRUE) {
@@ -158,15 +164,22 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
 
   # Finding overlaps and analyzing haplotypes
   message("Classifying variants...")
-  classifications_left <- classifyVariants(candidate_variant_granges_left, phasing_orientation = "left", 
-                                           haplotype_granges = hap_granges, 
-                                           haplotype_boundary_coordinate_granges = hap_boundary_coordinates, 
-                                           boundary_cutoff = boundary_cutoff, distance_cutoff = distance_cutoff)
-  classifications_right <- classifyVariants(candidate_variant_granges_right, phasing_orientation = "right", 
-                                           haplotype_granges = hap_granges, 
-                                           haplotype_boundary_coordinate_granges = hap_boundary_coordinates, 
-                                           boundary_cutoff = boundary_cutoff, distance_cutoff = distance_cutoff)
-  
+  if (length(candidate_variant_granges_left) > 0){
+    classifications_left <- classifyVariants(candidate_variant_granges_left, phasing_orientation = "left", 
+                                             haplotype_granges = hap_granges, 
+                                             haplotype_boundary_coordinate_granges = hap_boundary_coordinates, 
+                                             boundary_cutoff = boundary_cutoff, distance_cutoff = distance_cutoff)
+  } else {
+    classifications_left <- GRanges()
+  }
+  if (length(candidate_variant_granges_right) > 0){
+    classifications_right <- classifyVariants(candidate_variant_granges_right, phasing_orientation = "right", 
+                                              haplotype_granges = hap_granges, 
+                                              haplotype_boundary_coordinate_granges = hap_boundary_coordinates, 
+                                              boundary_cutoff = boundary_cutoff, distance_cutoff = distance_cutoff)
+  } else {
+    classifications_right <- GRanges()
+  }
   duo_novo_classifications <- c(classifications_left, classifications_right)
   output <- duo_novo_classifications
   output_sorted <- sort(output)
