@@ -53,7 +53,7 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
   counts_het_hom <- rep(NA, length(seq_along(indices)))
   counts_het_het <- rep(NA, length(seq_along(indices)))
   counts_hom_het <- rep(NA, length(seq_along(indices)))
-  het <- c("0|1", "1|0", "0|2", "2|0", "1|2", "2|1",
+  het <- c("0/1", "1/0", "0|1", "1|0", "0|2", "2|0", "1|2", "2|1",
            "0|3", "3|0", "1|3", "3|1", "2|3", "3|2", "0|4", "4|0", "1|4", "4|1", "2|4", "4|2", "3|4", "4|3")
   hom <- c("0/0", "1/1", "2/2", "3/3", "4/4")
 
