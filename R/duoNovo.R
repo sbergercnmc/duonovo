@@ -93,7 +93,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   hap_granges_low_depth <- hap_granges[low_depth_indices]
   hap_granges_low_depth$QC_fail_step <- "low_depth"
   
-  low_GQ_indices <- which(hap_granges$GQ1 < GQ_cutoff | hap_granges$GQ2 >= GQ_cutoff)
+  low_GQ_indices <- which(hap_granges$GQ1 < GQ_cutoff | hap_granges$GQ2 < GQ_cutoff)
   hap_granges_low_GQ <- hap_granges[low_GQ_indices]
   hap_granges_low_GQ$QC_fail_step <- "low_GQ"
   
@@ -230,4 +230,35 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     writeVcf(vcf_out, output_vcf_path, index = TRUE)
   }
   return(output_sorted)
+  
+  ###Also give a verbose summary of results
+  # Generate the table of counts for each classification
+  classification_counts <- table(output_sorted$duoNovo_classification)
+  
+  # Define the expected classification categories
+  expected_classes <- c("de_novo", "on_other_parent_haplotype", "uncertain", "failed_QC")
+  
+  # Add missing classes if they are not present in the table (to ensure all classes are covered)
+  for (class in expected_classes) {
+    if (!class %in% names(classification_counts)) {
+      classification_counts[class] <- 0
+    }
+  }
+  
+  # Sort the counts in the expected order
+  classification_counts <- classification_counts[expected_classes]
+  
+  # Create a verbose summary
+  verbose_summary <- paste0(
+    "Variant Classification Summary:\n",
+    "--------------------------------\n",
+    "Number of de novo variants: ", classification_counts["de_novo"], "\n",
+    "Number of variants present on haplotype inherited from non-sequenced parent: ", classification_counts["on_other_parent_haplotype"], "\n",
+    "Number of uncertain variants: ", classification_counts["uncertain"], "\n",
+    "Number of variants that failed QC: ", classification_counts["failed_QC"], "\n",
+    "--------------------------------"
+  )
+  
+  # Print the verbose summary
+  cat(verbose_summary)
 }
