@@ -22,23 +22,28 @@ getHaplotypeBlockCoordinates <- function(haplotype_granges) {
 
   # Split haplotype ranges by PS1 and calculate coordinates
   granges_by_ps1 <- split(hap_granges, hap_granges$PS1)
-  all_chrs <- sapply(granges_by_ps1, function(xx) unique(seqnames(xx)))
-  indices_to_use <- which(lengths(all_chrs) == 1)
-  start_coords <- sapply(granges_by_ps1[indices_to_use], function(xx) min(start(xx)))
-  end_coords <- sapply(granges_by_ps1[indices_to_use], function(xx) max(end(xx)))
-  all_chrs <- unlist(all_chrs[indices_to_use])
-
+  start_coords <- start(granges_by_ps1)
+  start_coords <- sapply(start_coords, min)
+  end_coords <- end(granges_by_ps1)
+  end_coords <- sapply(end_coords, max)
+  all_chrs <- seqnames(granges_by_ps1)  
+  all_chrs <- unlist(unique(all_chrs)) #Assuming all sequences are from the same chromosome in each list element
+  
   ps1_boundaries <- GRanges(
     seqnames = all_chrs, ranges = IRanges(start = start_coords, end = end_coords),
-    PS1 = names(granges_by_ps1)[indices_to_use]
+    PS1 = names(granges_by_ps1)
   )
 
   # Split haplotype ranges by PS2 and calculate coordinates
   granges_by_ps2 <- split(hap_granges, hap_granges$PS2)
-  start_coords <- sapply(granges_by_ps2, function(xx) min(start(xx)))
-  end_coords <- sapply(granges_by_ps2, function(xx) max(end(xx)))
-  all_chrs <- sapply(granges_by_ps2, function(xx) unique(seqnames(xx)))
-
+  
+  start_coords <- start(granges_by_ps2)
+  start_coords <- sapply(start_coords, min)
+  end_coords <- end(granges_by_ps2)
+  end_coords <- sapply(end_coords, max)
+  all_chrs <- seqnames(granges_by_ps2)  
+  all_chrs <- unlist(unique(all_chrs)) #Assuming all sequences are from the same chromosome in each list element
+  
   ps2_boundaries <- GRanges(
     seqnames = all_chrs, ranges = IRanges(start = start_coords, end = end_coords),
     PS2 = names(granges_by_ps2)
