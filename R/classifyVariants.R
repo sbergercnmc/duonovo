@@ -11,6 +11,8 @@
 #'   within which candidate variants are considered.
 #' @param distance_cutoff A numeric value specifying the minimum Hamming distance required for supporting
 #'   the classification of variants.
+#' @param PS_width_cutoff A numeric value specifying the minimum width for phasing sets to be included in the analysis.
+#' @param QC_fail_variant_granges A \code{GRanges} object containing the candidate variants that have failed QC thus far (e.g. due to low sequencing depth or GQ).
 #'
 #' @return A \code{GRanges} object containing classified candidate variants. The classified variants include
 #'   the following columns:
@@ -31,9 +33,11 @@
 #' @export
 classifyVariants <- function(candidate_variant_granges, phasing_orientation = c("left", "right"),
                              haplotype_granges, haplotype_boundary_coordinate_granges,
-                             boundary_cutoff, distance_cutoff){
+                             boundary_cutoff, distance_cutoff, PS_width_cutoff,
+                             QC_fail_variant_granges){
 
   ###QC steps
+  QC_fail_variants <- QC_fail_variant_granges
   #first obtain variants that do not overlap any of the haplotype blocks
   hap_overlap_indices <- unique(queryHits(findOverlaps(candidate_variant_granges,
                                                        haplotype_boundary_coordinate_granges)))

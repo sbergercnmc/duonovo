@@ -10,7 +10,9 @@ classifyVariants(
   haplotype_granges,
   haplotype_boundary_coordinate_granges,
   boundary_cutoff,
-  distance_cutoff
+  distance_cutoff,
+  PS_width_cutoff,
+  QC_fail_variant_granges
 )
 }
 \arguments{
@@ -27,6 +29,10 @@ within which candidate variants are considered.}
 
 \item{distance_cutoff}{A numeric value specifying the minimum Hamming distance required for supporting
 the classification of variants.}
+
+\item{PS_width_cutoff}{A numeric value specifying the minimum width for phasing sets to be included in the analysis.}
+
+\item{QC_fail_variant_granges}{A \code{GRanges} object containing the candidate variants that have failed QC thus far (e.g. due to low sequencing depth or GQ).}
 }
 \value{
 A \code{GRanges} object containing classified candidate variants. The classified variants include

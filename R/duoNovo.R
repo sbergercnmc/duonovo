@@ -186,7 +186,8 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                                              haplotype_granges = hap_granges, 
                                              haplotype_boundary_coordinate_granges = hap_boundary_coordinates, 
                                              boundary_cutoff = boundary_cutoff, distance_cutoff = distance_cutoff, 
-                                             PS_width_cutoff)
+                                             PS_width_cutoff = PS_width_cutoff, 
+                                             QC_fail_variant_granges = QC_fail_variants)
   } else {
     classifications_left <- GRanges()
   }
@@ -195,7 +196,8 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                                               haplotype_granges = hap_granges, 
                                               haplotype_boundary_coordinate_granges = hap_boundary_coordinates, 
                                               boundary_cutoff = boundary_cutoff, distance_cutoff = distance_cutoff, 
-                                              PS_width_cutoff)
+                                              PS_width_cutoff = PS_width_cutoff,
+                                              QC_fail_variant_granges = QC_fail_variants)
   } else {
     classifications_right <- GRanges()
   }
