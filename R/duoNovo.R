@@ -248,13 +248,18 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                       "Reason for QC failure (NA for variants that passed QC)")
     )
     
+    # Add each INFO field to the header
     for (i in 1:nrow(info_fields)) {
-      info(vcf_header) <- DataFrameRow(
-        rownames = info_fields$ID[i],
+      # Create a DataFrame for the new INFO field
+      new_info <- DataFrame(
         Number = info_fields$Number[i],
         Type = info_fields$Type[i],
-        Description = info_fields$Description[i]
+        Description = info_fields$Description[i],
+        row.names = info_fields$ID[i]
       )
+      
+      # Append the new INFO field to the existing header
+      info(vcf_header) <- rbind(info(vcf_header), new_info)
     }
     
     # Create the VCF object with the row ranges and info
