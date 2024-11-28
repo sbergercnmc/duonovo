@@ -33,10 +33,38 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
                              haplotype_granges, haplotype_boundary_coordinate_granges,
                              boundary_cutoff, distance_cutoff){
 
+  ###QC steps
+  #first obtain variants that do not overlap any of the haplotype blocks
+  hap_overlap_indices <- unique(queryHits(findOverlaps(candidate_variant_granges,
+                                                       haplotype_boundary_coordinate_granges)))
+  QC_fail_variants_no_hap_overlap <- candidate_variant_granges[-hap_overlap_indices]
+  QC_fail_variants_no_hap_overlap$QC_fail_step <- "no_haplotype_block_overlap"
+  QC_fail_variants <- c(QC_fail_variants, QC_fail_variants_no_hap_overlap)
+  candidate_variant_granges <- candidate_variant_granges[hap_overlap_indices]
+
+  #now obtain those that do not overlap any after filtering out small haplotype blocks
+  haplotype_boundary_coordinate_granges <- haplotype_boundary_coordinate_granges[
+    which(width(haplotype_boundary_coordinate_granges) > PS_width_cutoff)]
+
+  hap_overlap_indices <- unique(queryHits(findOverlaps(candidate_variant_granges,
+                                                       haplotype_boundary_coordinate_granges)))
+  QC_fail_variants_no_hap_overlap <- candidate_variant_granges[-hap_overlap_indices]
+  QC_fail_variants_no_hap_overlap$QC_fail_step <- "in_small_haplotype_block"
+  QC_fail_variants <- c(QC_fail_variants, QC_fail_variants_no_hap_overlap)
+  candidate_variant_granges <- candidate_variant_granges[hap_overlap_indices]
+
+  #now obtain those that fall too close within boundaries of haplotype blocks
   overlaps <- findOverlaps(candidate_variant_granges, haplotype_boundary_coordinate_granges - boundary_cutoff)
+  no_boundary_overlap_indices <- unique(queryHits(overlaps))
+  QC_fail_variants_boundary_overlap <- candidate_variant_granges[-no_boundary_overlap_indices]
+  QC_fail_variants_boundary_overlap$QC_fail_step <- "in_haplotype_block_boundary"
+  QC_fail_variants <- c(QC_fail_variants, QC_fail_variants_boundary_overlap)
+  ###QC steps end here
+
+  ###now proceed to variant classification
   overlapping_indices <- split(queryHits(overlaps), subjectHits(overlaps))
   if (length(overlapping_indices) == 0) {
-    warning("Candidate variants cannot be classified because they fall outside haplotype boundaries.")
+    warning("Candidate variants cannot be classified because they all fall outside haplotype block boundaries after QC.")
     return(candidate_variant_granges)
   }
 
@@ -172,9 +200,9 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
   if (phasing_orientation == "left") {
     if (!is.null(hap11_inherited)){
       de_novo11 <- candidate_variant_granges[hap11_inherited]
-      de_novo11$duoNovo_classification <- "de novo"
+      de_novo11$duoNovo_classification <- "de_novo"
       #add columns for supporting evidence of de novo classification
-      de_novo11$hamming_distance_other_parent_hap <- hap11_hamming_distance_other_parent_hap
+      de_novo11$supporting_hamming_distance <- hap11_hamming_distance_other_parent_hap
       de_novo11$supporting_counts_het_hom <- hap11_supporting_counts_het_hom
       de_novo11$supporting_counts_het_het <- hap11_supporting_counts_het_het
       de_novo11$supporting_counts_hom_het <- hap11_supporting_counts_hom_het
@@ -184,9 +212,9 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
 
     if (!is.null(hap12_inherited)){
       de_novo12 <- candidate_variant_granges[hap12_inherited]
-      de_novo12$duoNovo_classification <- "de novo"
+      de_novo12$duoNovo_classification <- "de_novo"
       #add columns for supporting evidence of de novo classification
-      de_novo12$hamming_distance_other_parent_hap <- hap12_hamming_distance_other_parent_hap
+      de_novo12$supporting_hamming_distance <- hap12_hamming_distance_other_parent_hap
       de_novo12$supporting_counts_het_hom <- hap12_supporting_counts_het_hom
       de_novo12$supporting_counts_het_het <- hap12_supporting_counts_het_het
       de_novo12$supporting_counts_hom_het <- hap12_supporting_counts_hom_het
@@ -195,22 +223,35 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     }
     de_novo <- c(de_novo11, de_novo12)
 
-    if (!is.null(hap21_inherited) | !is.null(hap22_inherited)){
-      not_de_novo_indices <- c(hap21_inherited, hap22_inherited)
-      not_de_novo <- candidate_variant_granges[not_de_novo_indices]
-      not_de_novo$duoNovo_classification <- "on other parent haplotype"
-      not_de_novo$hamming_distance_other_parent_hap <- NA
-      not_de_novo$supporting_counts_het_hom <- NA
-      not_de_novo$supporting_counts_het_het <- NA
-      not_de_novo$supporting_counts_hom_het <- NA
+    if (!is.null(hap21_inherited)){
+      not_de_novo21 <- candidate_variant_granges[hap21_inherited]
+      not_de_novo21$duoNovo_classification <- "on_other_parent_haplotype"
+      #add columns for supporting evidence of de novo classification
+      not_de_novo21$supporting_hamming_distance <- hap21_hamming_distance_other_parent_hap
+      not_de_novo21$supporting_counts_het_hom <- hap21_supporting_counts_het_hom
+      not_de_novo21$supporting_counts_het_het <- hap21_supporting_counts_het_het
+      not_de_novo21$supporting_counts_hom_het <- hap21_supporting_counts_hom_het
     } else {
-      not_de_novo <- GRanges()
+      not_de_novo21 <- GRanges()
     }
+
+    if (!is.null(hap22_inherited)){
+      not_de_novo22 <- candidate_variant_granges[hap22_inherited]
+      not_de_novo22$duoNovo_classification <- "on_other_parent_haplotype"
+      #add columns for supporting evidence of de novo classification
+      not_de_novo22$supporting_hamming_distance <- hap22_hamming_distance_other_parent_hap
+      not_de_novo22$supporting_counts_het_hom <- hap22_supporting_counts_het_hom
+      not_de_novo22$supporting_counts_het_het <- hap22_supporting_counts_het_het
+      not_de_novo22$supporting_counts_hom_het <- hap22_supporting_counts_hom_het
+    } else {
+      not_de_novo22 <- GRanges()
+    }
+    not_de_novo <- c(not_de_novo21, not_de_novo22)
 
     if (!is.null(uncertain)){
       uncertain <- candidate_variant_granges[uncertain]
       uncertain$duoNovo_classification <- "uncertain"
-      uncertain$hamming_distance_other_parent_hap <- NA
+      uncertain$supporting_hamming_distance <- NA
       uncertain$supporting_counts_het_hom <- NA
       uncertain$supporting_counts_het_het <- NA
       uncertain$supporting_counts_hom_het <- NA
@@ -222,9 +263,9 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
   } else if (phasing_orientation == "right") {
     if (!is.null(hap21_inherited)){
       de_novo21 <- candidate_variant_granges[hap21_inherited]
-      de_novo21$duoNovo_classification <- "de novo"
+      de_novo21$duoNovo_classification <- "de_novo"
       #add columns for supporting evidence of de novo classification
-      de_novo21$hamming_distance_other_parent_hap <- hap21_hamming_distance_other_parent_hap
+      de_novo21$supporting_hamming_distance <- hap21_hamming_distance_other_parent_hap
       de_novo21$supporting_counts_het_hom <- hap21_supporting_counts_het_hom
       de_novo21$supporting_counts_het_het <- hap21_supporting_counts_het_het
       de_novo21$supporting_counts_hom_het <- hap21_supporting_counts_hom_het
@@ -234,9 +275,9 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
 
     if (!is.null(hap22_inherited)){
       de_novo22 <- candidate_variant_granges[hap22_inherited]
-      de_novo22$duoNovo_classification <- "de novo"
+      de_novo22$duoNovo_classification <- "de_novo"
       #add columns for supporting evidence of de novo classification
-      de_novo22$hamming_distance_other_parent_hap <- hap22_hamming_distance_other_parent_hap
+      de_novo22$supporting_hamming_distance <- hap22_hamming_distance_other_parent_hap
       de_novo22$supporting_counts_het_hom <- hap22_supporting_counts_het_hom
       de_novo22$supporting_counts_het_het <- hap22_supporting_counts_het_het
       de_novo22$supporting_counts_hom_het <- hap22_supporting_counts_hom_het
@@ -245,31 +286,54 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     }
     de_novo <- c(de_novo21, de_novo22)
 
-    if (!is.null(hap11_inherited) | !is.null(hap12_inherited)){
-      not_de_novo_indices <- c(hap11_inherited, hap12_inherited)
-      not_de_novo <- candidate_variant_granges[not_de_novo_indices]
-      not_de_novo$duoNovo_classification <- "on other parent haplotype"
-      not_de_novo$hamming_distance_other_parent_hap <- NA
-      not_de_novo$supporting_counts_het_hom <- NA
-      not_de_novo$supporting_counts_het_het <- NA
-      not_de_novo$supporting_counts_hom_het <- NA
+    if (!is.null(hap11_inherited)){
+      not_de_novo11 <- candidate_variant_granges[hap11_inherited]
+      not_de_novo11$duoNovo_classification <- "on_other_parent_haplotype"
+      #add columns for supporting evidence of de novo classification
+      not_de_novo11$supporting_hamming_distance <- hap11_hamming_distance_other_parent_hap
+      not_de_novo11$supporting_counts_het_hom <- hap11_supporting_counts_het_hom
+      not_de_novo11$supporting_counts_het_het <- hap11_supporting_counts_het_het
+      not_de_novo11$supporting_counts_hom_het <- hap11_supporting_counts_hom_het
     } else {
-      not_de_novo <- GRanges()
+      not_de_novo11 <- GRanges()
     }
+
+    if (!is.null(hap12_inherited)){
+      not_de_novo12 <- candidate_variant_granges[hap12_inherited]
+      not_de_novo12$duoNovo_classification <- "on_other_parent_haplotype"
+      #add columns for supporting evidence of de novo classification
+      not_de_novo12$supporting_hamming_distance <- hap12_hamming_distance_other_parent_hap
+      not_de_novo12$supporting_counts_het_hom <- hap12_supporting_counts_het_hom
+      not_de_novo12$supporting_counts_het_het <- hap12_supporting_counts_het_het
+      not_de_novo12$supporting_counts_hom_het <- hap12_supporting_counts_hom_het
+    } else {
+      not_de_novo12 <- GRanges()
+    }
+    not_de_novo <- c(not_de_novo11, not_de_novo12)
 
     if (!is.null(uncertain)){
       uncertain <- candidate_variant_granges[uncertain]
       uncertain$duoNovo_classification <- "uncertain"
-      uncertain$hamming_distance_other_parent_hap <- NA
+      uncertain$supporting_hamming_distance <- NA
       uncertain$supporting_counts_het_hom <- NA
       uncertain$supporting_counts_het_het <- NA
       uncertain$supporting_counts_hom_het <- NA
     } else {
       uncertain <- GRanges()
     }
+
     output <- c(de_novo, not_de_novo, uncertain)
   }
-  output
+
+  QC_fail_variants$duoNovo_classification <- "failed_QC"
+  QC_fail_variants$supporting_hamming_distance <- NA
+  QC_fail_variants$supporting_counts_het_hom <- NA
+  QC_fail_variants$supporting_counts_het_het <- NA
+  QC_fail_variants$supporting_counts_hom_het <- NA
+
+  output$QC_fail_step <- NA
+  combined_output <- c(output, QC_fail_variants)
+  combined_output
 }
 
 

@@ -39,7 +39,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                     candidate_variants_concordant_with_SRS = TRUE,
                     SRS_vcf_file_path, reference = "hg38", 
                     candidate_variant_coordinates = NULL, 
-                    output_vcf_path) {
+                    output_vcf_path = NULL) {
   if (!file.exists(LRS_phased_vcf_file_path)) {
     stop("The LRS VCF file path does not exist: ", LRS_phased_vcf_file_path)
   }
@@ -82,13 +82,23 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   vcf_granges$PS1 <- vcf_metadata$PS[, proband_column]
   vcf_granges$PS2 <- vcf_metadata$PS[, -proband_column]
 
-  vcf_granges_filtered <- vcf_granges[which(vcf_granges$depth1 >= depth_cutoff & vcf_granges$GQ1 >= GQ_cutoff &
-                                              vcf_granges$depth2 >= depth_cutoff & vcf_granges$GQ2 >= GQ_cutoff)]
-
+  QC_fail_variants <- GRanges() # Initialize empty granges to store all variants that failed QC
+  
   message("Reconstructing haplotypes...")
-  hap_granges <- getHaplotypes(vcf_granges_filtered)
+  hap_granges <- getHaplotypes(vcf_granges)
+  pass_depth_GQ <- which(hap_granges$depth1 >= depth_cutoff & hap_granges$GQ1 >= GQ_cutoff &
+                           hap_granges$depth2 >= depth_cutoff & hap_granges$GQ2 >= GQ_cutoff)
+  
+  low_depth_indices <- which(hap_granges$depth1 < depth_cutoff | hap_granges$depth2 < depth_cutoff)
+  hap_granges_low_depth <- hap_granges[low_depth_indices]
+  hap_granges_low_depth$QC_fail_step <- "low_depth"
+  
+  low_GQ_indices <- which(hap_granges$GQ1 < GQ_cutoff | hap_granges$GQ2 >= GQ_cutoff)
+  hap_granges_low_GQ <- hap_granges[low_GQ_indices]
+  hap_granges_low_GQ$QC_fail_step <- "low_GQ"
+  
+  hap_granges <- hap_granges[pass_depth_GQ]
   hap_boundary_coordinates <- getHaplotypeBlockCoordinates(hap_granges)
-  hap_boundary_coordinates <- hap_boundary_coordinates[which(width(hap_boundary_coordinates) > PS_width_cutoff)]
 
   # If candidate variant coordinates are provided, filter hap_granges accordingly
   if (!is.null(candidate_variant_coordinates)) {
@@ -98,12 +108,19 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
         start = as.numeric(sapply(strsplit(sapply(strsplit(candidate_variant_coordinates, ":"), `[[`, 2), "-"), `[[`, 1)),
         end = as.numeric(sapply(strsplit(sapply(strsplit(candidate_variant_coordinates, ":"), `[[`, 2), "-"), `[[`, 2))
       ))
+    QC_fail_variants <- c(QC_fail_variants, hap_granges_low_depth[
+      unique(queryHits(findOverlaps(hap_granges_low_depth, candidate_variant_granges)))])
+    QC_fail_variants <- c(QC_fail_variants, hap_granges_low_GQ[
+      unique(queryHits(findOverlaps(hap_granges_low_GQ, candidate_variant_granges)))])
     
     candidate_variant_indices <- unique(queryHits(findOverlaps(hap_granges, candidate_variant_granges)))
     ranges_to_subset <- hap_granges[candidate_variant_indices]
     candidate_variant_indices_left <- which(ranges_to_subset$phasing1 == "1|0" & ranges_to_subset$phasing2 == "0/0")  
     candidate_variant_indices_right <- which(ranges_to_subset$phasing1 == "0|1" & ranges_to_subset$phasing2 == "0/0")
   } else { # Otherwise, identify candidate de novo variants directly from genotypes
+    QC_fail_variants <- c(QC_fail_variants, hap_granges_low_depth)
+    QC_fail_variants <- c(QC_fail_variants, hap_granges_low_GQ)
+    
     ranges_to_subset <- hap_granges
     candidate_variant_indices_left <- which(ranges_to_subset$phasing1 == "1|0" & ranges_to_subset$phasing2 == "0/0")  
     candidate_variant_indices_right <- which(ranges_to_subset$phasing1 == "0|1" & ranges_to_subset$phasing2 == "0/0")
@@ -168,7 +185,8 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     classifications_left <- classifyVariants(candidate_variant_granges_left, phasing_orientation = "left", 
                                              haplotype_granges = hap_granges, 
                                              haplotype_boundary_coordinate_granges = hap_boundary_coordinates, 
-                                             boundary_cutoff = boundary_cutoff, distance_cutoff = distance_cutoff)
+                                             boundary_cutoff = boundary_cutoff, distance_cutoff = distance_cutoff, 
+                                             PS_width_cutoff)
   } else {
     classifications_left <- GRanges()
   }
@@ -176,7 +194,8 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     classifications_right <- classifyVariants(candidate_variant_granges_right, phasing_orientation = "right", 
                                               haplotype_granges = hap_granges, 
                                               haplotype_boundary_coordinate_granges = hap_boundary_coordinates, 
-                                              boundary_cutoff = boundary_cutoff, distance_cutoff = distance_cutoff)
+                                              boundary_cutoff = boundary_cutoff, distance_cutoff = distance_cutoff, 
+                                              PS_width_cutoff)
   } else {
     classifications_right <- GRanges()
   }
@@ -184,26 +203,29 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   output <- duo_novo_classifications
   output_sorted <- sort(output)
   
-  message("Writing classified variants to VCF file...")
-  info <- DataFrame(
-    phasing_proband = output_sorted$phasing1,
-    phasing_parent = output_sorted$phasing2,
-    depth_proband = output_sorted$depth1,
-    depth_parent = output_sorted$depth2,
-    GQ_proband = output_sorted$GQ1,
-    GQ_parent = output_sorted$GQ2,
-    duoNovo_classification = output_sorted$duoNovo_classification,
-    hamming_distance_other_parent_hap = output_sorted$hamming_distance_other_parent_hap,
-    supporting_counts_het_hom = output_sorted$supporting_counts_het_hom,
-    supporting_counts_het_het = output_sorted$supporting_counts_het_het,
-    supporting_counts_hom_het = output_sorted$supporting_counts_hom_het
-  )
-  
-  # Create a VCF object
-  vcf_out <- VCF(
-    rowRanges = output_sorted,
-    info = info
-  )  
-  writeVcf(vcf_out, output_vcf_path)
+  if (!is.null(output_vcf_path)){
+    message("Writing classified variants to VCF file...")
+    info <- DataFrame(
+      phasing_proband = output_sorted$phasing1,
+      phasing_parent = output_sorted$phasing2,
+      depth_proband = output_sorted$depth1,
+      depth_parent = output_sorted$depth2,
+      GQ_proband = output_sorted$GQ1,
+      GQ_parent = output_sorted$GQ2,
+      duoNovo_classification = output_sorted$duoNovo_classification,
+      supporting_hamming_distance = output_sorted$supporting_hamming_distance,
+      supporting_counts_het_hom = output_sorted$supporting_counts_het_hom,
+      supporting_counts_het_het = output_sorted$supporting_counts_het_het,
+      supporting_counts_hom_het = output_sorted$supporting_counts_hom_het,
+      QC_fail_step = output_sorted$QC_fail_step
+    )
+    
+    # Create a VCF object
+    vcf_out <- VCF(
+      rowRanges = output_sorted,
+      info = info
+    )  
+    writeVcf(vcf_out, output_vcf_path, index = TRUE)
+  }
   return(output_sorted)
 }

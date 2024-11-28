@@ -16,7 +16,7 @@ duoNovo(
   SRS_vcf_file_path,
   reference = "hg38",
   candidate_variant_coordinates = NULL,
-  output_vcf_path
+  output_vcf_path = NULL
 )
 }
 \arguments{
