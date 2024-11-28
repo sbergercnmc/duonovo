@@ -222,11 +222,49 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
       QC_fail_step = output_sorted$QC_fail_step
     )
     
-    # Create a VCF object
+    # Create a VCF header with the meta-information
+    vcf_header <- VCFHeader()
+    
+    # Add INFO fields to the VCF header
+    info_fields <- data.frame(
+      ID = c("phasing_proband", "phasing_parent", "depth_proband", "depth_parent",
+             "GQ_proband", "GQ_parent", "duoNovo_classification",
+             "supporting_hamming_distance", "supporting_counts_het_hom",
+             "supporting_counts_het_het", "supporting_counts_hom_het", "QC_fail_step"),
+      Number = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+      Type = c("String", "String", "Integer", "Integer", "Integer", "Integer", "String",
+               "Integer", "Integer", "Integer", "Integer", "String"),
+      Description = c("Phasing of the proband",
+                      "Phasing of the parent",
+                      "Read depth for the proband",
+                      "Read depth for the parent",
+                      "Genotype Quality (GQ) for the proband",
+                      "Genotype Quality (GQ) for the parent",
+                      "Classification result by duoNovo ('de_novo', 'on_other_parent_haplotype', 'uncertain', 'failed_QC')",
+                      "Hamming distance to support the classification",
+                      "Count of heterozygous proband and homozygous parent variant pairs supporting the classification",
+                      "Count of heterozygous proband and heterozygous parent variant pairs supporting the classification",
+                      "Count of homozygous proband and heterozygous parent variant pairs supporting the classification",
+                      "Reason for QC failure (NA for variants that passed QC)")
+    )
+    
+    for (i in 1:nrow(info_fields)) {
+      info(vcf_header) <- DataFrameRow(
+        rownames = info_fields$ID[i],
+        Number = info_fields$Number[i],
+        Type = info_fields$Type[i],
+        Description = info_fields$Description[i]
+      )
+    }
+    
+    # Create the VCF object with the row ranges and info
     vcf_out <- VCF(
       rowRanges = output_sorted,
-      info = info
-    )  
+      info = info,
+      header = vcf_header  # Add the header to the VCF object
+    )
+    
+    # Write the VCF to a file, with index
     writeVcf(vcf_out, output_vcf_path, index = TRUE)
   }
   return(output_sorted)
@@ -258,7 +296,6 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     "Number of variants that failed QC: ", classification_counts["failed_QC"], "\n",
     "--------------------------------"
   )
-  
   # Print the verbose summary
   cat(verbose_summary)
 }
