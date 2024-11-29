@@ -80,7 +80,9 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   vcf_granges$GQ2 <- vcf_metadata$GQ[, -proband_column]
 
   vcf_granges$PS1 <- vcf_metadata$PS[, proband_column]
+  vcf_granges$PS1 <- paste0(seqnames(vcf_granges), "_", vcf_granges$PS1)
   vcf_granges$PS2 <- vcf_metadata$PS[, -proband_column]
+  vcf_granges$PS2 <- paste0(seqnames(vcf_granges), "_", vcf_granges$PS2)
 
   QC_fail_variants <- GRanges() # Initialize empty granges to store all variants that failed QC
   
@@ -88,11 +90,8 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   hap_granges <- getHaplotypes(vcf_granges)
 
   low_depth_indices <- which(hap_granges$depth1 < depth_cutoff | hap_granges$depth2 < depth_cutoff)
-  
   low_GQ_indices <- which(hap_granges$GQ1 < GQ_cutoff | hap_granges$GQ2 < GQ_cutoff)
-  hap_granges_low_GQ <- hap_granges[low_GQ_indices]
-  hap_granges_low_GQ$QC_fail_step <- "low_GQ"
-  
+
   low_depth_or_GQ <- union(low_depth_indices, low_GQ_indices)
   low_depth_and_GQ <- intersect(low_depth_indices, low_GQ_indices)
   low_depth_only <- low_depth_indices[-which(low_depth_indices %in% low_GQ_indices)]
@@ -122,7 +121,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   } else {
     hap_granges_low_depth_GQ<- GRanges()
   }
-  QC_fail_variants <- c(hap_granges_low_GQ, hap_granges_low_depth, hap_granges_low_depth_GQ)
+  QC_fail_variants <- c(hap_granges_low_GQ, hap_granges_low_depth, hap_granges_low_depth_GQ, QC_fail_variants)
 
   hap_granges <- hap_granges[-low_depth_or_GQ]
   hap_boundary_coordinates <- getHaplotypeBlockCoordinates(hap_granges)
