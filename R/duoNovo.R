@@ -80,10 +80,12 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   vcf_granges$GQ2 <- vcf_metadata$GQ[, -proband_column]
 
   vcf_granges$PS1 <- vcf_metadata$PS[, proband_column]
-  vcf_granges$PS1 <- paste0(seqnames(vcf_granges), "_", vcf_granges$PS1)
+  has_PS1 <- !is.na(vcf_granges$PS1)
+  vcf_granges$PS1[has_PS1] <- paste0(seqnames(vcf_granges[has_PS1]), "_", vcf_granges$PS1[has_PS1])
   vcf_granges$PS2 <- vcf_metadata$PS[, -proband_column]
-  vcf_granges$PS2 <- paste0(seqnames(vcf_granges), "_", vcf_granges$PS2)
-
+  has_PS2 <- !is.na(vcf_granges$PS2)
+  vcf_granges$PS2[has_PS2] <- paste0(seqnames(vcf_granges[has_PS2]), "_", vcf_granges$PS2[has_PS2])
+  
   QC_fail_variants <- GRanges() # Initialize empty granges to store all variants that failed QC
   
   message("Reconstructing haplotypes...")
