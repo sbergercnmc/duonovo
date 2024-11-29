@@ -86,18 +86,45 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   
   message("Reconstructing haplotypes...")
   hap_granges <- getHaplotypes(vcf_granges)
-  pass_depth_GQ <- which(hap_granges$depth1 >= depth_cutoff & hap_granges$GQ1 >= GQ_cutoff &
-                           hap_granges$depth2 >= depth_cutoff & hap_granges$GQ2 >= GQ_cutoff)
-  
+
   low_depth_indices <- which(hap_granges$depth1 < depth_cutoff | hap_granges$depth2 < depth_cutoff)
-  hap_granges_low_depth <- hap_granges[low_depth_indices]
-  hap_granges_low_depth$QC_fail_step <- "low_depth"
   
   low_GQ_indices <- which(hap_granges$GQ1 < GQ_cutoff | hap_granges$GQ2 < GQ_cutoff)
   hap_granges_low_GQ <- hap_granges[low_GQ_indices]
   hap_granges_low_GQ$QC_fail_step <- "low_GQ"
   
-  hap_granges <- hap_granges[pass_depth_GQ]
+  low_depth_or_GQ <- union(low_depth_indices, low_GQ_indices)
+  low_depth_and_GQ <- intersect(low_depth_indices, low_GQ_indices)
+  low_depth_only <- low_depth_indices[-which(low_depth_indices %in% low_GQ_indices)]
+  low_GQ_only <- low_GQ_indices[-which(low_GQ_indices %in% low_depth_indices)]
+  
+  if (length(low_depth_only) > 0){
+    hap_granges_low_depth <- hap_granges[low_depth_only]
+    hap_granges_low_depth$QC_fail_step <- "low_depth"
+  } else {
+    hap_granges_low_depth <- GRanges()
+  }
+  if (length(low_GQ_only) > 0){
+    hap_granges_low_GQ <- hap_granges[low_GQ_only]
+    hap_granges_low_GQ$QC_fail_step <- "low_GQ"
+  } else {
+    hap_granges_low_GQ<- GRanges()
+  }
+  if (length(low_depth_only) > 0){
+    hap_granges_low_depth <- hap_granges[low_depth_only]
+    hap_granges_low_depth$QC_fail_step <- "low_depth"
+  } else {
+    hap_granges_low_depth <- GRanges()
+  }
+  if (length(low_depth_and_GQ) > 0){
+    hap_granges_low_depth_GQ <- hap_granges[low_depth_and_GQ]
+    hap_granges_low_depth_GQ$QC_fail_step <- "low_depth_and_GQ"
+  } else {
+    hap_granges_low_depth_GQ<- GRanges()
+  }
+  QC_fail_variants <- c(hap_granges_low_GQ, hap_granges_low_depth, hap_granges_low_depth_GQ)
+
+  hap_granges <- hap_granges[-low_depth_or_GQ]
   hap_boundary_coordinates <- getHaplotypeBlockCoordinates(hap_granges)
 
   # If candidate variant coordinates are provided, filter hap_granges accordingly
@@ -108,19 +135,14 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
         start = as.numeric(sapply(strsplit(sapply(strsplit(candidate_variant_coordinates, ":"), `[[`, 2), "-"), `[[`, 1)),
         end = as.numeric(sapply(strsplit(sapply(strsplit(candidate_variant_coordinates, ":"), `[[`, 2), "-"), `[[`, 2))
       ))
-    QC_fail_variants <- c(QC_fail_variants, hap_granges_low_depth[
-      unique(queryHits(findOverlaps(hap_granges_low_depth, candidate_variant_granges)))])
-    QC_fail_variants <- c(QC_fail_variants, hap_granges_low_GQ[
-      unique(queryHits(findOverlaps(hap_granges_low_GQ, candidate_variant_granges)))])
+    QC_fail_variants <- QC_fail_variants[
+      unique(queryHits(findOverlaps(QC_fail_variants, candidate_variant_granges)))]
     
     candidate_variant_indices <- unique(queryHits(findOverlaps(hap_granges, candidate_variant_granges)))
     ranges_to_subset <- hap_granges[candidate_variant_indices]
     candidate_variant_indices_left <- which(ranges_to_subset$phasing1 == "1|0" & ranges_to_subset$phasing2 == "0/0")  
     candidate_variant_indices_right <- which(ranges_to_subset$phasing1 == "0|1" & ranges_to_subset$phasing2 == "0/0")
   } else { # Otherwise, identify candidate de novo variants directly from genotypes
-    QC_fail_variants <- c(QC_fail_variants, hap_granges_low_depth)
-    QC_fail_variants <- c(QC_fail_variants, hap_granges_low_GQ)
-    
     ranges_to_subset <- hap_granges
     candidate_variant_indices_left <- which(ranges_to_subset$phasing1 == "1|0" & ranges_to_subset$phasing2 == "0/0")  
     candidate_variant_indices_right <- which(ranges_to_subset$phasing1 == "0|1" & ranges_to_subset$phasing2 == "0/0")
