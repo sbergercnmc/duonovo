@@ -40,7 +40,7 @@ duoNovo(
 
 \item{reference}{Reference genome name (e.g. hg38) used in the vcfs.}
 
-\item{candidate_variant_coordinates}{List of coordinates for specific variants of interest.}
+\item{candidate_variant_coordinates}{Vector of coordinates for specific variants of interest (of the form c(chr1:1000, chr2:2000)).}
 
 \item{output_vcf_path}{File path for output vcf.}
 }
@@ -55,9 +55,9 @@ Variants are classifed as de novo, present on the haplotype inherited from the n
 The function ultimately works by detecting identical by descent haplotype blocks, to determine whether each candidate variant of interest is de novo, using the genotype of only one parent. If requested, concordance with short-read sequencing can be checked.
 }
 \examples{
-# duoNovo(LRS_phased_vcf_file_path = my_LRS_file_path,
-#          proband_phasing = "1|0", proband_column_identifier = "-0$",
-#          PS_width_cutoff = 10000, boundary_cutoff = 10000, distance_cutoff = 2000,
+# duoNovo(LRS_phased_vcf_file_path = my_LRS_file_path, depth_cutoff = 20, GQ_cutoff = 30,
+#          proband_column_identifier = "-0$",
+#          PS_width_cutoff = 10000, boundary_cutoff = 2000, distance_cutoff = 40,
 #          candidate_variants_concordant_with_SRS = TRUE,
 #          SRS_vcf_file_path = my_SRS_file_path, reference = "hg38")
 }

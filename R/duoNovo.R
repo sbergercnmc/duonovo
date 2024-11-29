@@ -13,7 +13,7 @@
 #' @param candidate_variants_concordant_with_SRS Logical value specifying if candidate variants should be concordant with short-read sequencing (default is `TRUE` or `FALSE`).
 #' @param SRS_vcf_file_path File path to the vcf containing variant calls from short-read sequencing of the duo.
 #' @param reference Reference genome name (e.g. hg38) used in the vcfs.
-#' @param candidate_variant_coordinates List of coordinates for specific variants of interest.
+#' @param candidate_variant_coordinates Vector of coordinates for specific variants of interest (of the form c(chr1:1000, chr2:2000)).
 #' @param output_vcf_path File path for output vcf.
 #'
 #' @return A `GRangesList` containing three elements: `de_novo`, `not_de_novo`, and `uncertain`.
@@ -28,9 +28,9 @@
 #' @export
 #'
 #' @examples
-#' # duoNovo(LRS_phased_vcf_file_path = my_LRS_file_path,
-#' #          proband_phasing = "1|0", proband_column_identifier = "-0$",
-#' #          PS_width_cutoff = 10000, boundary_cutoff = 10000, distance_cutoff = 2000,
+#' # duoNovo(LRS_phased_vcf_file_path = my_LRS_file_path, depth_cutoff = 20, GQ_cutoff = 30,
+#' #          proband_column_identifier = "-0$",
+#' #          PS_width_cutoff = 10000, boundary_cutoff = 2000, distance_cutoff = 40,
 #' #          candidate_variants_concordant_with_SRS = TRUE,
 #' #          SRS_vcf_file_path = my_SRS_file_path, reference = "hg38")
 duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
@@ -136,15 +136,20 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
         start = as.numeric(sapply(strsplit(sapply(strsplit(candidate_variant_coordinates, ":"), `[[`, 2), "-"), `[[`, 1)),
         end = as.numeric(sapply(strsplit(sapply(strsplit(candidate_variant_coordinates, ":"), `[[`, 2), "-"), `[[`, 2))
       ))
-    QC_fail_variants <- QC_fail_variants[
-      unique(queryHits(findOverlaps(QC_fail_variants, candidate_variant_granges)))]
-    
     candidate_variant_indices <- unique(queryHits(findOverlaps(hap_granges, candidate_variant_granges)))
     ranges_to_subset <- hap_granges[candidate_variant_indices]
+    
+    QC_fail_variants <- QC_fail_variants[
+      unique(queryHits(findOverlaps(QC_fail_variants, ranges_to_subset)))]
+    
     candidate_variant_indices_left <- which(ranges_to_subset$phasing1 == "1|0" & ranges_to_subset$phasing2 == "0/0")  
     candidate_variant_indices_right <- which(ranges_to_subset$phasing1 == "0|1" & ranges_to_subset$phasing2 == "0/0")
   } else { # Otherwise, identify candidate de novo variants directly from genotypes
     ranges_to_subset <- hap_granges
+    
+    QC_fail_variants <- QC_fail_variants[
+      unique(queryHits(findOverlaps(QC_fail_variants, ranges_to_subset)))]
+    
     candidate_variant_indices_left <- which(ranges_to_subset$phasing1 == "1|0" & ranges_to_subset$phasing2 == "0/0")  
     candidate_variant_indices_right <- which(ranges_to_subset$phasing1 == "0|1" & ranges_to_subset$phasing2 == "0/0")
   }
@@ -245,55 +250,36 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
       QC_fail_step = output_sorted$QC_fail_step
     )
     
-    # Create a VCF header with the meta-information
+    # 1. Create the VCF Header
     vcf_header <- VCFHeader()
-    
-    # Add INFO fields to the VCF header
-    info_fields <- data.frame(
-      ID = c("phasing_proband", "phasing_parent", "depth_proband", "depth_parent",
-             "GQ_proband", "GQ_parent", "duoNovo_classification",
-             "supporting_hamming_distance", "supporting_counts_het_hom",
-             "supporting_counts_het_het", "supporting_counts_hom_het", "QC_fail_step"),
+    info_fields <- DataFrame(
+      row.names = c("phasing_proband", "phasing_parent", "depth_proband", "depth_parent", 
+                    "GQ_proband", "GQ_parent", "duoNovo_classification", 
+                    "supporting_hamming_distance", "supporting_counts_het_hom", 
+                    "supporting_counts_het_het", "supporting_counts_hom_het", 
+                    "QC_fail_step"),
       Number = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-      Type = c("String", "String", "Integer", "Integer", "Integer", "Integer", "String",
+      Type = c("String", "String", "Integer", "Integer", "Integer", "Integer", "String", 
                "Integer", "Integer", "Integer", "Integer", "String"),
-      Description = c("Phasing of the proband",
-                      "Phasing of the parent",
-                      "Read depth for the proband",
-                      "Read depth for the parent",
-                      "Genotype Quality (GQ) for the proband",
-                      "Genotype Quality (GQ) for the parent",
-                      "Classification result by duoNovo ('de_novo', 'on_other_parent_haplotype', 'uncertain', 'failed_QC')",
-                      "Hamming distance to support the classification",
-                      "Count of heterozygous proband and homozygous parent variant pairs supporting the classification",
-                      "Count of heterozygous proband and heterozygous parent variant pairs supporting the classification",
-                      "Count of homozygous proband and heterozygous parent variant pairs supporting the classification",
-                      "Reason for QC failure (NA for variants that passed QC)")
+      Description = c("Phasing for proband", "Phasing for parent", "Depth for proband", 
+                      "Depth for parent", "Genotype quality for proband", 
+                      "Genotype quality for parent", "DuoNovo classification", 
+                      "Supporting Hamming distance", "Supporting counts (het-hom)", 
+                      "Supporting counts (het-het)", "Supporting counts (hom-het)", 
+                      "QC fail step (NA for variants that passed QC)")
     )
     
-    # Add each INFO field to the header
-    for (i in 1:nrow(info_fields)) {
-      # Create a DataFrame for the new INFO field
-      new_info <- DataFrame(
-        Number = info_fields$Number[i],
-        Type = info_fields$Type[i],
-        Description = info_fields$Description[i],
-        row.names = info_fields$ID[i]
-      )
-      
-      # Append the new INFO field to the existing header
-      info(vcf_header) <- rbind(info(vcf_header), new_info)
-    }
+    # Add each INFO field to the VCF header
+    info(vcf_header) <- info_fields
     
-    # Create the VCF object with the row ranges and info
+    # 2. Create the VCF object
     vcf_out <- VCF(
       rowRanges = output_sorted,
-      info = info,
-      header = vcf_header  # Add the header to the VCF object
+      info = info
     )
     
-    # Write the VCF to a file, with index
-    writeVcf(vcf_out, output_vcf_path, index = TRUE)
+    # 3. Write the VCF to a file with the header
+    writeVcf(vcf_out, output_vcf_path, index = TRUE, header = vcf_header)
   }
   return(output_sorted)
   
