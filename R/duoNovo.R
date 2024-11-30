@@ -10,7 +10,8 @@
 #' @param PS_width_cutoff A numeric value specifying the minimum width for phasing sets to be included in the analysis.
 #' @param boundary_cutoff A numeric value indicating the minimum distance from a haplotype block boundary (either start or end coordinate) for candidate variants to be analyzed.
 #' @param distance_cutoff A numeric value specifying the minimum hamming distance cutoff to determine that a proband-parent haplotype block are not identical by descent.
-#' @param candidate_variants_concordant_with_SRS Logical value specifying if candidate variants should be concordant with short-read sequencing (default is `TRUE` or `FALSE`).
+#' @param candidate_variants_concordant_with_SRS Logical value specifying if candidate variants should be concordant with short-read sequencing (default is `TRUE`).
+#' @param test_reference_allele Logical value specifying if positions where the proband is heterozygous and the parent is homozygous for the variant allele (not the reference) should be tested (default is `FALSE`).
 #' @param SRS_vcf_file_path File path to the vcf containing variant calls from short-read sequencing of the duo.
 #' @param reference Reference genome name (e.g. hg38) used in the vcfs.
 #' @param candidate_variant_coordinates Vector of coordinates for specific variants of interest (of the form c(chr1:1000, chr2:2000)).
@@ -29,14 +30,14 @@
 #'
 #' @examples
 #' # duoNovo(LRS_phased_vcf_file_path = my_LRS_file_path, depth_cutoff = 20, GQ_cutoff = 30,
-#' #          proband_column_identifier = "-0$",
+#' #          proband_column_identifier = my_proband_identifier,
 #' #          PS_width_cutoff = 10000, boundary_cutoff = 2000, distance_cutoff = 40,
 #' #          candidate_variants_concordant_with_SRS = TRUE,
 #' #          SRS_vcf_file_path = my_SRS_file_path, reference = "hg38")
 duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                     proband_column_identifier,
                     PS_width_cutoff = 10000, boundary_cutoff = 2000, distance_cutoff = 40,
-                    candidate_variants_concordant_with_SRS = TRUE,
+                    candidate_variants_concordant_with_SRS = TRUE, test_reference_allele = FALSE,
                     SRS_vcf_file_path, reference = "hg38", 
                     candidate_variant_coordinates = NULL, 
                     output_vcf_path = NULL) {
@@ -141,11 +142,23 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     
     candidate_variant_indices_left <- which(ranges_to_subset$phasing1 == "1|0" & ranges_to_subset$phasing2 == "0/0")  
     candidate_variant_indices_right <- which(ranges_to_subset$phasing1 == "0|1" & ranges_to_subset$phasing2 == "0/0")
+    if (test_reference_allele == TRUE){
+      candidate_variant_indices_left_ref <- which(ranges_to_subset$phasing1 == "0|1" & ranges_to_subset$phasing2 == "1/1")  
+      candidate_variant_indices_right_ref <- which(ranges_to_subset$phasing1 == "1|0" & ranges_to_subset$phasing2 == "1/1")
+      candidate_variant_indices_left <- c(candidate_variant_indices_left, candidate_variant_indices_left_ref)
+      candidate_variant_indices_right <- c(candidate_variant_indices_right, candidate_variant_indices_right_ref)
+    }
   } else { # Otherwise, identify candidate de novo variants directly from genotypes
     ranges_to_subset <- hap_granges
     
     candidate_variant_indices_left <- which(ranges_to_subset$phasing1 == "1|0" & ranges_to_subset$phasing2 == "0/0")  
     candidate_variant_indices_right <- which(ranges_to_subset$phasing1 == "0|1" & ranges_to_subset$phasing2 == "0/0")
+    if (test_reference_allele == TRUE){
+      candidate_variant_indices_left_ref <- which(ranges_to_subset$phasing1 == "0|1" & ranges_to_subset$phasing2 == "1/1")  
+      candidate_variant_indices_right_ref <- which(ranges_to_subset$phasing1 == "1|0" & ranges_to_subset$phasing2 == "1/1")
+      candidate_variant_indices_left <- c(candidate_variant_indices_left, candidate_variant_indices_left_ref)
+      candidate_variant_indices_right <- c(candidate_variant_indices_right, candidate_variant_indices_right_ref)
+    }
   }
   if (length(candidate_variant_indices_left) > 0){
     candidate_variant_granges_left <- ranges_to_subset[candidate_variant_indices_left]
