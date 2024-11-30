@@ -45,7 +45,7 @@ duoNovo(
 \item{output_vcf_path}{File path for output vcf.}
 }
 \value{
-A \code{GRangesList} containing three elements: \code{de_novo}, \code{not_de_novo}, and \code{uncertain}.
+A \code{GRanges} containing additional columns for the variant classifications as well as supporting information.
 }
 \description{
 The \code{duoNovo} function uses phased variant calls from duo long-read sequencing to classify candidate variants (heterozygous in the proband; absent in the parent).

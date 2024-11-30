@@ -16,12 +16,12 @@
 #' @param candidate_variant_coordinates Vector of coordinates for specific variants of interest (of the form c(chr1:1000, chr2:2000)).
 #' @param output_vcf_path File path for output vcf.
 #'
-#' @return A `GRangesList` containing three elements: `de_novo`, `not_de_novo`, and `uncertain`.
+#' @return A `GRanges` containing additional columns for the variant classifications as well as supporting information.
 #' @details The function ultimately works by detecting identical by descent haplotype blocks, to determine whether each candidate variant of interest is de novo, using the genotype of only one parent. If requested, concordance with short-read sequencing can be checked.
 #'
 #' @importFrom matrixStats colMins 
-#' @importFrom S4Vectors queryHits subjectHits DataFrame
-#' @importFrom SummarizedExperiment rowRanges
+#' @importFrom S4Vectors queryHits subjectHits DataFrame metadata
+#' @importFrom SummarizedExperiment rowRanges colData 
 #' @import GenomicRanges
 #' @import IRanges
 #' @import VariantAnnotation
@@ -235,6 +235,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   output_sorted <- sort(output)
   
   if (!is.null(output_vcf_path)){
+    message("Writing classified variants into VCF...")
     # Add each new INFO field to the header
     vcf_header <- header(vcf)
     new_info_fields <- DataFrame(
@@ -292,7 +293,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
       geno = geno_data             # Add the geno_data after subsetting for the rows present in our output
     )
     
-    metadata(vcf_out)$header <- vcf_header
+    S4Vectors::metadata(vcf_out)$header <- vcf_header
     writeVcf(vcf_out, output_vcf_path, index = TRUE, header = vcf_header)  
     }
   
