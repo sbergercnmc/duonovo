@@ -139,30 +139,31 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     candidate_variant_indices <- unique(queryHits(findOverlaps(hap_granges, candidate_variant_granges)))
     ranges_to_subset <- hap_granges[candidate_variant_indices]
     
-    QC_fail_variants <- QC_fail_variants[
-      unique(queryHits(findOverlaps(QC_fail_variants, ranges_to_subset)))]
-    
     candidate_variant_indices_left <- which(ranges_to_subset$phasing1 == "1|0" & ranges_to_subset$phasing2 == "0/0")  
     candidate_variant_indices_right <- which(ranges_to_subset$phasing1 == "0|1" & ranges_to_subset$phasing2 == "0/0")
   } else { # Otherwise, identify candidate de novo variants directly from genotypes
     ranges_to_subset <- hap_granges
-    
-    QC_fail_variants <- QC_fail_variants[
-      unique(queryHits(findOverlaps(QC_fail_variants, ranges_to_subset)))]
     
     candidate_variant_indices_left <- which(ranges_to_subset$phasing1 == "1|0" & ranges_to_subset$phasing2 == "0/0")  
     candidate_variant_indices_right <- which(ranges_to_subset$phasing1 == "0|1" & ranges_to_subset$phasing2 == "0/0")
   }
   if (length(candidate_variant_indices_left) > 0){
     candidate_variant_granges_left <- ranges_to_subset[candidate_variant_indices_left]
+    QC_fail_variants_left <- QC_fail_variants[
+      unique(queryHits(findOverlaps(QC_fail_variants, candidate_variant_granges_left)))]
   } else {
     candidate_variant_granges_left <- GRanges()
+    QC_fail_variants_left <- GRanges()
   }
   if (length(candidate_variant_indices_right) > 0){
     candidate_variant_granges_right <- ranges_to_subset[candidate_variant_indices_right]
+    QC_fail_variants_right <- QC_fail_variants[
+      unique(queryHits(findOverlaps(QC_fail_variants, candidate_variant_granges_right)))]
   } else {
     candidate_variant_granges_right <- GRanges()
+    QC_fail_variants_right <- GRanges()
   }  
+  QC_fail_variants <- c(QC_fail_variants_left, QC_fail_variants_right)
   
   # Optional: Restrict to candidate variants concordant with short-read sequencing
   if (candidate_variants_concordant_with_SRS == TRUE) {
