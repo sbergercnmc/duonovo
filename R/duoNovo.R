@@ -235,7 +235,28 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   output_sorted <- sort(output)
   
   if (!is.null(output_vcf_path)){
-    message("Writing classified variants to VCF file...")
+    # Add each new INFO field to the header
+    vcf_header <- header(vcf)
+    new_info_fields <- DataFrame(
+      row.names = c("phasing_proband", "phasing_parent", "depth_proband", "depth_parent",
+                    "GQ_proband", "GQ_parent", "duoNovo_classification",
+                    "supporting_hamming_distance", "supporting_counts_het_hom",
+                    "supporting_counts_het_het", "supporting_counts_hom_het",
+                    "QC_fail_step"),
+      Number = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+      Type = c("String", "String", "Integer", "Integer", "Integer", "Integer", "String",
+               "Integer", "Integer", "Integer", "Integer", "String"),
+      Description = c("Phasing for proband", "Phasing for parent", "Depth for proband",
+                      "Depth for parent", "Genotype quality for proband",
+                      "Genotype quality for parent", "DuoNovo classification",
+                      "Supporting Hamming distance", "Supporting counts (het-hom)",
+                      "Supporting counts (het-het)", "Supporting counts (hom-het)",
+                      "QC fail step (NA for variants that passed QC)")
+    )
+    
+    # Add each new INFO field to the header
+    info(vcf_header) <- rbind(info(vcf_header), new_info_fields)
+    
     info <- DataFrame(
       phasing_proband = output_sorted$phasing1,
       phasing_parent = output_sorted$phasing2,
@@ -251,38 +272,29 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
       QC_fail_step = output_sorted$QC_fail_step
     )
     
-    # 1. Create the VCF Header
-    vcf_header <- VCFHeader()
-    info_fields <- DataFrame(
-      row.names = c("phasing_proband", "phasing_parent", "depth_proband", "depth_parent", 
-                    "GQ_proband", "GQ_parent", "duoNovo_classification", 
-                    "supporting_hamming_distance", "supporting_counts_het_hom", 
-                    "supporting_counts_het_het", "supporting_counts_hom_het", 
-                    "QC_fail_step"),
-      Number = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-      Type = c("String", "String", "Integer", "Integer", "Integer", "Integer", "String", 
-               "Integer", "Integer", "Integer", "Integer", "String"),
-      Description = c("Phasing for proband", "Phasing for parent", "Depth for proband", 
-                      "Depth for parent", "Genotype quality for proband", 
-                      "Genotype quality for parent", "DuoNovo classification", 
-                      "Supporting Hamming distance", "Supporting counts (het-hom)", 
-                      "Supporting counts (het-het)", "Supporting counts (hom-het)", 
-                      "QC fail step (NA for variants that passed QC)")
-    )
     
-    # Add each INFO field to the VCF header
-    info(vcf_header) <- info_fields
+    sample_info <- colData(vcf)
+    geno_data <- geno(vcf)
+    geno_data <- lapply(geno_data, function(mat) {
+      if (length(dim(mat)) == 2) {
+        # 2D: subset rows and retain all columns
+        mat[names(output_sorted), , drop = FALSE]
+      } else if (length(dim(mat)) == 3) {
+        # 3D: subset rows and retain all slices and columns
+        mat[names(output_sorted), , , drop = FALSE]
+      }
+    })
     
-    # 2. Create the VCF object
     vcf_out <- VCF(
-      rowRanges = output_sorted,
-      info = info
+      rowRanges = output_sorted,   
+      colData = sample_info,       # Retain the original sample information
+      info = info,                 # Add the new INFO metadata fields
+      geno = geno_data             # Add the geno_data after subsetting for the rows present in our output
     )
     
-    # 3. Write the VCF to a file with the header
-    writeVcf(vcf_out, output_vcf_path, index = TRUE, header = vcf_header)
-  }
-  return(output_sorted)
+    metadata(vcf_out)$header <- vcf_header
+    writeVcf(vcf_out, output_vcf_path, index = TRUE, header = vcf_header)  
+    }
   
   ###Also give a verbose summary of results
   # Generate the table of counts for each classification
@@ -313,4 +325,5 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   )
   # Print the verbose summary
   cat(verbose_summary)
+  return(output_sorted)
 }
