@@ -27,7 +27,8 @@ parser$add_argument("-b", "--boundary_cutoff", type="integer", default=2000,
 parser$add_argument("-c", "--distance_cutoff", type="integer", default=40, 
                      help= "A numeric value specifying the minimum Hamming distance cutoff to determine that a proband-parent haplotype block is not identical by descent. [default %(default)d]",
                      metavar="number")
-parser$add_argument("-t", "--candidate_variant_coordinates", metavar="coordinates", 
+parser$add_argument("-t", "--test_reference_allele", action="store_true",  default=FALSE,  help="Test for deNovo Reference reversions (parent is hom_var, proband is het) [default FALSE]")
+parser$add_argument("-n", "--candidate_variant_coordinates", metavar="coordinates", 
                      help= "1-based list of chromosome ranges to evaluate for variants, e.g.  chr1:12345-12345,chr2:65430-65430. [Optional]")
 parser$add_argument("-s", "--SRS_vcf_file_path",  metavar="FILE", help = "Path to short read duo vcf [Optional]")
 parser$add_argument("-o", "--output_vcf",  metavar="FILE", help = "Path to file to write output vcf [Optional: Default appends _duoNovo to input vcf]")
@@ -70,6 +71,7 @@ duoNovo_results <- duoNovo(
   distance_cutoff = args$distance_cutoff,
   candidate_variants_concordant_with_SRS = args$use_SRS,
   SRS_vcf_file_path = args$SRS_vcf_file_path,
+  test_reference_allele = args$test_reference_allele,
   reference = args$ref,
   candidate_variant_coordinates=candidateCoords,
   output_vcf_path=args$output_vcf
