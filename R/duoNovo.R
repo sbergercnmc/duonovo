@@ -22,7 +22,7 @@
 #' @details The function ultimately works by detecting identical by descent haplotype blocks, to determine whether each candidate variant of interest is de novo, using the genotype of only one parent. If requested, concordance with short-read sequencing can be checked.
 #'
 #' @importFrom matrixStats colMins 
-#' @importFrom S4Vectors queryHits subjectHits DataFrame metadata
+#' @importFrom S4Vectors queryHits subjectHits DataFrame metadata append
 #' @importFrom SummarizedExperiment rowRanges colData 
 #' @import GenomicRanges
 #' @import IRanges
@@ -289,6 +289,26 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     message("Writing classified variants into VCF...")
     # Add each new INFO field to the header
     vcf_header <- header(vcf)
+    header_metadata <- meta(vcf_header)
+    
+    # Create new metadata entries in a similar format to existing entries
+    # Adding the custom metadata lines to the header
+    additional_metadata <- DataFrame(
+      Type = rep("String", 3),
+      Description = c("duoNovo Version: 0.1.0",
+                      paste0("duoNovo minGQ: ", GQ_cutoff), 
+                      paste0("duoNovo minDepth: ", depth_cutoff)),
+      row.names = c("duoNovo_Version",
+                    "duoNovo_minGQ", 
+                    "duoNovo_minDepth")
+    )
+    
+    # Combine the metadata with the new entries
+    combined_metadata <- S4Vectors::append(header_metadata, list(DUONOVO_INFO = additional_metadata))
+    
+    # Update the header
+    meta(vcf_header) <- combined_metadata
+    
     new_info_fields <- DataFrame(
       row.names = c("phasing_proband", "phasing_parent", "depth_proband", "depth_parent",
                     "GQ_proband", "GQ_parent", "duoNovo_classification",
@@ -349,7 +369,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     )
     
     S4Vectors::metadata(vcf_out)$header <- vcf_header
-    writeVcf(vcf_out, output_vcf_path, index = compress_output, header = vcf_header)  
+    writeVcf(vcf_out, output_vcf_path, index = compress_output)  
     }
   
   ###Also give a verbose summary of results
