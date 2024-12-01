@@ -110,7 +110,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     hap_granges_low_GQ <- hap_granges[low_GQ_only]
     hap_granges_low_GQ$QC_fail_step <- "low_GQ"
   } else {
-    hap_granges_low_GQ<- GRanges()
+    hap_granges_low_GQ <- GRanges()
   }
   if (length(low_depth_only) > 0){
     hap_granges_low_depth <- hap_granges[low_depth_only]
@@ -247,6 +247,19 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   output <- duo_novo_classifications
   output_sorted <- sort(output)
   
+  #flag de novo variants that are clustered in the same phasing set -- these are likely false positives
+  #first obtain phasing sets containing multiple variants classified as de novo
+  multi_denovo_PS_indices <- which(duplicated(output_sorted$PS1[
+    which(output_sorted$duoNovo_classification == "de_novo")]))
+  #now add flag for de novo variants in these phasing sets
+  output_sorted$clustered_in_same_PS <- NA
+  output_sorted$clustered_in_same_PS[which(output_sorted$duoNovo_classification == "de_novo")] <- FALSE
+  if (length(multi_denovo_PS_indices) > 0){
+      mult_denovo_PS <- unique(output_sorted$PS1[multi_denovo_PS_indices])
+      output_sorted$clustered_in_same_PS[which(output_sorted$duoNovo_classification == "de_novo" & 
+                                                 output_sorted$PS1 %in% mult_denovo_PS)] <- TRUE
+  }
+  
   if (!is.null(output_vcf_path)){
     message("Writing classified variants into VCF...")
     # Add each new INFO field to the header
@@ -256,16 +269,17 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                     "GQ_proband", "GQ_parent", "duoNovo_classification",
                     "supporting_hamming_distance", "supporting_counts_het_hom",
                     "supporting_counts_het_het", "supporting_counts_hom_het",
-                    "QC_fail_step"),
+                    "QC_fail_step", "clustered_in_same_PS"),
       Number = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
       Type = c("String", "String", "Integer", "Integer", "Integer", "Integer", "String",
-               "Integer", "Integer", "Integer", "Integer", "String"),
+               "Integer", "Integer", "Integer", "Integer", "String", "Flag"),
       Description = c("Phasing for proband", "Phasing for parent", "Depth for proband",
                       "Depth for parent", "Genotype quality for proband",
                       "Genotype quality for parent", "DuoNovo classification",
                       "Supporting Hamming distance", "Supporting counts (het-hom)",
                       "Supporting counts (het-het)", "Supporting counts (hom-het)",
-                      "QC fail step (NA for variants that passed QC)")
+                      "QC fail step (NA for variants that passed QC)", 
+                      "Clustered in the same phasing set (flag for de novo variants only)")
     )
     
     # Add each new INFO field to the header
@@ -283,7 +297,8 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
       supporting_counts_het_hom = output_sorted$supporting_counts_het_hom,
       supporting_counts_het_het = output_sorted$supporting_counts_het_het,
       supporting_counts_hom_het = output_sorted$supporting_counts_hom_het,
-      QC_fail_step = output_sorted$QC_fail_step
+      QC_fail_step = output_sorted$QC_fail_step, 
+      clustered_in_same_PS = output_sorted$clustered_in_same_PS
     )
     
     
