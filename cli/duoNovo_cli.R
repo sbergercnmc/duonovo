@@ -32,6 +32,7 @@ parser$add_argument("-n", "--candidate_variant_coordinates", metavar="coordinate
                      help= "1-based list of chromosome ranges to evaluate for variants, e.g.  chr1:12345-12345,chr2:65430-65430. [Optional]")
 parser$add_argument("-s", "--SRS_vcf_file_path",  metavar="FILE", help = "Path to short read duo vcf [Optional]")
 parser$add_argument("-o", "--output_vcf",  metavar="FILE", help = "Path to file to write output vcf [Optional: Default appends _duoNovo to input vcf]")
+parser$add_argument("-z", "--compess_output", action="store_true",  default=FALSE,  help="Compress output, append .bgz to filename, and tabix index [default FALSE]")
 
 # get command line options, if help option encountered print help and exit,
 # otherwise if options not found on command line then set defaults, 
@@ -74,5 +75,6 @@ duoNovo_results <- duoNovo(
   test_reference_allele = args$test_reference_allele,
   reference = args$ref,
   candidate_variant_coordinates=candidateCoords,
-  output_vcf_path=args$output_vcf
+  output_vcf_path=args$output_vcf,
+  compress_output=args$compress_output
 )

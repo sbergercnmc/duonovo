@@ -16,6 +16,7 @@
 #' @param reference Reference genome name (e.g. hg38) used in the vcfs.
 #' @param candidate_variant_coordinates Vector of coordinates for specific variants of interest (of the form c(chr1:1000, chr2:2000)).
 #' @param output_vcf_path File path for output vcf.
+#' @param compress_output Logical value specifying if output_vcf should be compressed and indexed. appended .bgz to filename (default is `TRUE`).
 #'
 #' @return A `GRanges` containing additional columns for the variant classifications as well as supporting information.
 #' @details The function ultimately works by detecting identical by descent haplotype blocks, to determine whether each candidate variant of interest is de novo, using the genotype of only one parent. If requested, concordance with short-read sequencing can be checked.
@@ -40,7 +41,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                     candidate_variants_concordant_with_SRS = TRUE, test_reference_allele = FALSE,
                     SRS_vcf_file_path, reference = "hg38", 
                     candidate_variant_coordinates = NULL, 
-                    output_vcf_path = NULL) {
+                    output_vcf_path = NULL, compress_output = TRUE) {
   if (!file.exists(LRS_phased_vcf_file_path)) {
     stop("The LRS VCF file path does not exist: ", LRS_phased_vcf_file_path)
   }
@@ -325,7 +326,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     )
     
     S4Vectors::metadata(vcf_out)$header <- vcf_header
-    writeVcf(vcf_out, output_vcf_path, index = TRUE, header = vcf_header)  
+    writeVcf(vcf_out, output_vcf_path, index = compress_output, header = vcf_header)  
     }
   
   ###Also give a verbose summary of results
