@@ -250,17 +250,17 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   
   #flag de novo variants that are clustered in the same phasing set -- these are likely false positives
   #first obtain phasing sets containing multiple variants classified as de novo
+  output_sorted$clustered_in_same_PS <- NA
   de_novo_indices <- which(output_sorted$duoNovo_classification == "de_novo")
   if (length(de_novo_indices) > 0){
     de_novo <- output_sorted[de_novo_indices]
     multi_denovo_PS_indices <- which(duplicated(de_novo$PS1))
     #now add flag for de novo variants in these phasing sets
-    output_sorted$clustered_in_same_PS <- NA
     output_sorted$clustered_in_same_PS[de_novo_indices] <- FALSE
     if (length(multi_denovo_PS_indices) > 0){
-      mult_denovo_PS <- unique(de_novo$PS1[multi_denovo_PS_indices])
+      multi_denovo_PS <- unique(de_novo$PS1[multi_denovo_PS_indices])
       output_sorted$clustered_in_same_PS[which(output_sorted$duoNovo_classification == "de_novo" & 
-                                                 output_sorted$PS1 %in% mult_denovo_PS)] <- TRUE
+                                                 output_sorted$PS1 %in% multi_denovo_PS)] <- TRUE
     }
   }
   
@@ -288,7 +288,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     
     # Add each new INFO field to the header
     info(vcf_header) <- rbind(info(vcf_header), new_info_fields)
-    
+
     info <- DataFrame(
       phasing_proband = output_sorted$phasing1,
       phasing_parent = output_sorted$phasing2,

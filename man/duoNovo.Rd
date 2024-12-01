@@ -17,7 +17,8 @@ duoNovo(
   SRS_vcf_file_path,
   reference = "hg38",
   candidate_variant_coordinates = NULL,
-  output_vcf_path = NULL
+  output_vcf_path = NULL,
+  compress_output = TRUE
 )
 }
 \arguments{
@@ -46,6 +47,8 @@ duoNovo(
 \item{candidate_variant_coordinates}{Vector of coordinates for specific variants of interest (of the form c(chr1:1000, chr2:2000)).}
 
 \item{output_vcf_path}{File path for output vcf.}
+
+\item{compress_output}{Logical value specifying if output_vcf should be compressed and indexed. appended .bgz to filename (default is \code{TRUE}).}
 }
 \value{
 A \code{GRanges} containing additional columns for the variant classifications as well as supporting information.
