@@ -249,15 +249,18 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   
   #flag de novo variants that are clustered in the same phasing set -- these are likely false positives
   #first obtain phasing sets containing multiple variants classified as de novo
-  multi_denovo_PS_indices <- which(duplicated(output_sorted$PS1[
-    which(output_sorted$duoNovo_classification == "de_novo")]))
-  #now add flag for de novo variants in these phasing sets
-  output_sorted$clustered_in_same_PS <- NA
-  output_sorted$clustered_in_same_PS[which(output_sorted$duoNovo_classification == "de_novo")] <- FALSE
-  if (length(multi_denovo_PS_indices) > 0){
-      mult_denovo_PS <- unique(output_sorted$PS1[multi_denovo_PS_indices])
+  de_novo_indices <- which(output_sorted$duoNovo_classification == "de_novo")
+  if (length(de_novo_indices) > 0){
+    de_novo <- output_sorted[de_novo_indices]
+    multi_denovo_PS_indices <- which(duplicated(de_novo$PS1))
+    #now add flag for de novo variants in these phasing sets
+    output_sorted$clustered_in_same_PS <- NA
+    output_sorted$clustered_in_same_PS[de_novo_indices] <- FALSE
+    if (length(multi_denovo_PS_indices) > 0){
+      mult_denovo_PS <- unique(de_novo$PS1[multi_denovo_PS_indices])
       output_sorted$clustered_in_same_PS[which(output_sorted$duoNovo_classification == "de_novo" & 
                                                  output_sorted$PS1 %in% mult_denovo_PS)] <- TRUE
+    }
   }
   
   if (!is.null(output_vcf_path)){
