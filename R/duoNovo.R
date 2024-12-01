@@ -271,7 +271,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     dn_overlaps_left <- findOverlaps(de_novo_left, hap_boundary_coordinates)
     dn_by_ps_left <- split(queryHits(dn_overlaps_left), subjectHits(dn_overlaps_left))
     n_dn_in_ps_left <- lengths(dn_by_ps_left)
-    indices_left <- unlist(n_dn_in_ps_left)
+    indices_left <- unlist(dn_by_ps_left)
     counts_left <- rep(n_dn_in_ps_left, n_dn_in_ps_left)
     output_sorted$n_de_novo_left_orientation_same_PS[de_novo_indices_left[indices_left]] <- counts_left
   }
@@ -280,7 +280,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     dn_overlaps_right <- findOverlaps(de_novo_right, hap_boundary_coordinates)
     dn_by_ps_right <- split(queryHits(dn_overlaps_right), subjectHits(dn_overlaps_right))
     n_dn_in_ps_right <- lengths(dn_by_ps_right)
-    indices_right <- unlist(n_dn_in_ps_right)
+    indices_right <- unlist(dn_by_ps_right)
     counts_right <- rep(n_dn_in_ps_right, n_dn_in_ps_right)
     output_sorted$n_de_novo_right_orientation_same_PS[de_novo_indices_right[indices_right]] <- counts_right
   }
