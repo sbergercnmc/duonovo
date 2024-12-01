@@ -324,7 +324,8 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
       supporting_counts_het_het = output_sorted$supporting_counts_het_het,
       supporting_counts_hom_het = output_sorted$supporting_counts_hom_het,
       QC_fail_step = output_sorted$QC_fail_step, 
-      clustered_in_same_PS = output_sorted$clustered_in_same_PS
+      n_de_novo_left_orientation_same_PS = output_sorted$n_de_novo_left_orientation_same_PS,
+      n_de_novo_right_orientation_same_PS = output_sorted$n_de_novo_right_orientation_same_PS
     )
     
     
