@@ -293,11 +293,30 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     
     # Create new metadata entries in a similar format to existing entries
     # Adding the custom metadata lines to the header
+    duoNovo_version <- "unknown"
+    if (requireNamespace("duoNovo", quietly = TRUE)) {
+       duoNovo_version <-packageVersion("duoNovo")
+    }
+
     additional_metadata <- DataFrame(
-      Type = rep("String", 3),
-      Description = c("duoNovo Version: 0.1.0",
-                      paste0("duoNovo minGQ: ", GQ_cutoff), 
-                      paste0("duoNovo minDepth: ", depth_cutoff)),
+      Type = rep("String", 15),
+      Description = c(
+                      paste0("duoNovo Version: 0.1.0", duoNovo_version),
+                      paste0("duoNovo LRS_phased_vcf_file_path: ", LRS_phased_vcf_file_path), 
+                      paste0("duoNovo GQ_cutoff: ", GQ_cutoff), 
+                      paste0("duoNovo depth_cutoff: ", depth_cutoff),
+                      paste0("duoNovo proband_column_identifier: ", proband_column_identifier ),
+                      paste0("duoNovo PS_width_cutoff: ",  PS_width_cutoff ), 
+                      paste0("duoNovo boundary_cutoff: ", boundary_cutoff ), 
+                      paste0("duoNovo distance_cutoff: ", distance_cutoff ), 
+                      paste0("duoNovo candidate_variants_concordant_with_SRS: ", candidate_variants_concordant_with_SRS ), 
+                      paste0("duoNovo test_reference_allele: ", test_reference_allele ),
+                      paste0("duoNovo SRS_vcf_file_path: ", SRS_vcf_file_path ),
+                      paste0("duoNovo reference: ", reference ), 
+                      paste0("duoNovo candidate_variant_coordinates: ", candidate_variant_coordinates ),
+                      paste0("duoNovo output_vcf_path: ", output_vcf_path ),
+                      paste0("duoNovo compress_output: ", compress_output )
+                     ),
       row.names = c("duoNovo_Version",
                     "duoNovo_minGQ", 
                     "duoNovo_minDepth")
