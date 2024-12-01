@@ -301,7 +301,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     additional_metadata <- DataFrame(
       Type = rep("String", 15),
       Description = c(
-                      paste0("duoNovo Version: 0.1.0", duoNovo_version),
+                      paste0("duoNovo Version: ", duoNovo_version),
                       paste0("duoNovo LRS_phased_vcf_file_path: ", LRS_phased_vcf_file_path), 
                       paste0("duoNovo GQ_cutoff: ", GQ_cutoff), 
                       paste0("duoNovo depth_cutoff: ", depth_cutoff),
@@ -318,8 +318,21 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                       paste0("duoNovo compress_output: ", compress_output )
                      ),
       row.names = c("duoNovo_Version",
+                    "duoNovo_LRS_phased_input_vcf",
                     "duoNovo_minGQ", 
-                    "duoNovo_minDepth")
+                    "duoNovo_minDepth",
+                    "duoNovo_proband_column_identifier",
+                    "duoNovo_PS_width_cutoff",
+                    "duoNovo_boundary_cutoff",
+                    "duoNovo_distance_cutoff",
+                    "duoNovo_candidate_variants_concordant_with_SRS",
+                    "duoNovo_test_reference_allele",
+                    "duoNovo_SRS_vcf_file_path",
+                    "duoNovo_reference",
+                    "duoNovo_candidate_variant_coordinates",
+                    "duoNovo_output_vcf_path",
+                    "duoNovo_compress_output"
+                   )
     )
     
     # Combine the metadata with the new entries
