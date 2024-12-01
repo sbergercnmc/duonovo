@@ -256,11 +256,11 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     de_novo <- output_sorted[de_novo_indices]
     multi_denovo_PS_indices <- which(duplicated(de_novo$PS1))
     #now add flag for de novo variants in these phasing sets
-    output_sorted$clustered_in_same_PS[de_novo_indices] <- FALSE
+    output_sorted$clustered_in_same_PS[de_novo_indices] <- "no"
     if (length(multi_denovo_PS_indices) > 0){
       multi_denovo_PS <- unique(de_novo$PS1[multi_denovo_PS_indices])
       output_sorted$clustered_in_same_PS[which(output_sorted$duoNovo_classification == "de_novo" & 
-                                                 output_sorted$PS1 %in% multi_denovo_PS)] <- TRUE
+                                                 output_sorted$PS1 %in% multi_denovo_PS)] <- "yes"
     }
   }
   
@@ -276,7 +276,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                     "QC_fail_step", "clustered_in_same_PS"),
       Number = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
       Type = c("String", "String", "Integer", "Integer", "Integer", "Integer", "String",
-               "Integer", "Integer", "Integer", "Integer", "String", "Flag"),
+               "Integer", "Integer", "Integer", "Integer", "String", "String"),
       Description = c("Phasing for proband", "Phasing for parent", "Depth for proband",
                       "Depth for parent", "Genotype quality for proband",
                       "Genotype quality for parent", "DuoNovo classification",
