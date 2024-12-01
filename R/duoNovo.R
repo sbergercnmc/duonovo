@@ -250,18 +250,39 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   
   #flag de novo variants that are clustered in the same phasing set -- these are likely false positives
   #first obtain phasing sets containing multiple variants classified as de novo
-  output_sorted$clustered_in_same_PS <- NA
-  de_novo_indices <- which(output_sorted$duoNovo_classification == "de_novo")
-  if (length(de_novo_indices) > 0){
-    de_novo <- output_sorted[de_novo_indices]
-    multi_denovo_PS_indices <- which(duplicated(de_novo$PS1))
-    #now add flag for de novo variants in these phasing sets
-    output_sorted$clustered_in_same_PS[de_novo_indices] <- "no"
-    if (length(multi_denovo_PS_indices) > 0){
-      multi_denovo_PS <- unique(de_novo$PS1[multi_denovo_PS_indices])
-      output_sorted$clustered_in_same_PS[which(output_sorted$duoNovo_classification == "de_novo" & 
-                                                 output_sorted$PS1 %in% multi_denovo_PS)] <- "yes"
-    }
+  output_sorted$n_de_novo_left_orientation_same_PS <- NA
+  output_sorted$n_de_novo_right_orientation_same_PS <- NA
+  de_novo_indices_left <- which(
+    output_sorted$duoNovo_classification == "de_novo" & 
+                                  (
+                                    (output_sorted$phasing1 == "1|0" & output_sorted$phasing2 == "0/0") | 
+                                      (output_sorted$phasing1 == "0|1" & output_sorted$phasing2 == "1/1")
+                                    )
+    )
+  de_novo_indices_right <- which(
+    output_sorted$duoNovo_classification == "de_novo" & 
+      (
+        (output_sorted$phasing1 == "0|1" & output_sorted$phasing2 == "0/0") | 
+          (output_sorted$phasing1 == "1|0" & output_sorted$phasing2 == "1/1")
+      )
+  )
+  if (length(de_novo_indices_left) > 0){
+    de_novo_left <- output_sorted[de_novo_indices_left]
+    dn_overlaps_left <- findOverlaps(de_novo_left, hap_boundary_coordinates)
+    dn_by_ps_left <- split(queryHits(dn_overlaps_left), subjectHits(dn_overlaps_left))
+    n_dn_in_ps_left <- lengths(dn_by_ps_left)
+    indices_left <- unlist(n_dn_in_ps_left)
+    counts_left <- rep(n_dn_in_ps_left, n_dn_in_ps_left)
+    output_sorted$n_de_novo_left_orientation_same_PS[de_novo_indices_left[indices_left]] <- counts_left
+  }
+  if (length(de_novo_indices_right) > 0){
+    de_novo_right <- output_sorted[de_novo_indices_right]
+    dn_overlaps_right <- findOverlaps(de_novo_right, hap_boundary_coordinates)
+    dn_by_ps_right <- split(queryHits(dn_overlaps_right), subjectHits(dn_overlaps_right))
+    n_dn_in_ps_right <- lengths(dn_by_ps_right)
+    indices_right <- unlist(n_dn_in_ps_right)
+    counts_right <- rep(n_dn_in_ps_right, n_dn_in_ps_right)
+    output_sorted$n_de_novo_right_orientation_same_PS[de_novo_indices_right[indices_right]] <- counts_right
   }
   
   if (!is.null(output_vcf_path)){
@@ -273,17 +294,18 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                     "GQ_proband", "GQ_parent", "duoNovo_classification",
                     "supporting_hamming_distance", "supporting_counts_het_hom",
                     "supporting_counts_het_het", "supporting_counts_hom_het",
-                    "QC_fail_step", "clustered_in_same_PS"),
-      Number = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+                    "QC_fail_step", "n_de_novo_left_orientation_same_PS", "n_de_novo_right_orientation_same_PS"),
+      Number = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
       Type = c("String", "String", "Integer", "Integer", "Integer", "Integer", "String",
-               "Integer", "Integer", "Integer", "Integer", "String", "String"),
+               "Integer", "Integer", "Integer", "Integer", "String", "Integer", "Integer"),
       Description = c("Phasing for proband", "Phasing for parent", "Depth for proband",
                       "Depth for parent", "Genotype quality for proband",
                       "Genotype quality for parent", "DuoNovo classification",
                       "Supporting Hamming distance", "Supporting counts (het-hom)",
                       "Supporting counts (het-het)", "Supporting counts (hom-het)",
                       "QC fail step (NA for variants that passed QC)", 
-                      "Clustered in the same phasing set (flag for de novo variants only)")
+                      "Total number of de novo variants in left orientation and same phasing set (NA for non-de novo variants or de novo variants in right orientation)", 
+                      "Total number of de novo variants in right orientation and same phasing set (NA for non-de novo variants or de novo variants in left orientation)")
     )
     
     # Add each new INFO field to the header
