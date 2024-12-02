@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# duoNovo: idnetification of de novo variants from single parent-proband duos
+# duoNovo: Identification of de novo variants from single parent-proband duos
 
 <!-- badges: start -->
 <!-- badges: end -->
