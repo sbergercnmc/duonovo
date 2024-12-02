@@ -36,7 +36,7 @@ duoNovo(
 
 \item{distance_cutoff}{A numeric value specifying the minimum hamming distance cutoff to determine that a proband-parent haplotype block are not identical by descent.}
 
-\item{candidate_variants_concordant_with_SRS}{Logical value specifying if candidate variants should be concordant with short-read sequencing (default is \code{TRUE}).}
+\item{candidate_variants_concordant_with_SRS}{Logical value specifying if candidate variants should be concordant with short-read sequencing (default is \code{FALSE}).}
 
 \item{SRS_vcf_file_path}{File path to the vcf containing variant calls from short-read sequencing of the duo.}
 

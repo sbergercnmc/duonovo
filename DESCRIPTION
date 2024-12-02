@@ -18,4 +18,5 @@ Imports:
     SummarizedExperiment,
     GenomicRanges,
     IRanges,
-    S4Vectors
+    S4Vectors,
+    utils

@@ -10,9 +10,9 @@
 #' @param PS_width_cutoff A numeric value specifying the minimum width of the haplotype blocks included in the analysis.
 #' @param boundary_cutoff A numeric value indicating the minimum distance from a haplotype block boundary (either start or end coordinate) for candidate variants to be analyzed.
 #' @param distance_cutoff A numeric value specifying the minimum hamming distance cutoff to determine that a proband-parent haplotype block are not identical by descent.
-#' @param candidate_variants_concordant_with_SRS Logical value specifying if candidate variants should be concordant with short-read sequencing (default is `TRUE`).
-#' @param test_reference_allele Logical value specifying if positions where the proband is heterozygous and the parent is homozygous for the variant allele (not the reference) should be tested (default is `FALSE`).
+#' @param candidate_variants_concordant_with_SRS Logical value specifying if candidate variants should be concordant with short-read sequencing (default is `FALSE`).
 #' @param SRS_vcf_file_path File path to the vcf containing variant calls from short-read sequencing of the duo.
+#' @param test_reference_allele Logical value specifying if positions where the proband is heterozygous and the parent is homozygous for the variant allele (not the reference) should be tested (default is `FALSE`).
 #' @param reference Reference genome name (e.g. hg38) used in the vcfs.
 #' @param candidate_variant_coordinates Vector of coordinates for specific variants of interest (of the form c(chr1:1000, chr2:2000)).
 #' @param output_vcf_path File path for output vcf.
@@ -27,6 +27,7 @@
 #' @import GenomicRanges
 #' @import IRanges
 #' @import VariantAnnotation
+#' @importFrom utils packageVersion
 #' @export
 #'
 #' @examples
@@ -123,7 +124,9 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   }
   QC_fail_variants <- c(hap_granges_low_GQ, hap_granges_low_depth, hap_granges_low_depth_GQ, QC_fail_variants)
 
-  hap_granges <- hap_granges[-low_depth_or_GQ]
+  if (length(low_depth_or_GQ) > 0){
+    hap_granges <- hap_granges[-low_depth_or_GQ]
+  }
   hap_boundary_coordinates <- getHaplotypeBlockCoordinates(hap_granges)
 
   # If candidate variant coordinates are provided, filter hap_granges accordingly
