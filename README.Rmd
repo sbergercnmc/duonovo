@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# duoNovo
+# duoNovo: idnetification of de novo variants from single parent-proband duos
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -36,15 +36,15 @@ if (!requireNamespace("devtools", quietly = TRUE)) {
     install.packages("devtools")
 }
 
-# Or alternatively using remotes
+# Or alternatively install remotes
 if (!requireNamespace("remotes", quietly = TRUE)) {
     install.packages("remotes")
 }
 
-# Step 3: Install duoNovo from GitHub
+# Step 3: Install duoNovo from GitHub using devtools
 devtools::install_github("sbergercnmc/duoNovo", dependencies = TRUE)
 
-# Or alternatively
+# Or alternatively using remotes
 remotes::install_github("sbergercnmc/duoNovo", dependencies = TRUE)
 ```
 
@@ -74,7 +74,6 @@ duoNovo_results <- duoNovo(
   LRS_phased_vcf_file_path = "duo_proband_father.longread.hiphase.vcf.gz", 
   depth_cutoff = 20, 
   GQ_cutoff = 30,
-  proband_phasing = "1|0", 
   proband_column_identifier = "-0$",
   PS_width_cutoff = 10000, 
   boundary_cutoff = 2000, 
@@ -85,19 +84,25 @@ duoNovo_results <- duoNovo(
 )
 ```
 
-duoNovo returns a `GRangesList` containing three elements: `de_novo`, `not_de_novo`, and `uncertain`. Each of these elements corresponds to a `GRanges` containing the variants that have been classified into the corresponding category.
+duoNovo returns a `GRanges` containing all candidate variants tested for de novo status, along with their classification into de novo, present on the haplotype inherited from the non-sequenced parent, and uncertain. It also includes additional pertinent information, such as the minimum of the two Hamming distances supporting the non-IBD status of the proband haplotype not containing the variant of interest and the two parental haplotypes, as well as the counts of the different proband-parent genotype classes supporting the classification. For variants that were not classified because they failed QC, a column named `QC_fail_step` provides the specific QC step they failed. 
+
+The user can optionally provide a vector of coordinates of variants of interest. In this case, only these variants will be tested for de novo status (assuming they are heterozygous in the proband and abset in the parent). If specific variants of interest are not provided, then duoNovo tests all variants heterozygous in the proband and absent in the parent.
+
+Optionally, the output is written into a vcf file.
 
 Below is a detailed description of each argument of `duoNovo()`:
 
 - **LRS_phased_vcf_file_path**: File path to the VCF containing phased variant calls from long-read sequencing of the duo.
 - **depth_cutoff**: A numeric value specifying the minimum sequencing depth for variants to be included in the analysis. The same cutoff applies to both proband and parent variants, for both LRS and SRS (if used).
 - **GQ_cutoff**: A numeric value specifying the minimum GQ (genotype quality) for variants to be included in the analysis. The same cutoff applies to both proband and parent variants, for both LRS and SRS (if used).
-- **proband_phasing**: A character string indicating the phasing of the proband, either "1|0" or "0|1".
-- **proband_column_identifier**: A character corresponding to an identifier for the proband column in the metadata matrices. Should be the same for both the LRS VCF and (if used) the SRS VCF.
+- **proband_column_identifier**: A character corresponding to an identifier for the proband column in the metadata matrices of the VCF. Should be the same for both the LRS VCF and (if used) the SRS VCF.
 - **PS_width_cutoff**: A numeric value specifying the minimum width for phasing sets to be included in the analysis.
 - **boundary_cutoff**: A numeric value indicating the minimum distance from a haplotype block boundary (either start or end coordinate) for candidate variants to be analyzed.
 - **distance_cutoff**: A numeric value specifying the minimum Hamming distance cutoff to determine that a proband-parent haplotype block is not identical by descent.
 - **candidate_variants_concordant_with_SRS**: Logical value specifying if candidate variants should be concordant with short-read sequencing (default is `TRUE` or `FALSE`).
 - **SRS_vcf_file_path**: File path to the VCF containing variant calls from short-read sequencing of the duo.
+- **test_reference_allele**: Logical value specifying if positions where the proband is heterozygous and the parent is homozygous for the variant allele should also be tested.
 - **reference**: Name of reference genome (e.g. hg38) used by the vcf.
-
+- **candidate_variant_coordinates**: A vector of coordinates (e.g. c(chr1:1000, chr2:2000)) of candidate variants of interest.
+- **output_vcf_path**: File path to be used when writing the output VCF file.
+- **compress_output**: Whether or not to compress the output VCF file.
