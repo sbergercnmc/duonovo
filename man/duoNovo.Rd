@@ -12,7 +12,7 @@ duoNovo(
   PS_width_cutoff = 10000,
   boundary_cutoff = 2000,
   distance_cutoff = 40,
-  candidate_variants_concordant_with_SRS = TRUE,
+  candidate_variants_concordant_with_SRS = FALSE,
   SRS_vcf_file_path,
   test_reference_allele = FALSE,
   reference = "hg38",

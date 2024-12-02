@@ -148,4 +148,5 @@ Below is a description of each argument that `duoNovo()` accepts:
 - **candidate_variant_coordinates**: A vector of coordinates
   (e.g. c(chr1:1000, chr2:2000)) of candidate variants of interest.
 - **output_vcf_path**: File path for the output VCF file.
-- **compress_output**: Whether or not to compress the output VCF file.
+- **compress_output**: Logical value specifying whether or not to
+  compress the output VCF file. The default is `TRUE`
