@@ -86,7 +86,7 @@ duoNovo_results <- duoNovo(
 
 duoNovo returns a `GRanges` containing all candidate variants tested for de novo status. A column named `duoNovo_classification` provides the classification of each variant as de novo, present on the haplotype inherited from the non-sequenced parent, or uncertain. Additional columns provide further pertinent information, such as the minimum of the two Hamming distances supporting the non-IBD status of the proband haplotype not containing the variant of interest and the two parental haplotypes, as well as the counts of the different proband-parent genotype classes supporting the classification. For variants that were not classified because they failed QC, a column named `QC_fail_step` provides the specific QC step they failed. 
 
-The user can optionally provide a vector of coordinates of variants of interest. In this case, only these variants will be tested for de novo status (assuming they are heterozygous in the proband and absent in the parent). If specific variants of interest are not provided, then duoNovo tests all variants heterozygous in the proband and absent in the parent.
+The user can optionally provide a vector of coordinates of variants of interest. In this case, only these variants will be tested for de novo status (provided they are heterozygous in the proband and absent in the parent, and they pass QC). If specific variants of interest are not provided, then duoNovo tests all variants heterozygous in the proband and absent in the parent that pass QC.
 
 Optionally, the output is written into a vcf file.
 
@@ -99,9 +99,9 @@ Below is a detailed description of each argument of `duoNovo()`:
 - **PS_width_cutoff**: A numeric value specifying the minimum width for phasing sets to be included in the analysis.
 - **boundary_cutoff**: A numeric value indicating the minimum distance from a haplotype block boundary (either start or end coordinate) for candidate variants to be analyzed.
 - **distance_cutoff**: A numeric value specifying the minimum Hamming distance cutoff to determine that a proband-parent haplotype block is not identical by descent.
-- **candidate_variants_concordant_with_SRS**: Logical value specifying if candidate variants should be concordant with short-read sequencing (default is `TRUE` or `FALSE`).
+- **candidate_variants_concordant_with_SRS**: Logical value specifying if candidate variants should be concordant with short-read sequencing.
 - **SRS_vcf_file_path**: File path to the VCF containing variant calls from short-read sequencing of the duo.
-- **test_reference_allele**: Logical value specifying if positions where the proband is heterozygous and the parent is homozygous for the variant allele should also be tested.
+- **test_reference_allele**: Logical value specifying if positions where the proband is heterozygous and the parent is homozygous for the variant allele should also be tested (default is `FALSE`).
 - **reference**: Name of reference genome (e.g. hg38) used by the vcf.
 - **candidate_variant_coordinates**: A vector of coordinates (e.g. c(chr1:1000, chr2:2000)) of candidate variants of interest.
 - **output_vcf_path**: File path to be used when writing the output VCF file.

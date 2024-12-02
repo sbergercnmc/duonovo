@@ -115,9 +115,10 @@ provides the specific QC step they failed.
 
 The user can optionally provide a vector of coordinates of variants of
 interest. In this case, only these variants will be tested for de novo
-status (assuming they are heterozygous in the proband and absent in the
-parent). If specific variants of interest are not provided, then duoNovo
-tests all variants heterozygous in the proband and absent in the parent.
+status (provided they are heterozygous in the proband and absent in the
+parent, and they pass QC). If specific variants of interest are not
+provided, then duoNovo tests all variants heterozygous in the proband
+and absent in the parent that pass QC.
 
 Optionally, the output is written into a vcf file.
 
@@ -145,13 +146,12 @@ Below is a detailed description of each argument of `duoNovo()`:
   distance cutoff to determine that a proband-parent haplotype block is
   not identical by descent.
 - **candidate_variants_concordant_with_SRS**: Logical value specifying
-  if candidate variants should be concordant with short-read sequencing
-  (default is `TRUE` or `FALSE`).
+  if candidate variants should be concordant with short-read sequencing.
 - **SRS_vcf_file_path**: File path to the VCF containing variant calls
   from short-read sequencing of the duo.
 - **test_reference_allele**: Logical value specifying if positions where
   the proband is heterozygous and the parent is homozygous for the
-  variant allele should also be tested.
+  variant allele should also be tested (default is `FALSE`).
 - **reference**: Name of reference genome (e.g. hg38) used by the vcf.
 - **candidate_variant_coordinates**: A vector of coordinates
   (e.g. c(chr1:1000, chr2:2000)) of candidate variants of interest.
