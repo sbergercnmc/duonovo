@@ -92,16 +92,18 @@ duoNovo_results <- duoNovo(
 ```
 
 *duoNovo* returns a `GRanges` containing all candidate variants tested
-for *de novo* status. A column named `duoNovo_classification` provides
-the classification of each variant as *de novo*, present on the
-haplotype inherited from the non-sequenced parent, or uncertain.
-Additional columns provide further pertinent information, such as the
-minimum of the two Hamming distances supporting the non-IBD status of
-the proband haplotype not containing the variant of interest and the two
-parental haplotypes, as well as the counts of the different
-proband-parent genotype classes supporting the classification. For
-variants that were not classified because they failed QC, a column named
-`QC_fail_step` provides the specific QC step they failed.
+for *de novo* status. This `GRanges` is a subset of the `rowRanges`
+corresponding to the input LRS VCF, but contains additional metadata
+columns. A column named `duoNovo_classification` provides the
+classification of each variant as *de novo*, present on the haplotype
+inherited from the non-sequenced parent, or uncertain. Additional
+columns provide further pertinent information, such as the minimum of
+the two Hamming distances supporting the non-IBD status of the proband
+haplotype not containing the variant of interest and the two parental
+haplotypes, as well as the counts of the different proband-parent
+genotype classes supporting the classification. For variants that were
+not classified because they failed QC, a column named `QC_fail_step`
+provides the specific QC step they failed.
 
 The user can optionally provide a vector of coordinates of variants of
 interest. In this case, only these variants will be tested for *de novo*
