@@ -7,7 +7,7 @@
 #' @param depth_cutoff A numeric value specifying the minimum sequencing depth for variants to be included in the analysis. The same cutoff applies to both proband and parent variants, for both LRS and SRS (if used).
 #' @param GQ_cutoff A numeric value specifying the minimum GQ (genotype quality) for variants to be included in the analysis. The same cutoff applies to both proband and parent variants, for both LRS and SRS (if used).
 #' @param proband_column_identifier A character corresponding to an identifier for the proband column in the metadata matrices. Should be the same for both the LRS vcf and (if used) the SRS vcf.
-#' @param PS_width_cutoff A numeric value specifying the minimum width for phasing sets to be included in the analysis.
+#' @param PS_width_cutoff A numeric value specifying the minimum width of the haplotype blocks included in the analysis.
 #' @param boundary_cutoff A numeric value indicating the minimum distance from a haplotype block boundary (either start or end coordinate) for candidate variants to be analyzed.
 #' @param distance_cutoff A numeric value specifying the minimum hamming distance cutoff to determine that a proband-parent haplotype block are not identical by descent.
 #' @param candidate_variants_concordant_with_SRS Logical value specifying if candidate variants should be concordant with short-read sequencing (default is `TRUE`).
@@ -38,8 +38,8 @@
 duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                     proband_column_identifier,
                     PS_width_cutoff = 10000, boundary_cutoff = 2000, distance_cutoff = 40,
-                    candidate_variants_concordant_with_SRS = TRUE, test_reference_allele = FALSE,
-                    SRS_vcf_file_path, reference = "hg38", 
+                    candidate_variants_concordant_with_SRS = TRUE, SRS_vcf_file_path, 
+                    test_reference_allele = FALSE, reference = "hg38", 
                     candidate_variant_coordinates = NULL, 
                     output_vcf_path = NULL, compress_output = TRUE) {
   if (!file.exists(LRS_phased_vcf_file_path)) {
@@ -81,6 +81,8 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   vcf_granges$GQ1 <- vcf_metadata$GQ[, proband_column]
   vcf_granges$GQ2 <- vcf_metadata$GQ[, -proband_column]
 
+  #the following extracts the phasing set to which each phased variant is assigned to in the proband and in the parent
+  #and ensures the phasing set is represented by a unique identifier in the columns PS1 (for proband) and PS2 (for parent)
   vcf_granges$PS1 <- vcf_metadata$PS[, proband_column]
   has_PS1 <- !is.na(vcf_granges$PS1)
   vcf_granges$PS1[has_PS1] <- paste0(seqnames(vcf_granges[has_PS1]), "_", vcf_granges$PS1[has_PS1])
@@ -113,12 +115,6 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   } else {
     hap_granges_low_GQ <- GRanges()
   }
-  if (length(low_depth_only) > 0){
-    hap_granges_low_depth <- hap_granges[low_depth_only]
-    hap_granges_low_depth$QC_fail_step <- "low_depth"
-  } else {
-    hap_granges_low_depth <- GRanges()
-  }
   if (length(low_depth_and_GQ) > 0){
     hap_granges_low_depth_GQ <- hap_granges[low_depth_and_GQ]
     hap_granges_low_depth_GQ$QC_fail_step <- "low_depth_and_GQ"
@@ -132,12 +128,23 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
 
   # If candidate variant coordinates are provided, filter hap_granges accordingly
   if (!is.null(candidate_variant_coordinates)) {
+    split_coords <- strsplit(candidate_variant_coordinates, ":")
+    seqnames <- sapply(split_coords, `[[`, 1)
+    ranges <- sapply(split_coords, `[[`, 2)
+    
+    # Extract chromosome names and start/end coordinates
+    ranges_split <- strsplit(ranges, "-")
+    starts <- as.numeric(sapply(ranges_split, `[[`, 1))
+    ends <- sapply(ranges_split, function(x) if (length(x) > 1) as.numeric(x[2]) else as.numeric(x[1]))
+    
+    # Create GRanges
     candidate_variant_granges <- GRanges(
-      seqnames = sapply(strsplit(candidate_variant_coordinates, ":"), `[[`, 1),
+      seqnames = seqnames,
       ranges = IRanges(
-        start = as.numeric(sapply(strsplit(sapply(strsplit(candidate_variant_coordinates, ":"), `[[`, 2), "-"), `[[`, 1)),
-        end = as.numeric(sapply(strsplit(sapply(strsplit(candidate_variant_coordinates, ":"), `[[`, 2), "-"), `[[`, 2))
-      ))
+        start = starts,
+        end = ends
+      )
+    )
     candidate_variant_indices <- unique(queryHits(findOverlaps(hap_granges, candidate_variant_granges)))
     ranges_to_subset <- hap_granges[candidate_variant_indices]
     

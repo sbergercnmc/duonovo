@@ -13,8 +13,8 @@ duoNovo(
   boundary_cutoff = 2000,
   distance_cutoff = 40,
   candidate_variants_concordant_with_SRS = TRUE,
-  test_reference_allele = FALSE,
   SRS_vcf_file_path,
+  test_reference_allele = FALSE,
   reference = "hg38",
   candidate_variant_coordinates = NULL,
   output_vcf_path = NULL,
@@ -30,7 +30,7 @@ duoNovo(
 
 \item{proband_column_identifier}{A character corresponding to an identifier for the proband column in the metadata matrices. Should be the same for both the LRS vcf and (if used) the SRS vcf.}
 
-\item{PS_width_cutoff}{A numeric value specifying the minimum width for phasing sets to be included in the analysis.}
+\item{PS_width_cutoff}{A numeric value specifying the minimum width of the haplotype blocks included in the analysis.}
 
 \item{boundary_cutoff}{A numeric value indicating the minimum distance from a haplotype block boundary (either start or end coordinate) for candidate variants to be analyzed.}
 
@@ -38,9 +38,9 @@ duoNovo(
 
 \item{candidate_variants_concordant_with_SRS}{Logical value specifying if candidate variants should be concordant with short-read sequencing (default is \code{TRUE}).}
 
-\item{test_reference_allele}{Logical value specifying if positions where the proband is heterozygous and the parent is homozygous for the variant allele (not the reference) should be tested (default is \code{FALSE}).}
-
 \item{SRS_vcf_file_path}{File path to the vcf containing variant calls from short-read sequencing of the duo.}
+
+\item{test_reference_allele}{Logical value specifying if positions where the proband is heterozygous and the parent is homozygous for the variant allele (not the reference) should be tested (default is \code{FALSE}).}
 
 \item{reference}{Reference genome name (e.g. hg38) used in the vcfs.}
 
