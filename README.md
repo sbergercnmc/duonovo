@@ -155,6 +155,5 @@ Below is a detailed description of each argument of `duoNovo()`:
 - **reference**: Name of reference genome (e.g. hg38) used by the vcf.
 - **candidate_variant_coordinates**: A vector of coordinates
   (e.g. c(chr1:1000, chr2:2000)) of candidate variants of interest.
-- **output_vcf_path**: File path to be used when writing the output VCF
-  file.
+- **output_vcf_path**: File path for the output VCF file.
 - **compress_output**: Whether or not to compress the output VCF file.
