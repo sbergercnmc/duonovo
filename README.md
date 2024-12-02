@@ -7,10 +7,10 @@
 <!-- badges: end -->
 
 duoNovo is an R package that identifies de novo variants from single
-parent-proband duos, that is, without having to sequence both biological
-parents. duoNovo uses phased variant calls generated via long-read
-sequencing followed by variant calling and read-backed phasing (for
-example, using HiPhase), in order to determine whether candidate
+parent-proband duos, that is, without requiring sequencing of both
+biological parents. duoNovo uses phased variant calls generated via
+long-read sequencing followed by variant calling and read-backed phasing
+(for example, using HiPhase), in order to determine whether candidate
 variants of interest (heterozygous in the proband; absent in the parent)
 are present on haplotypes that are identical by descent between the
 sequenced parent and the proband. If that is the case, duoNovo
@@ -102,9 +102,10 @@ duoNovo_results <- duoNovo(
 ```
 
 duoNovo returns a `GRanges` containing all candidate variants tested for
-de novo status, along with their classification into de novo, present on
-the haplotype inherited from the non-sequenced parent, and uncertain. It
-also includes additional pertinent information, such as the minimum of
+de novo status. A column named `duoNovo_classification` provides the
+classification of each variant as de novo, present on the haplotype
+inherited from the non-sequenced parent, or uncertain. Additional
+columns provide further pertinent information, such as the minimum of
 the two Hamming distances supporting the non-IBD status of the proband
 haplotype not containing the variant of interest and the two parental
 haplotypes, as well as the counts of the different proband-parent
