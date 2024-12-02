@@ -115,7 +115,7 @@ provides the specific QC step they failed.
 
 The user can optionally provide a vector of coordinates of variants of
 interest. In this case, only these variants will be tested for de novo
-status (assuming they are heterozygous in the proband and abset in the
+status (assuming they are heterozygous in the proband and absent in the
 parent). If specific variants of interest are not provided, then duoNovo
 tests all variants heterozygous in the proband and absent in the parent.
 
