@@ -44,6 +44,16 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
   QC_fail_variants_no_hap_overlap <- candidate_variant_granges[-hap_overlap_indices]
   QC_fail_variants_no_hap_overlap$QC_fail_step <- "no_haplotype_block_overlap"
   QC_fail_variants <- c(QC_fail_variants, QC_fail_variants_no_hap_overlap)
+
+  if (length(hap_overlap_indices) == 0) {
+    warning(paste0("No candidate variants of ", phasing_orientation, " phasing orientation passed QC."))
+    QC_fail_variants$duoNovo_classification <- "failed_QC"
+    QC_fail_variants$supporting_hamming_distance <- NA
+    QC_fail_variants$supporting_counts_het_hom <- NA
+    QC_fail_variants$supporting_counts_het_het <- NA
+    QC_fail_variants$supporting_counts_hom_het <- NA
+    return(QC_fail_variants)
+  }
   candidate_variant_granges <- candidate_variant_granges[hap_overlap_indices]
 
   #now obtain those that do not overlap any after filtering out small haplotype blocks
@@ -55,6 +65,16 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
   QC_fail_variants_no_hap_overlap <- candidate_variant_granges[-hap_overlap_indices]
   QC_fail_variants_no_hap_overlap$QC_fail_step <- "in_small_haplotype_block"
   QC_fail_variants <- c(QC_fail_variants, QC_fail_variants_no_hap_overlap)
+
+  if (length(hap_overlap_indices) == 0) {
+    warning(paste0("No candidate variants of ", phasing_orientation, " phasing orientation passed QC."))
+    QC_fail_variants$duoNovo_classification <- "failed_QC"
+    QC_fail_variants$supporting_hamming_distance <- NA
+    QC_fail_variants$supporting_counts_het_hom <- NA
+    QC_fail_variants$supporting_counts_het_het <- NA
+    QC_fail_variants$supporting_counts_hom_het <- NA
+    return(QC_fail_variants)
+  }
   candidate_variant_granges <- candidate_variant_granges[hap_overlap_indices]
 
   #now obtain those that fall too close within boundaries of haplotype blocks
@@ -63,14 +83,19 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
   QC_fail_variants_boundary_overlap <- candidate_variant_granges[-no_boundary_overlap_indices]
   QC_fail_variants_boundary_overlap$QC_fail_step <- "in_haplotype_block_boundary"
   QC_fail_variants <- c(QC_fail_variants, QC_fail_variants_boundary_overlap)
+  if (length(overlaps) == 0) {
+    warning(paste0("No candidate variants of ", phasing_orientation, " phasing orientation passed QC."))
+    QC_fail_variants$duoNovo_classification <- "failed_QC"
+    QC_fail_variants$supporting_hamming_distance <- NA
+    QC_fail_variants$supporting_counts_het_hom <- NA
+    QC_fail_variants$supporting_counts_het_het <- NA
+    QC_fail_variants$supporting_counts_hom_het <- NA
+    return(QC_fail_variants)
+  }
   ###QC steps end here
 
   ###now proceed to variant classification
   overlapping_indices <- split(queryHits(overlaps), subjectHits(overlaps))
-  if (length(overlapping_indices) == 0) {
-    warning("Candidate variants cannot be classified because they all fall outside haplotype block boundaries after QC.")
-    return(candidate_variant_granges)
-  }
 
   haplotypes <- vector("list", length(overlapping_indices))
   names(haplotypes) <- names(overlapping_indices)

@@ -125,6 +125,9 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   QC_fail_variants <- c(hap_granges_low_GQ, hap_granges_low_depth, hap_granges_low_depth_GQ, QC_fail_variants)
 
   if (length(low_depth_or_GQ) > 0){
+    if (length(low_depth_or_GQ) == length(hap_granges)) {
+      stop("No variants called from LRS pass depth and GQ thresholds.")
+    }
     hap_granges <- hap_granges[-low_depth_or_GQ]
   }
   hap_boundary_coordinates <- getHaplotypeBlockCoordinates(hap_granges)
@@ -173,21 +176,36 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   }
   if (length(candidate_variant_indices_left) > 0){
     candidate_variant_granges_left <- ranges_to_subset[candidate_variant_indices_left]
-    QC_fail_variants_left <- QC_fail_variants[
-      unique(queryHits(findOverlaps(QC_fail_variants, candidate_variant_granges_left)))]
+    overlaps <- findOverlaps(QC_fail_variants, candidate_variant_granges_left)
+    if (length(overlaps) > 0){
+      QC_fail_variants_left <- QC_fail_variants[unique(queryHits(overlaps))]
+      candidate_variant_granges_left <- candidate_variant_granges_left[-unique(subjectHits(overlaps))]
+    } else {
+      QC_fail_variants_left <- GRanges()
+    }
   } else {
     candidate_variant_granges_left <- GRanges()
     QC_fail_variants_left <- GRanges()
   }
   if (length(candidate_variant_indices_right) > 0){
     candidate_variant_granges_right <- ranges_to_subset[candidate_variant_indices_right]
-    QC_fail_variants_right <- QC_fail_variants[
-      unique(queryHits(findOverlaps(QC_fail_variants, candidate_variant_granges_right)))]
+    overlaps <- findOverlaps(QC_fail_variants, candidate_variant_granges_right)
+    if (length(overlaps) > 0){
+      QC_fail_variants_right <- QC_fail_variants[unique(queryHits(overlaps))]
+      candidate_variant_granges_right <- candidate_variant_granges_right[-unique(subjectHits(overlaps))]
+    } else {
+      QC_fail_variants_right <- GRanges()
+    }  
   } else {
     candidate_variant_granges_right <- GRanges()
     QC_fail_variants_right <- GRanges()
   }  
   QC_fail_variants <- c(QC_fail_variants_left, QC_fail_variants_right)
+  
+  if (length(candidate_variant_granges_left) == 0 & length(candidate_variant_granges_right) == 0) {
+    warning("No candidate variants passed QC.")
+    return(QC_fail_variants)
+  }
   
   # Optional: Restrict to candidate variants concordant with short-read sequencing
   if (candidate_variants_concordant_with_SRS == TRUE) {
@@ -220,18 +238,71 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     vcf_granges_SR$GQ1 <- vcf_metadata_SR$GQ[, proband_column]
     vcf_granges_SR$GQ2 <- vcf_metadata_SR$GQ[, -proband_column]
 
-    vcf_granges_filtered_SR <- vcf_granges_SR[which(vcf_granges_SR$depth1 >= depth_cutoff & vcf_granges_SR$GQ1 >= GQ_cutoff &
-                                                      vcf_granges_SR$depth2 >= depth_cutoff & vcf_granges_SR$GQ2 >= GQ_cutoff)]
-
-    vcf_granges_filtered_SR <- vcf_granges_filtered_SR[
-      which(vcf_granges_filtered_SR$gt1 %in% c("1/0", "0/1") & vcf_granges_filtered_SR$gt2 == "0/0")]
+    pass_depth_GQ_SR <- which(vcf_granges_SR$depth1 >= depth_cutoff & vcf_granges_SR$GQ1 >= GQ_cutoff &
+                                vcf_granges_SR$depth2 >= depth_cutoff & vcf_granges_SR$GQ2 >= GQ_cutoff)
+    if (length(pass_depth_GQ_SR) == 0) {
+      stop("No variants called from SRS pass depth and GQ thresholds.")
+    }
+    vcf_granges_filtered_SR <- vcf_granges_SR[pass_depth_GQ_SR]
+    candidate_indices_SR <- which(vcf_granges_filtered_SR$gt1 %in% c("1/0", "0/1") & 
+                                    vcf_granges_filtered_SR$gt2 == "0/0")
+    if (test_reference_allele == TRUE){
+      candidate_indices_SR <- c(candidate_indices_SR, which(vcf_granges_filtered_SR$gt1 %in% c("1/0", "0/1") & 
+                                      vcf_granges_filtered_SR$gt2 == "1/1"))
+    }
+    if (length(candidate_indices_SR) == 0) {
+      stop("No variants called from SRS pass depth and GQ thresholds.")
+    } 
+    vcf_granges_filtered_SR <- vcf_granges_filtered_SR[candidate_indices_SR]
     
-    candidate_variant_granges_left <- candidate_variant_granges_left[
-      unique(queryHits(findOverlaps(candidate_variant_granges_left, vcf_granges_filtered_SR)))]
-    candidate_variant_granges_right <- candidate_variant_granges_right[
-      unique(queryHits(findOverlaps(candidate_variant_granges_left, vcf_granges_filtered_SR)))]
+    QC_fail_variants_SR_left <- GRanges()
+    QC_fail_variants_SR_right <- GRanges()
+    
+    if (length(candidate_variant_granges_left) > 0){
+        concordant_genotype_overlaps_left <- findOverlaps(candidate_variant_granges_left, vcf_granges_filtered_SR)
+        if (length(concordant_genotype_overlaps_left) > 0){
+          queryHits_indices <- unique(queryHits(concordant_genotype_overlaps_left))
+          candidate_variant_granges_left <- candidate_variant_granges_left[queryHits_indices]
+          
+          QC_fail_variants_SR_left <- c(QC_fail_variants_SR_left, 
+                                        candidate_variant_granges_left[-queryHits_indices])
+          if (length(QC_fail_variants_SR_left) > 0){
+            QC_fail_variants_SR_left$QC_fail_step <- "failed_SRS_concordance_QC"
+          }
+      } else {
+        candidate_variant_granges_left <- GRanges()
+        QC_fail_variants_SR_left <- c(QC_fail_variants_SR_left, 
+                                      candidate_variant_granges_left)
+        QC_fail_variants_SR_left$QC_fail_step <- "failed_SRS_concordance_QC"
+      }
+    }
+    if (length(candidate_variant_granges_right) > 0){
+        concordant_genotype_overlaps_right <- findOverlaps(candidate_variant_granges_right, vcf_granges_filtered_SR)
+        if (length(concordant_genotype_overlaps_right) > 0){
+          queryHits_indices <- unique(queryHits(concordant_genotype_overlaps_right))
+          candidate_variant_granges_right <- candidate_variant_granges_right[queryHits_indices]
+          
+          QC_fail_variants_SR_right <- c(QC_fail_variants_SR_right, 
+                                        candidate_variant_granges_right[-queryHits_indices])
+          if (length(QC_fail_variants_SR_right) > 0){
+            QC_fail_variants_SR_right$QC_fail_step <- "failed_SRS_concordance_QC"
+          }
+      } else {
+        candidate_variant_granges_right <- GRanges()
+        QC_fail_variants_SR_right <- c(QC_fail_variants_SR_right, 
+                                      candidate_variant_granges_right)
+        QC_fail_variants_SR_right$QC_fail_step <- "failed_SRS_concordance_QC"
+      }      
+    }
+    
+    QC_fail_variants <- c(QC_fail_variants, QC_fail_variants_SR_right, QC_fail_variants_SR_left)
+    
+    if (length(candidate_variant_granges_left) == 0 & length(candidate_variant_granges_right) == 0) {
+      warning("No candidate variants passed QC.")
+      return(QC_fail_variants)
+    }
   }
-
+  
   # Finding overlaps and analyzing haplotypes
   message("Classifying variants...")
   if (length(candidate_variant_granges_left) > 0){
