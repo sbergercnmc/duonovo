@@ -375,11 +375,13 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     output <- c(de_novo, not_de_novo, uncertain)
   }
 
-  QC_fail_variants$duoNovo_classification <- "failed_QC"
-  QC_fail_variants$supporting_hamming_distance <- NA
-  QC_fail_variants$supporting_counts_het_hom <- NA
-  QC_fail_variants$supporting_counts_het_het <- NA
-  QC_fail_variants$supporting_counts_hom_het <- NA
+  if (length(QC_fail_variants) > 0){
+    QC_fail_variants$duoNovo_classification <- "failed_QC"
+    QC_fail_variants$supporting_hamming_distance <- NA
+    QC_fail_variants$supporting_counts_het_hom <- NA
+    QC_fail_variants$supporting_counts_het_het <- NA
+    QC_fail_variants$supporting_counts_hom_het <- NA
+  }
 
   output$QC_fail_step <- NA
   combined_output <- c(output, QC_fail_variants)
