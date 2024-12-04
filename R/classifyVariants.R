@@ -54,7 +54,7 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     warning(paste0("No candidate variants of ", phasing_orientation, " phasing orientation passed QC."))
     return(QC_fail_variants)
   }
-  if (length(hap_overlap_indices) <length(candidate_variant_granges)){
+  if (length(hap_overlap_indices) < length(candidate_variant_granges)){
     QC_fail_variants_no_hap_overlap <- candidate_variant_granges[-hap_overlap_indices]
     QC_fail_variants_no_hap_overlap$QC_fail_step <- "no_haplotype_block_overlap"
     QC_fail_variants <- c(QC_fail_variants, QC_fail_variants_no_hap_overlap)
@@ -134,28 +134,30 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
   # Precompute query hits split by subject hits
   overlapping_map <- split(queryHits(overlap_results), subjectHits(overlap_results))
 
+  hap11_all <- haplotype_granges_no_denovo$hap11
+  hap12_all <- haplotype_granges_no_denovo$hap12
+  hap21_all <- haplotype_granges_no_denovo$hap21
+  hap22_all <- haplotype_granges_no_denovo$hap22
+
+  is_het1_all <- haplotype_granges_no_denovo$phasing1 %in% het
+  is_het2_all <- haplotype_granges_no_denovo$phasing2 %in% het
+  is_hom1_all <- haplotype_granges_no_denovo$phasing1 %in% hom
+  is_hom2_all <- haplotype_granges_no_denovo$phasing2 %in% hom
+
   for (i in with_variants) {
     variant_indices <- overlapping_map[[as.character(i)]]
 
     haplotypes[[i]] <- cbind(
-      hap11 = haplotype_granges_no_denovo$hap11[variant_indices],
-      hap12 = haplotype_granges_no_denovo$hap12[variant_indices],
-      hap21 = haplotype_granges_no_denovo$hap21[variant_indices],
-      hap22 = haplotype_granges_no_denovo$hap22[variant_indices]
+      hap11 = hap11_all[variant_indices],
+      hap12 = hap12_all[variant_indices],
+      hap21 = hap21_all[variant_indices],
+      hap22 = hap22_all[variant_indices]
     )
 
-    phasing1 <- haplotype_granges_no_denovo$phasing1[variant_indices]
-    phasing2 <- haplotype_granges_no_denovo$phasing2[variant_indices]
-
     # Compute logical indices once and reuse them
-    is_het1 <- phasing1 %in% het
-    is_het2 <- phasing2 %in% het
-    is_hom1 <- phasing1 %in% hom
-    is_hom2 <- phasing2 %in% hom
-
-    counts_het_hom[i] <- sum(is_het1 & is_hom2, na.rm = TRUE)
-    counts_het_het[i] <- sum(is_het1 & is_het2, na.rm = TRUE)
-    counts_hom_het[i] <- sum(is_hom1 & is_het2, na.rm = TRUE)
+    counts_het_hom[i] <- sum(is_het1_all[variant_indices] & is_hom2_all[variant_indices], na.rm = TRUE)
+    counts_het_het[i] <- sum(is_het1_all[variant_indices] & is_het2_all[variant_indices], na.rm = TRUE)
+    counts_hom_het[i] <- sum(is_hom1_all[variant_indices] & is_het2_all[variant_indices], na.rm = TRUE)
   }
 
   hamming_distance_mat <- sapply(haplotypes, function(xx)
@@ -170,8 +172,8 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
   hamming_distance_mins_2vs1 <- colMins(hamming_distance_mat[3, , drop = FALSE])
   hamming_distance_mins_2vs2 <- colMins(hamming_distance_mat[4, , drop = FALSE])
 
-  hamming_distance_mins_hap1 <- colMins(hamming_distance_mat[1:2, ])
-  hamming_distance_mins_hap2 <- colMins(hamming_distance_mat[3:4, ])
+  hamming_distance_mins_hap1 <- colMins(hamming_distance_mat[1:2, , drop = FALSE])
+  hamming_distance_mins_hap2 <- colMins(hamming_distance_mat[3:4, , drop = FALSE])
 
   all_columns <- 1:dim(hamming_distance_mat)[2]
   clean_inheritance_hap1vs1 <- which(hamming_distance_mins_1vs1 == 0 & hamming_distance_mins_1vs2 > 0 &

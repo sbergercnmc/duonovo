@@ -258,10 +258,22 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     QC_fail_variants_SR_left <- GRanges()
     QC_fail_variants_SR_right <- GRanges()
     
+    SR_indices_ref <- which(vcf_granges_filtered_SR$gt2 == "0/0")
+    SR_indices_alt <- which(vcf_granges_filtered_SR$gt2 == "1/1")
+    
     if (length(candidate_variant_granges_left) > 0){
-        concordant_genotype_overlaps_left <- findOverlaps(candidate_variant_granges_left, vcf_granges_filtered_SR)
-        if (length(concordant_genotype_overlaps_left) > 0){
-          queryHits_indices <- unique(queryHits(concordant_genotype_overlaps_left))
+        concordant_genotype_overlaps_left_alt <- findOverlaps(
+          candidate_variant_granges_left[which(candidate_variant_granges_left$phasing2 == "0/0")], 
+          vcf_granges_filtered_SR[SR_indices_ref])
+        
+        concordant_genotype_overlaps_left_ref <- findOverlaps(
+          candidate_variant_granges_left[which(candidate_variant_granges_left$phasing2 == "1/1")], 
+          vcf_granges_filtered_SR[SR_indices_alt])
+        
+        queryHits_indices <- c(unique(queryHits(concordant_genotype_overlaps_left_alt)), 
+                               unique(queryHits(concordant_genotype_overlaps_left_ref)))
+        
+        if (length(queryHits_indices) > 0){
           candidate_variant_granges_left <- candidate_variant_granges_left[queryHits_indices]
           
           QC_fail_variants_SR_left <- c(QC_fail_variants_SR_left, 
@@ -277,9 +289,18 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
       }
     }
     if (length(candidate_variant_granges_right) > 0){
-        concordant_genotype_overlaps_right <- findOverlaps(candidate_variant_granges_right, vcf_granges_filtered_SR)
-        if (length(concordant_genotype_overlaps_right) > 0){
-          queryHits_indices <- unique(queryHits(concordant_genotype_overlaps_right))
+      concordant_genotype_overlaps_right_alt <- findOverlaps(
+        candidate_variant_granges_right[which(candidate_variant_granges_right$phasing2 == "0/0")], 
+        vcf_granges_filtered_SR[SR_indices_ref])
+      
+      concordant_genotype_overlaps_right_ref <- findOverlaps(
+        candidate_variant_granges_right[which(candidate_variant_granges_right$phasing2 == "1/1")], 
+        vcf_granges_filtered_SR[SR_indices_alt])
+      
+      queryHits_indices <- c(unique(queryHits(concordant_genotype_overlaps_right_alt)), 
+                             unique(queryHits(concordant_genotype_overlaps_right_ref)))
+      
+      if (length(queryHits_indices) > 0){
           candidate_variant_granges_right <- candidate_variant_granges_right[queryHits_indices]
           
           QC_fail_variants_SR_right <- c(QC_fail_variants_SR_right, 
