@@ -440,7 +440,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     )
     
     # Combine the metadata with the new entries
-    combined_metadata <- S4Vectors::append(header_metadata, list(additional_metadata))
+    combined_metadata <- S4Vectors::append(header_metadata, list(duoNovoPARAM=additional_metadata))
     
     # Update the header
     meta(vcf_header) <- combined_metadata
