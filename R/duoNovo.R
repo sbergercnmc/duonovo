@@ -400,25 +400,28 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
        duoNovo_version <-packageVersion("duoNovo")
     }
 
+
+    description_values <- c(
+      paste0("duoNovo Version: ", ifelse(is.null(duoNovo_version), "NA", duoNovo_version)),
+      paste0("duoNovo LRS_phased_vcf_file_path: ", ifelse(is.null(LRS_phased_vcf_file_path), "NA", LRS_phased_vcf_file_path)),
+      paste0("duoNovo GQ_cutoff: ", ifelse(is.null(GQ_cutoff), "NA", GQ_cutoff)),
+      paste0("duoNovo depth_cutoff: ", ifelse(is.null(depth_cutoff), "NA", depth_cutoff)),
+      paste0("duoNovo proband_column_identifier: ", ifelse(is.null(proband_column_identifier), "NA", proband_column_identifier)),
+      paste0("duoNovo PS_width_cutoff: ", ifelse(is.null(PS_width_cutoff), "NA", PS_width_cutoff)),
+      paste0("duoNovo boundary_cutoff: ", ifelse(is.null(boundary_cutoff), "NA", boundary_cutoff)),
+      paste0("duoNovo distance_cutoff: ", ifelse(is.null(distance_cutoff), "NA", distance_cutoff)),
+      paste0("duoNovo candidate_variants_concordant_with_SRS: ", ifelse(is.null(candidate_variants_concordant_with_SRS), "NA", candidate_variants_concordant_with_SRS)),
+      paste0("duoNovo test_reference_allele: ", ifelse(is.null(test_reference_allele), "NA", test_reference_allele)),
+      paste0("duoNovo SRS_vcf_file_path: ", ifelse(is.null(SRS_vcf_file_path), "NA", SRS_vcf_file_path)),
+      paste0("duoNovo reference: ", ifelse(is.null(reference), "NA", reference)),
+      paste0("duoNovo candidate_variant_coordinates: ", ifelse(is.null(candidate_variant_coordinates), "NA", candidate_variant_coordinates)),
+      paste0("duoNovo output_vcf_path: ", ifelse(is.null(output_vcf_path), "NA", output_vcf_path)),
+      paste0("duoNovo compress_output: ", ifelse(is.null(compress_output), "NA", compress_output))
+    )
+    
     additional_metadata <- DataFrame(
       Type = rep("String", 15),
-      Description = c(
-                      paste0("duoNovo Version: ", duoNovo_version),
-                      paste0("duoNovo LRS_phased_vcf_file_path: ", LRS_phased_vcf_file_path), 
-                      paste0("duoNovo GQ_cutoff: ", GQ_cutoff), 
-                      paste0("duoNovo depth_cutoff: ", depth_cutoff),
-                      paste0("duoNovo proband_column_identifier: ", proband_column_identifier ),
-                      paste0("duoNovo PS_width_cutoff: ",  PS_width_cutoff ), 
-                      paste0("duoNovo boundary_cutoff: ", boundary_cutoff ), 
-                      paste0("duoNovo distance_cutoff: ", distance_cutoff ), 
-                      paste0("duoNovo candidate_variants_concordant_with_SRS: ", candidate_variants_concordant_with_SRS ), 
-                      paste0("duoNovo test_reference_allele: ", test_reference_allele ),
-                      paste0("duoNovo SRS_vcf_file_path: ", SRS_vcf_file_path ),
-                      paste0("duoNovo reference: ", reference ), 
-                      paste0("duoNovo candidate_variant_coordinates: ", candidate_variant_coordinates ),
-                      paste0("duoNovo output_vcf_path: ", output_vcf_path ),
-                      paste0("duoNovo compress_output: ", compress_output )
-                     ),
+      Description = description_values,
       row.names = c("duoNovo_Version",
                     "duoNovo_LRS_phased_input_vcf",
                     "duoNovo_minGQ", 
@@ -433,8 +436,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                     "duoNovo_reference",
                     "duoNovo_candidate_variant_coordinates",
                     "duoNovo_output_vcf_path",
-                    "duoNovo_compress_output"
-                   )
+                    "duoNovo_compress_output")
     )
     
     # Combine the metadata with the new entries
