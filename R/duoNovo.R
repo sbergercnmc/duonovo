@@ -39,7 +39,7 @@
 duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                     proband_column_identifier,
                     PS_width_cutoff = 10000, boundary_cutoff = 2000, distance_cutoff = 40,
-                    candidate_variants_concordant_with_SRS = FALSE, SRS_vcf_file_path, 
+                    candidate_variants_concordant_with_SRS = FALSE, SRS_vcf_file_path = NULL, 
                     test_reference_allele = FALSE, reference = "hg38", 
                     candidate_variant_coordinates = NULL, 
                     output_vcf_path = NULL, compress_output = TRUE) {
