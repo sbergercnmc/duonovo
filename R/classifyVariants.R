@@ -184,8 +184,12 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
                                        hamming_distance_mins_hap1 > distance_cutoff)
   clean_inheritance_hap2vs2 <- which(hamming_distance_mins_2vs1 > 0 & hamming_distance_mins_2vs2 == 0 &
                                        hamming_distance_mins_hap1 > distance_cutoff)
-  uncertain_inheritance <- all_columns[-Reduce(union, list(clean_inheritance_hap1vs1, clean_inheritance_hap1vs2,
-                                              clean_inheritance_hap2vs1, clean_inheritance_hap2vs2))]
+  clean_inheritance_all <- Reduce(union, list(clean_inheritance_hap1vs1, clean_inheritance_hap1vs2,
+                                           clean_inheritance_hap2vs1, clean_inheritance_hap2vs2))
+  uncertain_inheritance <- all_columns
+  if (length(clean_inheritance_all) > 0) {
+    uncertain_inheritance <- all_columns[-clean_inheritance_all]
+  }
 
   ###4 different cases corresponding to 4 different clean inheritance pairs
   #proband haplotype 1 vs parent haplotype 1
