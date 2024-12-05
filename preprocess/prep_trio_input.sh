@@ -20,7 +20,7 @@ fi
 
 
 if [[ -z "$8" ]]; then #allows a task ID to be passed to command line if not run as an array
-  echo Usage: prep_trio_input.sh PROBAND_GVCF PROBAND_BAM PARENT_GVCF PARENT_BAM REFERENCE_FASTA OUTPUT_VCF [THREADS:default nproc]
+  echo Usage: prep_trio_input.sh PROBAND_GVCF PROBAND_BAM PARENT_1_GVCF PARENT_1_BAM PARENT_2_GVCF PARENT_2_BAM REFERENCE_FASTA OUTPUT_VCF [THREADS:default nproc]
   echo Requires: bcftools, glnexus_cli, hiphase
   echo Inputs:
   echo PROBAND_GVCF: g.vcf file from the proband \(can be g.vcf or g.vcf.gz\)
