@@ -4,7 +4,6 @@
 # *duoNovo*: Identification of *de novo* variants from single parent-proband duos
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 *duoNovo* is an R package that identifies *de novo* variants from single
@@ -47,8 +46,10 @@ devtools::install_github("sbergercnmc/duoNovo", dependencies = TRUE)
 # Or alternatively using remotes
 remotes::install_github("sbergercnmc/duoNovo", dependencies = TRUE)
 
-# Step 4: Optionally if you plan to use the duoNovo command line interface, install the argparse dependency
-install.packages("argparse")
+# Step 4: Optionally, to use the duoNovo command line interface, install argparse
+if (!requireNamespace("argparse", quietly = TRUE)) {
+    install.packages("argparse")
+}
 ```
 
 ## Run *duoNovo*
@@ -85,8 +86,7 @@ using steps 1 and 2 above.
 ### Classify candidate variants with *duoNovo*
 
 The following shows how to run duoNovo within R, assuming we have a VCF
-“duo\_proband\_father.longread.hiphase.vcf.gz” from long-read
-sequencing.
+“duo_proband_father.longread.hiphase.vcf.gz” from long-read sequencing.
 
 ``` r
 library(duoNovo)
@@ -122,59 +122,58 @@ Optionally, the output is written into a vcf file.
 
 Below is a description of each argument that `duoNovo()` accepts:
 
-  - **LRS\_phased\_vcf\_file\_path**: File path to the VCF containing
-    phased variant calls from long-read sequencing of the duo.
-  - **depth\_cutoff**: A numeric value specifying the minimum sequencing
-    depth for variants to be included in the analysis. The same cutoff
-    applies to both proband and parent variants, for both LRS and SRS
-    (if used). The default is 20.
-  - **GQ\_cutoff**: A numeric value specifying the minimum GQ (genotype
-    quality) for variants to be included in the analysis. The same
-    cutoff applies to both proband and parent variants, for both LRS and
-    SRS (if used). The default is 30.
-  - **proband\_column\_identifier**: A character corresponding to an
-    identifier for the proband column in the metadata matrices of the
-    VCF. Should be the same for both the LRS VCF and (if used) the SRS
-    VCF.
-  - **PS\_width\_cutoff**: A numeric value specifying the minimum width
-    of haplotype blocks used in the analysis. The default is 10000.
-  - **boundary\_cutoff**: A numeric value indicating the minimum
-    distance from a haplotype block boundary (either start or end
-    coordinate) for candidate variants to be analyzed. The default is
-    2000.
-  - **distance\_cutoff**: A numeric value specifying the minimum Hamming
-    distance cutoff to determine that a proband-parent haplotype block
-    is not identical by descent. The default is 40.
-  - **candidate\_variants\_concordant\_with\_SRS**: Logical value
-    specifying if candidate variant genotype calls should be concordant
-    with short-read sequencing (the default is `FALSE`).
-  - **SRS\_vcf\_file\_path**: File path to the VCF containing variant
-    calls from short-read sequencing of the duo.
-  - **test\_reference\_allele**: Logical value specifying if positions
-    where the proband is heterozygous and the parent is homozygous for
-    the variant allele should also be tested (the default is `FALSE`).
-  - **candidate\_variant\_coordinates**: A vector of coordinates
-    (e.g. c(chr1:1000, chr2:2000)) of candidate variants of interest.
-  - **output\_vcf\_path**: File path for the output VCF file.
-  - **compress\_output**: Logical value specifying whether or not to
-    compress the output VCF file. The default is `TRUE`
+- **LRS_phased_vcf_file_path**: Required input. Path to the VCF
+  containing phased variant calls from long-read sequencing of the duo.
+- **depth_cutoff**: A numeric value specifying the minimum sequencing
+  depth for variants to be included in the analysis. The same cutoff
+  applies to both proband and parent variants, for both LRS and SRS (if
+  used). The default is 20.
+- **GQ_cutoff**: A numeric value specifying the minimum GQ (genotype
+  quality) for variants to be included in the analysis. The same cutoff
+  applies to both proband and parent variants, for both LRS and SRS (if
+  used). The default is 30.
+- **proband_column_identifier**: Required input. A character
+  corresponding to an identifier for the proband column in the metadata
+  matrices of the VCF. Should be the same for both the LRS VCF and (if
+  used) the SRS VCF.
+- **PS_width_cutoff**: A numeric value specifying the minimum width of
+  haplotype blocks used in the analysis. The default is 10000.
+- **boundary_cutoff**: A numeric value indicating the minimum distance
+  from a haplotype block boundary (either start or end coordinate) for
+  candidate variants to be analyzed. The default is 2000.
+- **distance_cutoff**: A numeric value specifying the minimum Hamming
+  distance cutoff to determine that a proband-parent haplotype block is
+  not identical by descent. The default is 40.
+- **candidate_variants_concordant_with_SRS**: Logical value specifying
+  if candidate variant genotype calls should be concordant with
+  short-read sequencing (the default is `FALSE`).
+- **SRS_vcf_file_path**: Path to the VCF containing variant calls from
+  short-read sequencing of the duo.
+- **test_reference_allele**: Logical value specifying if positions where
+  the proband is heterozygous and the parent is homozygous for the
+  variant allele should also be tested (the default is `FALSE`).
+- **candidate_variant_coordinates**: A vector of coordinates
+  (e.g. `c("chr1:1000", "chr2:2000")`) of candidate variants of
+  interest.
+- **output_vcf_path**: Path to write the output VCF file.
+- **compress_output**: Logical value specifying whether or not to
+  compress the output VCF file. The default is `TRUE`
 
 ### Run *duoNovo* from the Command line
 
 The *duoNovo* command line interface provides a tool to run *duoNovo*
-directly from the command line. Clone the duoNovo\_cli.R script from the
-cli directory. The script can be run from the command line after
-‘*duoNovo*’ package has been installed as well as the ‘argparse’
-package. The command line script can be invoked using Rscript from the
-command line and has command line parameters to set each of the
-*duoNovo* parameters.
+directly from the command line. After installing the ‘*duoNovo*’ and the
+‘argparse’ packages, the first step is to clone the `duoNovo_cli.R`
+script from the cli directory. The command line script can then be
+invoked using Rscript from the command line and has command line
+parameters to set each of the `duoNovo()` arguments.
 
-Below is the output of Rscript duoNovo\_cli.R -h
+Below is the output of `Rscript duoNovo_cli.R -h`.
 
     usage: cli/duoNovo_cli.R [-h] [-v] [-q] [-d number] [-g number] -f FILE -p
                              PROBAND_SAMPLE_ID [-w number] [-b number] [-c number]
                              [-t] [-n coordinates] [-s FILE] [-o FILE] [-z]
-    
+
     options:
       -h, --help            show this help message and exit
       -v, --verbose         Print extra output/parameter values [default TRUE]
