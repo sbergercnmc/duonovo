@@ -419,7 +419,6 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     )
     
     additional_metadata <- DataFrame(
-      Type = c("String", "String", "Integer", "Integer", "String", "Integer", "Integer", "Integer", "Flag", "Flag", "String","String","String","Flag"),
       Value  = description_values,
       row.names = c("Version",
                     "LRS_phased_input_vcf",
