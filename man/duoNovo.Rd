@@ -15,7 +15,6 @@ duoNovo(
   candidate_variants_concordant_with_SRS = FALSE,
   SRS_vcf_file_path = NULL,
   test_reference_allele = FALSE,
-  reference = "hg38",
   candidate_variant_coordinates = NULL,
   output_vcf_path = NULL,
   compress_output = TRUE
@@ -42,8 +41,6 @@ duoNovo(
 
 \item{test_reference_allele}{Logical value specifying if positions where the proband is heterozygous and the parent is homozygous for the variant allele (not the reference) should be tested (default is \code{FALSE}).}
 
-\item{reference}{Reference genome name (e.g. hg38) used in the vcfs.}
-
 \item{candidate_variant_coordinates}{Vector of coordinates for specific variants of interest (of the form c(chr1:1000, chr2:2000)).}
 
 \item{output_vcf_path}{File path for output vcf.}
@@ -65,5 +62,5 @@ The function ultimately works by detecting identical by descent haplotype blocks
 #          proband_column_identifier = my_proband_identifier,
 #          PS_width_cutoff = 10000, boundary_cutoff = 2000, distance_cutoff = 40,
 #          candidate_variants_concordant_with_SRS = TRUE,
-#          SRS_vcf_file_path = my_SRS_file_path, reference = "hg38")
+#          SRS_vcf_file_path = my_SRS_file_path)
 }

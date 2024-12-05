@@ -123,13 +123,9 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   }
   QC_fail_variants <- c(hap_granges_low_GQ, hap_granges_low_depth, hap_granges_low_depth_GQ, QC_fail_variants)
 
-  if (length(low_depth_or_GQ) > 0){
-    if (length(low_depth_or_GQ) == length(hap_granges)) {
-      stop("No variants called from LRS pass depth and GQ thresholds.")
-    }
-    hap_granges <- hap_granges[-low_depth_or_GQ]
+  if (length(low_depth_or_GQ) == length(hap_granges)) {
+    stop("No variants called from LRS pass depth and GQ thresholds.")
   }
-  hap_boundary_coordinates <- getHaplotypeBlockCoordinates(hap_granges)
 
   # If candidate variant coordinates are provided, filter hap_granges accordingly
   if (!is.null(candidate_variant_coordinates)) {
@@ -200,6 +196,11 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     QC_fail_variants_right <- GRanges()
   }  
   QC_fail_variants <- c(QC_fail_variants_left, QC_fail_variants_right)
+  
+  if (length(low_depth_or_GQ) > 0){
+    hap_granges <- hap_granges[-low_depth_or_GQ]
+  }
+  hap_boundary_coordinates <- getHaplotypeBlockCoordinates(hap_granges)
   
   if (length(candidate_variant_granges_left) == 0 & length(candidate_variant_granges_right) == 0) {
     warning("No candidate variants passed QC.")
