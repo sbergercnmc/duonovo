@@ -69,6 +69,23 @@ The first step is to prepare the input VCF file from long-read sequencing data. 
 
 Optionally, a VCF from short-read sequencing data can also be prepared using steps 1 and 2 above.
 
+#### Preprocessing Script
+The preprocess folder includes an optional shell script to automate the processing steps above for the long-read sequencing duos.
+
+```
+Usage: prep_duo_input.sh PROBAND_GVCF PROBAND_BAM PARENT_GVCF PARENT_BAM REFERENCE_FASTA OUTPUT_VCF [THREADS:default nproc]
+Requires: bcftools, glnexus_cli, hiphase
+Inputs:
+PROBAND_GVCF: g.vcf file from the proband (can be g.vcf or g.vcf.gz)
+PROBAND_BAM: bam (or cram) file from the proband
+PARENT_GVCF: g.vcf file from the parent (can be g.vcg or g.vcf.gz)
+PARENT_BAM: bam (or cram) file from the proband
+REFERENCE_FASTA: reference fasta file for the aligned sequences
+OUTPUT_VCF: vcf file to be created, a joint called (glnexus DeepVariant_unfiltered) duo vcf with both samples with phasing added from hiphase
+optional THREADS: number of thread to use for glnexus and hiphase. Default is is nproc - 88
+```
+
+
 ### Classify candidate variants with _duoNovo_
 
 The following shows how to run duoNovo within R, assuming we have a VCF "duo_proband_father.longread.hiphase.vcf.gz" from long-read sequencing.

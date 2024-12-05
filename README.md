@@ -4,6 +4,7 @@
 # *duoNovo*: Identification of *de novo* variants from single parent-proband duos
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 *duoNovo* is an R package that identifies *de novo* variants from single
@@ -83,10 +84,27 @@ sequencing data. Below are steps to generate a suitable VCF:
 Optionally, a VCF from short-read sequencing data can also be prepared
 using steps 1 and 2 above.
 
+#### Preprocessing Script
+
+The preprocess folder includes an optional shell script to automate the
+processing steps above for the long-read sequencing duos.
+
+    Usage: prep_duo_input.sh PROBAND_GVCF PROBAND_BAM PARENT_GVCF PARENT_BAM REFERENCE_FASTA OUTPUT_VCF [THREADS:default nproc]
+    Requires: bcftools, glnexus_cli, hiphase
+    Inputs:
+    PROBAND_GVCF: g.vcf file from the proband (can be g.vcf or g.vcf.gz)
+    PROBAND_BAM: bam (or cram) file from the proband
+    PARENT_GVCF: g.vcf file from the parent (can be g.vcg or g.vcf.gz)
+    PARENT_BAM: bam (or cram) file from the proband
+    REFERENCE_FASTA: reference fasta file for the aligned sequences
+    OUTPUT_VCF: vcf file to be created, a joint called (glnexus DeepVariant_unfiltered) duo vcf with both samples with phasing added from hiphase
+    optional THREADS: number of thread to use for glnexus and hiphase. Default is is nproc - 88
+
 ### Classify candidate variants with *duoNovo*
 
 The following shows how to run duoNovo within R, assuming we have a VCF
-“duo_proband_father.longread.hiphase.vcf.gz” from long-read sequencing.
+“duo\_proband\_father.longread.hiphase.vcf.gz” from long-read
+sequencing.
 
 ``` r
 library(duoNovo)
@@ -122,42 +140,43 @@ Optionally, the output is written into a vcf file.
 
 Below is a description of each argument that `duoNovo()` accepts:
 
-- **LRS_phased_vcf_file_path**: Required input. Path to the VCF
-  containing phased variant calls from long-read sequencing of the duo.
-- **depth_cutoff**: A numeric value specifying the minimum sequencing
-  depth for variants to be included in the analysis. The same cutoff
-  applies to both proband and parent variants, for both LRS and SRS (if
-  used). The default is 20.
-- **GQ_cutoff**: A numeric value specifying the minimum GQ (genotype
-  quality) for variants to be included in the analysis. The same cutoff
-  applies to both proband and parent variants, for both LRS and SRS (if
-  used). The default is 30.
-- **proband_column_identifier**: Required input. A character
-  corresponding to an identifier for the proband column in the metadata
-  matrices of the VCF. Should be the same for both the LRS VCF and (if
-  used) the SRS VCF.
-- **PS_width_cutoff**: A numeric value specifying the minimum width of
-  haplotype blocks used in the analysis. The default is 10000.
-- **boundary_cutoff**: A numeric value indicating the minimum distance
-  from a haplotype block boundary (either start or end coordinate) for
-  candidate variants to be analyzed. The default is 2000.
-- **distance_cutoff**: A numeric value specifying the minimum Hamming
-  distance cutoff to determine that a proband-parent haplotype block is
-  not identical by descent. The default is 40.
-- **candidate_variants_concordant_with_SRS**: Logical value specifying
-  if candidate variant genotype calls should be concordant with
-  short-read sequencing (the default is `FALSE`).
-- **SRS_vcf_file_path**: Path to the VCF containing variant calls from
-  short-read sequencing of the duo.
-- **test_reference_allele**: Logical value specifying if positions where
-  the proband is heterozygous and the parent is homozygous for the
-  variant allele should also be tested (the default is `FALSE`).
-- **candidate_variant_coordinates**: A vector of coordinates
-  (e.g. `c("chr1:1000", "chr2:2000")`) of candidate variants of
-  interest.
-- **output_vcf_path**: Path to write the output VCF file.
-- **compress_output**: Logical value specifying whether or not to
-  compress the output VCF file. The default is `TRUE`
+  - **LRS\_phased\_vcf\_file\_path**: Required input. Path to the VCF
+    containing phased variant calls from long-read sequencing of the
+    duo.
+  - **depth\_cutoff**: A numeric value specifying the minimum sequencing
+    depth for variants to be included in the analysis. The same cutoff
+    applies to both proband and parent variants, for both LRS and SRS
+    (if used). The default is 20.
+  - **GQ\_cutoff**: A numeric value specifying the minimum GQ (genotype
+    quality) for variants to be included in the analysis. The same
+    cutoff applies to both proband and parent variants, for both LRS and
+    SRS (if used). The default is 30.
+  - **proband\_column\_identifier**: Required input. A character
+    corresponding to an identifier for the proband column in the
+    metadata matrices of the VCF. Should be the same for both the LRS
+    VCF and (if used) the SRS VCF.
+  - **PS\_width\_cutoff**: A numeric value specifying the minimum width
+    of haplotype blocks used in the analysis. The default is 10000.
+  - **boundary\_cutoff**: A numeric value indicating the minimum
+    distance from a haplotype block boundary (either start or end
+    coordinate) for candidate variants to be analyzed. The default is
+    2000.
+  - **distance\_cutoff**: A numeric value specifying the minimum Hamming
+    distance cutoff to determine that a proband-parent haplotype block
+    is not identical by descent. The default is 40.
+  - **candidate\_variants\_concordant\_with\_SRS**: Logical value
+    specifying if candidate variant genotype calls should be concordant
+    with short-read sequencing (the default is `FALSE`).
+  - **SRS\_vcf\_file\_path**: Path to the VCF containing variant calls
+    from short-read sequencing of the duo.
+  - **test\_reference\_allele**: Logical value specifying if positions
+    where the proband is heterozygous and the parent is homozygous for
+    the variant allele should also be tested (the default is `FALSE`).
+  - **candidate\_variant\_coordinates**: A vector of coordinates (e.g.
+    `c("chr1:1000", "chr2:2000")`) of candidate variants of interest.
+  - **output\_vcf\_path**: Path to write the output VCF file.
+  - **compress\_output**: Logical value specifying whether or not to
+    compress the output VCF file. The default is `TRUE`
 
 ### Run *duoNovo* from the Command line
 
@@ -173,7 +192,7 @@ Below is the output of `Rscript duoNovo_cli.R -h`.
     usage: cli/duoNovo_cli.R [-h] [-v] [-q] [-d number] [-g number] -f FILE -p
                              PROBAND_SAMPLE_ID [-w number] [-b number] [-c number]
                              [-t] [-n coordinates] [-s FILE] [-o FILE] [-z]
-
+    
     options:
       -h, --help            show this help message and exit
       -v, --verbose         Print extra output/parameter values [default TRUE]
