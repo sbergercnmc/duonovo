@@ -105,7 +105,7 @@ The command line script can be invoked using Rscript from the command line and h
 
 Below is the output of Rscript duoNovo_cli.R -h
 
-```{bash example, eval = FALSE}
+```{bash example2, eval = FALSE}
 usage: cli/duoNovo_cli.R [-h] [-v] [-q] [-d number] [-g number] -f FILE -p
                          PROBAND_SAMPLE_ID [-w number] [-b number] [-c number]
                          [-t] [-n coordinates] [-s FILE] [-o FILE] [-z]
