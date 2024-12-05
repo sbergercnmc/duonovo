@@ -34,7 +34,7 @@
 #' #          proband_column_identifier = my_proband_identifier,
 #' #          PS_width_cutoff = 10000, boundary_cutoff = 2000, distance_cutoff = 40,
 #' #          candidate_variants_concordant_with_SRS = TRUE,
-#' #          SRS_vcf_file_path = my_SRS_file_path, reference = "hg38")
+#' #          SRS_vcf_file_path = my_SRS_file_path)
 duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                     proband_column_identifier,
                     PS_width_cutoff = 10000, boundary_cutoff = 2000, distance_cutoff = 40,
