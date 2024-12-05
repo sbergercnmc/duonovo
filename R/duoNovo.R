@@ -402,7 +402,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
 
 
     description_values <- c(
-      paste0( ifelse(is.null(duoNovo_version), "NA", duoNovo_version)),
+      paste0( ifelse(is.null(duoNovo_version), "NA", paste0(duoNovo_version, collapse="." ) )),
       paste0( ifelse(is.null(LRS_phased_vcf_file_path), "NA", LRS_phased_vcf_file_path)),
       paste0( ifelse(is.null(GQ_cutoff), "NA", GQ_cutoff)),
       paste0( ifelse(is.null(depth_cutoff), "NA", depth_cutoff)),
@@ -419,8 +419,8 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     )
     
     additional_metadata <- DataFrame(
-      Type = c("String", "String", "Integer", "Integer", "String", "Integer", "Integer", "Integer", "String", "String", "String","String","String","String"),
-      Description = description_values,
+      Type = c("String", "String", "Integer", "Integer", "String", "Integer", "Integer", "Integer", "Flag", "Flag", "String","String","String","Flag"),
+      Value  = description_values,
       row.names = c("Version",
                     "LRS_phased_input_vcf",
                     "minGQ", 
