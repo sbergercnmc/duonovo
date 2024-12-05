@@ -59,6 +59,10 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     stop("Proband column identifier not found: ", proband_column_identifier)
   }
 
+  if (dim(vcf)[2] != 2) {
+    stop("VCF does not contain exactly 2 samples.  Number of samples: ", length(samples(header(vcf))))
+  }
+
   if (!"GT" %in% names(vcf_metadata)) {
     stop("The 'GT' (genotype) field is missing in the VCF metadata from LRS.")
   }
