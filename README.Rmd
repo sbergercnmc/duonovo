@@ -46,6 +46,9 @@ devtools::install_github("sbergercnmc/duoNovo", dependencies = TRUE)
 
 # Or alternatively using remotes
 remotes::install_github("sbergercnmc/duoNovo", dependencies = TRUE)
+
+# Step 4: Optionally if you plan to use the duoNovo command line interface, install the argparse dependency
+install.packages("argparse")
 ```
 
 ## Run _duoNovo_
@@ -105,7 +108,7 @@ The command line script can be invoked using Rscript from the command line and h
 
 Below is the output of Rscript duoNovo_cli.R -h
 
-```{, example2, eval = FALSE}
+``` 
 usage: cli/duoNovo_cli.R [-h] [-v] [-q] [-d number] [-g number] -f FILE -p
                          PROBAND_SAMPLE_ID [-w number] [-b number] [-c number]
                          [-t] [-n coordinates] [-s FILE] [-o FILE] [-z]
