@@ -17,7 +17,6 @@ parser$add_argument("-g", "--GQ_cutoff", type="integer", default=30,
                      metavar="number")
 parser$add_argument("-f", "--LRS_phased_vcf_file_path", required=TRUE,  metavar="FILE", help = "Path to joint called phased duo vcf [REQUIRED]")
 parser$add_argument("-p", "--proband_id",  metavar="PROBAND_SAMPLE_ID", required=TRUE, help = "VCF column heading for Proband [REQUIRED]")
-parser$add_argument("-r", "--ref",  metavar="reference_genome",  default="hg38", help = "Reference Genome ID [default %(default)s]")
 parser$add_argument("-w", "--PS_width_cutoff", type="integer", default=10000, 
                      help="A numeric value specifying the minimum width for phasing sets to be included in the analysis. [default %(default)d]",
                      metavar="number")
@@ -73,7 +72,6 @@ duoNovo_results <- duoNovo(
   candidate_variants_concordant_with_SRS = args$use_SRS,
   SRS_vcf_file_path = args$SRS_vcf_file_path,
   test_reference_allele = args$test_reference_allele,
-  reference = args$ref,
   candidate_variant_coordinates=candidateCoords,
   output_vcf_path=args$output_vcf,
   compress_output=args$compress_output
