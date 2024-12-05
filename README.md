@@ -46,6 +46,9 @@ devtools::install_github("sbergercnmc/duoNovo", dependencies = TRUE)
 
 # Or alternatively using remotes
 remotes::install_github("sbergercnmc/duoNovo", dependencies = TRUE)
+
+# Step 4: Optionally if you plan to use the duoNovo command line interface, install the argparse dependency
+install.packages("argparse")
 ```
 
 ## Run *duoNovo*
@@ -168,34 +171,48 @@ command line and has command line parameters to set each of the
 
 Below is the output of Rscript duoNovo\_cli.R -h
 
-\`\`\`{, example2, eval = FALSE} usage: cli/duoNovo\_cli.R \[-h\] \[-v\]
-\[-q\] \[-d number\] \[-g number\] -f FILE -p PROBAND\_SAMPLE\_ID \[-w
-number\] \[-b number\] \[-c number\] \[-t\] \[-n coordinates\] \[-s
-FILE\] \[-o FILE\] \[-z\]
-
-options: -h, –help show this help message and exit -v, –verbose Print
-extra output/parameter values \[default TRUE\] -q, –quietly Print little
-output -d number, –depth\_cutoff number Depth cutoff for variant
-evaluation \[default 20\] -g number, –GQ\_cutoff number GQ cutoff for
-variant evaluation \[default 30\] -f FILE, –LRS\_phased\_vcf\_file\_path
-FILE Path to joint called phased duo vcf \[REQUIRED\] -p
-PROBAND\_SAMPLE\_ID, –proband\_id PROBAND\_SAMPLE\_ID VCF column heading
-for Proband \[REQUIRED\] -w number, –PS\_width\_cutoff number A numeric
-value specifying the minimum width for phasing sets to be included in
-the analysis. \[default 10000\] -b number, –boundary\_cutoff number A
-numeric value indicating the minimum distance from a haplotype block
-boundary (either start or end coordinate) for candidate variants to be
-analyzed. \[default 2000\] -c number, –distance\_cutoff number A numeric
-value specifying the minimum Hamming distance cutoff to determine that a
-proband-parent haplotype block is not identical by descent. \[default
-40\] -t, –test\_reference\_allele Test for deNovo Reference reversions
-(parent is hom\_var, proband is het) \[default FALSE\] -n coordinates,
-–candidate\_variant\_coordinates coordinates 1-based list of
-chromosome ranges to evaluate for variants,
-e.g. chr1:12345-12345,chr2:65430-65430. \[Optional\] -s FILE,
-–SRS\_vcf\_file\_path FILE Path to short read duo vcf \[Optional\] -o
-FILE, –output\_vcf FILE Path to file to write output vcf \[Optional:
-Default appends \_duoNovo to input vcf\] -z, –compress\_output Compress
-output, append .bgz to filename, and tabix index \[default FALSE\]
-
-\`\`\`
+    usage: cli/duoNovo_cli.R [-h] [-v] [-q] [-d number] [-g number] -f FILE -p
+                             PROBAND_SAMPLE_ID [-w number] [-b number] [-c number]
+                             [-t] [-n coordinates] [-s FILE] [-o FILE] [-z]
+    
+    options:
+      -h, --help            show this help message and exit
+      -v, --verbose         Print extra output/parameter values [default TRUE]
+      -q, --quietly         Print little output
+      -d number, --depth_cutoff number
+                            Depth cutoff for variant evaluation [default 20]
+      -g number, --GQ_cutoff number
+                            GQ cutoff for variant evaluation [default 30]
+      -f FILE, --LRS_phased_vcf_file_path FILE
+                            Path to joint called phased duo vcf [REQUIRED]
+      -p PROBAND_SAMPLE_ID, --proband_id PROBAND_SAMPLE_ID
+                            VCF column heading for Proband [REQUIRED]
+      -w number, --PS_width_cutoff number
+                            A numeric value specifying the minimum width for
+                            phasing sets to be included in the analysis. [default
+                            10000]
+      -b number, --boundary_cutoff number
+                            A numeric value indicating the minimum distance from a
+                            haplotype block boundary (either start or end
+                            coordinate) for candidate variants to be analyzed.
+                            [default 2000]
+      -c number, --distance_cutoff number
+                            A numeric value specifying the minimum Hamming
+                            distance cutoff to determine that a proband-parent
+                            haplotype block is not identical by descent. [default
+                            40]
+      -t, --test_reference_allele
+                            Test for deNovo Reference reversions (parent is
+                            hom_var, proband is het) [default FALSE]
+      -n coordinates, --candidate_variant_coordinates coordinates
+                            1-based list of chromosome ranges to evaluate for
+                            variants, e.g. chr1:12345-12345,chr2:65430-65430.
+                            [Optional]
+      -s FILE, --SRS_vcf_file_path FILE
+                            Path to short read duo vcf [Optional]
+      -o FILE, --output_vcf FILE
+                            Path to file to write output vcf [Optional: Default
+                            appends _duoNovo to input vcf]
+      -z, --compress_output
+                            Compress output, append .bgz to filename, and tabix
+                            index [default FALSE]
