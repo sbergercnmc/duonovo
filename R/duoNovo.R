@@ -468,6 +468,10 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     # Add each new INFO field to the header
     info(vcf_header) <- rbind(info(vcf_header), new_info_fields)
 
+    fixed_fields <- fixed(vcf) 
+    rownames(fixed_fields) <- rownames(info(vcf))
+    fixed_fields <- fixed_fields[names(output_sorted), ]
+    
     info_new <- DataFrame(
       phasing_proband = output_sorted$phasing1,
       phasing_parent = output_sorted$phasing2,
@@ -497,7 +501,6 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
         mat[names(output_sorted), , , drop = FALSE]
       }
     })
-    fixed_fields <- fixed(vcf)[names(output_sorted), ]
     
     vcf_out <- VCF(
       rowRanges = output_sorted, 
