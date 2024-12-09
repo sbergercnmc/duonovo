@@ -497,10 +497,11 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
         mat[names(output_sorted), , , drop = FALSE]
       }
     })
+    fixed_fields <- fixed(vcf)[names(output_sorted), ]
     
     vcf_out <- VCF(
       rowRanges = output_sorted, 
-      fixed = fixed(vcf),
+      fixed = fixed_fields,
       colData = sample_info,       # Retain the original sample information
       info = info,                 # Add the new INFO metadata fields
       geno = geno_data             # Add the geno_data after subsetting for the rows present in our output
