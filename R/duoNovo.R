@@ -468,7 +468,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     # Add each new INFO field to the header
     info(vcf_header) <- rbind(info(vcf_header), new_info_fields)
 
-    info <- DataFrame(
+    info_new <- DataFrame(
       phasing_proband = output_sorted$phasing1,
       phasing_parent = output_sorted$phasing2,
       depth_proband = output_sorted$depth1,
@@ -484,7 +484,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
       n_de_novo_left_orientation_same_PS = output_sorted$n_de_novo_left_orientation_same_PS,
       n_de_novo_right_orientation_same_PS = output_sorted$n_de_novo_right_orientation_same_PS
     )
-    
+    info <- cbind(info(vcf)[names(output_sorted), ], info_new)
     
     sample_info <- colData(vcf)
     geno_data <- geno(vcf)
@@ -499,7 +499,8 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     })
     
     vcf_out <- VCF(
-      rowRanges = output_sorted,   
+      rowRanges = output_sorted, 
+      fixed = fixed(vcf),
       colData = sample_info,       # Retain the original sample information
       info = info,                 # Add the new INFO metadata fields
       geno = geno_data             # Add the geno_data after subsetting for the rows present in our output
