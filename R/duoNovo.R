@@ -199,8 +199,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     candidate_variant_granges_right <- GRanges()
     QC_fail_variants_right <- GRanges()
   }  
-  QC_fail_variants <- c(QC_fail_variants_left, QC_fail_variants_right)
-  
+
   if (length(low_depth_or_GQ) > 0){
     hap_granges <- hap_granges[-low_depth_or_GQ]
   }
@@ -208,7 +207,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   
   if (length(candidate_variant_granges_left) == 0 & length(candidate_variant_granges_right) == 0) {
     warning("No candidate variants passed QC.")
-    return(QC_fail_variants)
+    return(c(QC_fail_variants_left, QC_fail_variants_right))
   }
   
   # Optional: Restrict to candidate variants concordant with short-read sequencing
@@ -320,11 +319,12 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
       }      
     }
     
-    QC_fail_variants <- c(QC_fail_variants, QC_fail_variants_SR_right, QC_fail_variants_SR_left)
+    QC_fail_variants_left <- c(QC_fail_variants_left, QC_fail_variants_SR_left)
+    QC_fail_variants_right <- c(QC_fail_variants_right, QC_fail_variants_SR_right)
     
     if (length(candidate_variant_granges_left) == 0 & length(candidate_variant_granges_right) == 0) {
       warning("No candidate variants passed QC.")
-      return(QC_fail_variants)
+      return(c(QC_fail_variants_left, QC_fail_variants_right))
     }
   }
   
@@ -336,7 +336,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                                              haplotype_boundary_coordinate_granges = hap_boundary_coordinates, 
                                              boundary_cutoff = boundary_cutoff, distance_cutoff = distance_cutoff, 
                                              PS_width_cutoff = PS_width_cutoff, 
-                                             QC_fail_variant_granges = QC_fail_variants)
+                                             QC_fail_variant_granges = QC_fail_variants_left)
   } else {
     classifications_left <- GRanges()
   }
@@ -346,7 +346,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                                               haplotype_boundary_coordinate_granges = hap_boundary_coordinates, 
                                               boundary_cutoff = boundary_cutoff, distance_cutoff = distance_cutoff, 
                                               PS_width_cutoff = PS_width_cutoff,
-                                              QC_fail_variant_granges = QC_fail_variants)
+                                              QC_fail_variant_granges = QC_fail_variants_right)
   } else {
     classifications_right <- GRanges()
   }
