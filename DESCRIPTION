@@ -2,7 +2,8 @@ Package: duoNovo
 Title: DuoNovo: Identifying De Novo Variants from Single Parent-Proband Duos Using Long-Read Sequencing
 Version: 0.1.0
 Authors@R: 
-    person("Leandros", "Boukas", email = "leandrosboukas@gmail.com", role = c("aut", "cre"))
+    c(person("Leandros", "Boukas", email = "leandrosboukas@gmail.com", role = c("aut", "cre"))
+     , person("Seth", "Ian", "Berger", role = c("aut", "cre")))
 Description: DuoNovo identifies de novo variants from single parent-proband duos using long-read sequencing data. 
     By reconstructing haplotypes and detecting identical-by-descent blocks, DuoNovo classifies candidate variants 
     (heterozygous in the proband; absent in the parent) as de novo or inherited from the non-sequenced parent.
@@ -10,8 +11,8 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-URL: https://github.com/leandrosboukas/duoNovo
-BugReports: https://github.com/leandrosboukas/duoNovo/issues
+URL: https://github.com/sbergercnmc/duoNovo
+BugReports: https://github.com/sbergercnmc/duoNovo/issues
 Imports: 
     VariantAnnotation,
     matrixStats,
