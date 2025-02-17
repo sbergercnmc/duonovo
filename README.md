@@ -238,24 +238,25 @@ Below is the output of `Rscript duoNovo_cli.R -h`.
 ### Understanding *duoNovo* outputs
 
 *duoNovo* outputs a vcf file filtered and annotated based on its inputs.
-The vcf INFO column has several annotations added. These include: …
-phasing\_proband, a string describing the Phasing for proband.
-phasing\_parent, a string describing the Phasing for parent.
-depth\_proband, an integer describing the Depth for proband.
-depth\_parent, an integer describing Depth for parent GQ\_proband, an
-integer describing Genotype quality for proband GQ\_parent, an integer
-describing Genotype quality for parent duoNovo\_classification, a string
-with the DuoNovo classification supporting\_hamming\_distance, an
-integer describing Supporting Hamming distance
-supporting\_counts\_het\_hom, an integer describing the Supporting
-counts (het-hom) supporting\_counts\_het\_het, an integer describing the
-Supporting counts (het-het) supporting\_counts\_hom\_het, an integer
-describing the Supporting counts (hom-het) QC\_fail\_step, a string
-describing the QC fail step (NA for variants that passed QC)
-n\_de\_novo\_left\_orientation\_same\_PS, an integer describing Total
+The vcf INFO column has several annotations added. These include: … -
+**phasing\_proband, a string describing the Phasing for proband. -
+**phasing\_parent, a string describing the Phasing for parent. -
+**depth\_proband, an integer describing the Depth for proband. -
+**depth\_parent, an integer describing Depth for parent - **GQ\_proband,
+an integer describing Genotype quality for proband - **GQ\_parent, an
+integer describing Genotype quality for parent -
+**duoNovo\_classification, a string with the DuoNovo classification -
+**supporting\_hamming\_distance, an integer describing Supporting
+Hamming distance - **supporting\_counts\_het\_hom, an integer describing
+the Supporting counts (het-hom) - **supporting\_counts\_het\_het, an
+integer describing the Supporting counts (het-het) -
+**supporting\_counts\_hom\_het, an integer describing the Supporting
+counts (hom-het) - **QC\_fail\_step, a string describing the QC fail
+step (NA for variants that passed QC) -
+**n\_de\_novo\_left\_orientation\_same\_PS, an integer describing Total
 number of de novo variants in left orientation and same phasing set (NA
-for non-de novo variants or de novo varia nts in right orientation)
-n\_de\_novo\_right\_orientation\_same\_PS, an integer describing Total
+for non-de novo variants or de novo varia nts in right orientation) -
+**n\_de\_novo\_right\_orientation\_same\_PS, an integer describing Total
 number of de novo variants in right orientation and same phasing set (NA
 for non-de novo variants or de novo var iants in left orientation) …
 

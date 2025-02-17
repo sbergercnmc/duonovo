@@ -178,21 +178,21 @@ options:
 _duoNovo_ outputs a vcf file filtered and annotated based on its inputs.
 The vcf INFO column has several annotations added.  These include:
 ...
-phasing_proband, a string describing the Phasing for proband.
-phasing_parent, a string describing the Phasing for parent.
-depth_proband, an integer describing the Depth for proband.
-depth_parent, an integer describing Depth for parent
-GQ_proband, an integer describing Genotype quality for proband
-GQ_parent, an integer describing Genotype quality for parent
-duoNovo_classification, a string with the DuoNovo classification
-supporting_hamming_distance, an integer describing Supporting Hamming distance
-supporting_counts_het_hom, an integer describing the Supporting counts (het-hom)
-supporting_counts_het_het, an integer describing the Supporting counts (het-het)
-supporting_counts_hom_het, an integer describing the Supporting counts (hom-het)
-QC_fail_step, a string describing the QC fail step (NA for variants that passed QC)
-n_de_novo_left_orientation_same_PS, an integer describing Total number of de novo variants in left orientation and same phasing set (NA for non-de novo variants or de novo varia
+- **phasing_proband, a string describing the Phasing for proband.
+- **phasing_parent, a string describing the Phasing for parent.
+- **depth_proband, an integer describing the Depth for proband.
+- **depth_parent, an integer describing Depth for parent
+- **GQ_proband, an integer describing Genotype quality for proband
+- **GQ_parent, an integer describing Genotype quality for parent
+- **duoNovo_classification, a string with the DuoNovo classification
+- **supporting_hamming_distance, an integer describing Supporting Hamming distance
+- **supporting_counts_het_hom, an integer describing the Supporting counts (het-hom)
+- **supporting_counts_het_het, an integer describing the Supporting counts (het-het)
+- **supporting_counts_hom_het, an integer describing the Supporting counts (hom-het)
+- **QC_fail_step, a string describing the QC fail step (NA for variants that passed QC)
+- **n_de_novo_left_orientation_same_PS, an integer describing Total number of de novo variants in left orientation and same phasing set (NA for non-de novo variants or de novo varia
 nts in right orientation)
-n_de_novo_right_orientation_same_PS, an integer describing Total number of de novo variants in right orientation and same phasing set (NA for non-de novo variants or de novo var
+- **n_de_novo_right_orientation_same_PS, an integer describing Total number of de novo variants in right orientation and same phasing set (NA for non-de novo variants or de novo var
 iants in left orientation)
 ...
 
