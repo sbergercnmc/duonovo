@@ -238,8 +238,7 @@ Below is the output of `Rscript duoNovo_cli.R -h`.
 ### Understanding *duoNovo* outputs
 
 *duoNovo* outputs a vcf file filtered and annotated based on its inputs.
-The vcf INFO column has several annotations added. These include:
-
+The vcf INFO column has several annotations added. These include: …
 phasing\_proband, a string describing the Phasing for proband.
 phasing\_parent, a string describing the Phasing for parent.
 depth\_proband, an integer describing the Depth for proband.
@@ -258,7 +257,7 @@ number of de novo variants in left orientation and same phasing set (NA
 for non-de novo variants or de novo varia nts in right orientation)
 n\_de\_novo\_right\_orientation\_same\_PS, an integer describing Total
 number of de novo variants in right orientation and same phasing set (NA
-for non-de novo variants or de novo var iants in left orientation)
+for non-de novo variants or de novo var iants in left orientation) …
 
 ### Interpretation of *duoNovo* results
 
@@ -275,7 +274,7 @@ are absent from gnomAD have a higher pretest probability of being *de
 novo* and thus has a higher posivite predictive value for these rare
 variants.
 
-### *duoNovo* preformance
+### *duoNovo* performance
 
 We systematically evaluated *duoNovo*’s performance on a cohort of 40
 trios which we used to construct 80 duos (40 proband-father and 40
