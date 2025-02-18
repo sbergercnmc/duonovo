@@ -272,11 +272,10 @@ In our testing, we used GQ \> 40. We recommend excluding variants within
 “Genome in a Bottle” annotated “Problematic Regions”, as these have
 higher false positive rates in our evaluation. We also recommend careful
 evaluation of variants in haplotype blocks with more than 1 *de novo*
-variant classification as we have found that these also may include more
-false positives. Finally, we note that variants which are absent from
-gnomAD have a higher pretest probability of being *de novo* and thus
-*duoNovo* has a higher positive predictive value for these rare
-variants.
+variant classification as we have found that these also tend to be false
+positives. Finally, we note that variants which are absent from gnomAD
+have a higher prior probability of being *de novo* and thus the positive
+predictive value of *duoNovo* for these variants is higher.
 
 ### *duoNovo* performance
 
