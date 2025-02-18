@@ -4,7 +4,6 @@
 # *duoNovo*: Identification of *de novo* variants from single parent-proband duos
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 *duoNovo* is an R package that identifies *de novo* variants from single
@@ -103,8 +102,7 @@ processing steps above for the long-read sequencing duos.
 ### Classify candidate variants with *duoNovo*
 
 The following shows how to run duoNovo within R, assuming we have a VCF
-“duo\_proband\_father.longread.hiphase.vcf.gz” from long-read
-sequencing.
+“duo_proband_father.longread.hiphase.vcf.gz” from long-read sequencing.
 
 ``` r
 library(duoNovo)
@@ -119,14 +117,8 @@ for *de novo* status. This `GRanges` is a subset of the `rowRanges`
 corresponding to the input LRS VCF, but contains additional metadata
 columns. A column named `duoNovo_classification` provides the
 classification of each variant as *de novo*, present on the haplotype
-inherited from the non-sequenced parent, or uncertain. Additional
-columns provide further pertinent information, such as the minimum of
-the two Hamming distances supporting the non-IBD status of the proband
-haplotype not containing the variant of interest and the two parental
-haplotypes, as well as the counts of the different proband-parent
-genotype classes supporting the classification. For variants that were
-not classified because they failed QC, a column named `QC_fail_step`
-provides the specific QC step they failed.
+inherited from the non-sequenced parent, or uncertain. See below for a
+more detailed description of the output.
 
 The user can optionally provide a vector of coordinates of variants of
 interest. In this case, only these variants will be tested for *de novo*
@@ -140,43 +132,44 @@ Optionally, the output is written into a vcf file.
 
 Below is a description of each argument that `duoNovo()` accepts:
 
-  - **LRS\_phased\_vcf\_file\_path**: Required input. Path to the VCF
-    containing phased variant calls from long-read sequencing of the
-    duo.
-  - **depth\_cutoff**: A numeric value specifying the minimum sequencing
-    depth for variants to be included in the analysis. The same cutoff
-    applies to both proband and parent variants, for both LRS and SRS
-    (if used). The default is 20.
-  - **GQ\_cutoff**: A numeric value specifying the minimum GQ (genotype
-    quality) for variants to be included in the analysis. The same
-    cutoff applies to both proband and parent variants, for both LRS and
-    SRS (if used). The default is 30.
-  - **proband\_column\_identifier**: Required input. A character
-    corresponding to an identifier for the proband column in the
-    metadata matrices of the VCF. Should be the same for both the LRS
-    VCF and (if used) the SRS VCF.
-  - **PS\_width\_cutoff**: A numeric value specifying the minimum width
-    of haplotype blocks used in the analysis. The default is 10000.
-  - **boundary\_cutoff**: A numeric value indicating the minimum
-    distance from a haplotype block boundary (either start or end
-    coordinate) for candidate variants to be analyzed. The default is
-    2000.
-  - **distance\_cutoff**: A numeric value specifying the minimum Hamming
-    distance cutoff to determine that a proband-parent haplotype block
-    is not identical by descent. The default is 40.
-  - **candidate\_variants\_concordant\_with\_SRS**: Logical value
-    specifying if candidate variant genotype calls should be concordant
-    with short-read sequencing (the default is `FALSE`).
-  - **SRS\_vcf\_file\_path**: Path to the VCF containing variant calls
-    from short-read sequencing of the duo.
-  - **test\_reference\_allele**: Logical value specifying if positions
-    where the proband is heterozygous and the parent is homozygous for
-    the variant allele should also be tested (the default is `FALSE`).
-  - **candidate\_variant\_coordinates**: A vector of coordinates (e.g.
-    `c("chr1:1000", "chr2:2000")`) of candidate variants of interest.
-  - **output\_vcf\_path**: Path to write the output VCF file.
-  - **compress\_output**: Logical value specifying whether or not to
-    compress the output VCF file. The default is `TRUE`
+- **LRS_phased_vcf_file_path**: Required input. Path to the VCF
+  containing phased variant calls from long-read sequencing of the duo.
+- **depth_cutoff**: A numeric value specifying the minimum sequencing
+  depth for variants to be included in the analysis. The same cutoff
+  applies to both proband and parent variants, for both LRS and SRS (if
+  used). The default is 20.
+- **GQ_cutoff**: A numeric value specifying the minimum GQ (PHRED
+  quality) for variants to be included in the analysis. The same cutoff
+  applies to both proband and parent variants, for both LRS and SRS (if
+  used). The default is 30.
+- **proband_column_identifier**: Required input. A character
+  corresponding to an identifier for the proband column in the metadata
+  matrices of the VCF. Should be the same for both the LRS VCF and (if
+  used) the SRS VCF.
+- **PS_width_cutoff**: A numeric value specifying the minimum width of
+  haplotype blocks used in the analysis. The default is 10000.
+- **boundary_cutoff**: A numeric value indicating the minimum distance
+  from a haplotype block boundary (either start or end coordinate) for
+  candidate variants to be evaluated. The default is 2000.
+- **distance_cutoff**: A numeric value specifying the minimum Hamming
+  distance cutoff to determine that a proband-parent haplotype block is
+  not identical by descent. The default is 40.
+- **candidate_variants_concordant_with_SRS**: Logical value specifying
+  if candidate variant genotype calls should be concordant with
+  short-read sequencing (the default is `FALSE`).
+- **SRS_vcf_file_path**: Path to the VCF containing variant calls from
+  short-read sequencing of the duo.
+- **test_reference_allele**: Logical value specifying if positions where
+  the proband is heterozygous and the parent is homozygous for the
+  variant allele should also be tested (the default is `FALSE`).
+- **candidate_variant_coordinates**: A vector of 1-based coordinates
+  (e.g. `c("chr1:1000", "chr2:2000")`) of candidate variants of
+  interest.
+- **output_vcf_path**: Path to write an output VCF file. Optional. If
+  used, by default it appends \_duoNovo to input vcf file path.
+- **compress_output**: Logical value specifying whether to compress the
+  output VCF file, append .bgz to file name, and tabix index. The
+  default is `TRUE`
 
 ### Run *duoNovo* from the Command line
 
@@ -192,27 +185,26 @@ Below is the output of `Rscript duoNovo_cli.R -h`.
     usage: cli/duoNovo_cli.R [-h] [-v] [-q] [-d number] [-g number] -f FILE -p
                              PROBAND_SAMPLE_ID [-w number] [-b number] [-c number]
                              [-t] [-n coordinates] [-s FILE] [-o FILE] [-z]
-    
+
     options:
       -h, --help            show this help message and exit
       -v, --verbose         Print extra output/parameter values [default TRUE]
       -q, --quietly         Print little output
       -d number, --depth_cutoff number
-                            Depth cutoff for variant evaluation [default 20]
+                            Numeric value specifying the minimum sequencing depth for variants to be included in the analysis [default 20]
       -g number, --GQ_cutoff number
-                            GQ cutoff for variant evaluation [default 30]
+                            Numeric value specifying the minimum GQ (PHRED quality) for variants to be included in the analysis [default 30]
       -f FILE, --LRS_phased_vcf_file_path FILE
                             Path to joint called phased duo vcf [REQUIRED]
       -p PROBAND_SAMPLE_ID, --proband_id PROBAND_SAMPLE_ID
-                            VCF column heading for Proband [REQUIRED]
+                            Identifier for the proband column in the metadata matrices of the VCF [REQUIRED]
       -w number, --PS_width_cutoff number
-                            A numeric value specifying the minimum width for
-                            phasing sets to be included in the analysis. [default
+                            Numeric value specifying the minimum width of haplotype blocks used in the analysis. [default
                             10000]
       -b number, --boundary_cutoff number
-                            A numeric value indicating the minimum distance from a
+                            Numeric value indicating the minimum distance from a
                             haplotype block boundary (either start or end
-                            coordinate) for candidate variants to be analyzed.
+                            coordinate) for candidate variants to be evaluated.
                             [default 2000]
       -c number, --distance_cutoff number
                             A numeric value specifying the minimum Hamming
@@ -220,11 +212,9 @@ Below is the output of `Rscript duoNovo_cli.R -h`.
                             haplotype block is not identical by descent. [default
                             40]
       -t, --test_reference_allele
-                            Test for deNovo Reference reversions (parent is
-                            hom_var, proband is het) [default FALSE]
+                            Logical value specifying if positions where the proband is heterozygous and the parent is homozygous for the variant allele should also be tested (the default is `FALSE`) [default FALSE]
       -n coordinates, --candidate_variant_coordinates coordinates
-                            1-based list of chromosome ranges to evaluate for
-                            variants, e.g. chr1:12345-12345,chr2:65430-65430.
+                            Vector of 1-based coordinates of candidate variants, e.g. chr1:12345-12345,chr2:65430-65430.
                             [Optional]
       -s FILE, --SRS_vcf_file_path FILE
                             Path to short read duo vcf [Optional]
@@ -232,52 +222,65 @@ Below is the output of `Rscript duoNovo_cli.R -h`.
                             Path to file to write output vcf [Optional: Default
                             appends _duoNovo to input vcf]
       -z, --compress_output
-                            Compress output, append .bgz to filename, and tabix
-                            index [default FALSE]
+                            Logical value specifying whether to compress output, append .bgz to filename, and tabix
+                            index [default TRUE]
 
-### Understanding *duoNovo* outputs
+### The output of *duoNovo*
 
-*duoNovo* outputs a vcf file filtered and annotated based on its inputs.
-The vcf INFO column has several annotations added. These include: … -
-**phasing\_proband, a string describing the Phasing for proband. -
-**phasing\_parent, a string describing the Phasing for parent. -
-**depth\_proband, an integer describing the Depth for proband. -
-**depth\_parent, an integer describing Depth for parent - **GQ\_proband,
-an integer describing Genotype quality for proband - **GQ\_parent, an
-integer describing Genotype quality for parent -
-**duoNovo\_classification, a string with the DuoNovo classification -
-**supporting\_hamming\_distance, an integer describing Supporting
-Hamming distance - **supporting\_counts\_het\_hom, an integer describing
-the Supporting counts (het-hom) - **supporting\_counts\_het\_het, an
-integer describing the Supporting counts (het-het) -
-**supporting\_counts\_hom\_het, an integer describing the Supporting
-counts (hom-het) - **QC\_fail\_step, a string describing the QC fail
-step (NA for variants that passed QC) -
-**n\_de\_novo\_left\_orientation\_same\_PS, an integer describing Total
-number of de novo variants in left orientation and same phasing set (NA
-for non-de novo variants or de novo varia nts in right orientation) -
-**n\_de\_novo\_right\_orientation\_same\_PS, an integer describing Total
-number of de novo variants in right orientation and same phasing set (NA
-for non-de novo variants or de novo var iants in left orientation) …
+*duoNovo* outputs a `GRanges` containing all candidate variants tested
+for *de novo* status. This `GRanges` is a subset of the `rowRanges`
+corresponding to the input LRS VCF, but contains additional metadata
+columns. If an output vcf is written, these columns are part of the vcf
+INFO. Variant classification by *duoNovo* (as *de novo*, present on the
+haplotype inherited from the non-sequenced parent, or uncertain) is
+provided in a column named `duoNovo_classification`. Some of the other
+metadata columns are self-explanatory, and provide information about the
+phasing of the proband and the parent, the sequencing depth, and GQ.
+Additional columns include:
+
+- **QC_fail_step**, which describes the specific QC step that variants
+  that didn’t pass QC failed (NA for variants that passed QC)
+- **supporting_hamming_distance**, an integer corresponding to the
+  minimum of the two Hamming distances between proband haplotype block
+  not containing the candidate variant and the two parental haplotype
+  block. This supports the non-IBD status of these haplotype blocks.
+- **supporting_counts_het_hom**, an integer corresponding to the number
+  of positions that went into the Hamming distance calculation where the
+  proband is heterozygous and the parent is homozygous (see the Methods
+  section of the preprint for details)
+- **supporting_counts_het_het**, an integer corresponding to the number
+  of positions that went into the Hamming distance calculation where
+  both the proband and the parent heterozygous (see preprint Methods)
+- **supporting_counts_hom_het**, an integer corresponding to the number
+  of positions that went into the Hamming distance calculation where the
+  proband is homozygous and the parent is heterozygous (see preprint
+  Methods)
+- **n_de_novo_left_orientation_same_PS**, an integer corresponding to
+  the total number of *de novo* variants in the left orientation and
+  same haplotype block (NA for non- *de novo* variants or *de novo*
+  variants in the right orientation).
+- **n_de_novo_right_orientation_same_PS**, an integer corresponding to
+  the total number of *de novo* variants in the right orientation and
+  same haplotype block (NA for non- *de novo* variants or *de novo*
+  variants in the left orientation).
 
 ### Interpretation of *duoNovo* results
 
-Calls generated by *duoNovo* should be evaluated for variant quality,
-sequence quality, and regional quality.  
-In our testing, we acheived a high positive predictive value for
-variants with a GQ \> 40.  
-We currently recommend excluding variants annotated as falling within a
-“Genome in a Bottle” annotated “Problematic Region” which had higher
-false positive rates. We also recommend careful evaluation of variants
-in phase blocks with more than 1 *de novo* variatn call as these also
-may include more false positives. Finally, we note that variants which
-are absent from gnomAD have a higher pretest probability of being *de
-novo* and thus has a higher posivite predictive value for these rare
+Classifications generated by *duoNovo* should be evaluated according to
+variant quality, sequence quality, and regional quality.  
+In our testing, we used GQ \> 40. We recommend excluding variants within
+“Genome in a Bottle” annotated “Problematic Regions”, as these have
+higher false positive rates in our evaluation. We also recommend careful
+evaluation of variants in haplotype blocks with more than 1 *de novo*
+variant classification as we have found that these also may include more
+false positives. Finally, we note that variants which are absent from
+gnomAD have a higher pretest probability of being *de novo* and thus
+*duoNovo* has a higher positive predictive value for these rare
 variants.
 
 ### *duoNovo* performance
 
 We systematically evaluated *duoNovo*’s performance on a cohort of 40
-trios which we used to construct 80 duos (40 proband-father and 40
-proband-mother). Details about its performance will be posted shortly
-(preprint coming soon).
+trios which we used to construct 80 duos (40 father-proband and 40
+mother-proband duos). Details about its performance will be posted
+shortly (preprint coming soon).
