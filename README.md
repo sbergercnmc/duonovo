@@ -118,7 +118,8 @@ corresponding to the input LRS VCF, but contains additional metadata
 columns. A column named `duoNovo_classification` provides the
 classification of each variant as *de novo*, present on the haplotype
 inherited from the non-sequenced parent, or uncertain. See below for a
-more detailed description of the output.
+more detailed description of the output. Optionally, the output is
+written into a vcf.
 
 The user can optionally provide a vector of coordinates of variants of
 interest. In this case, only these variants will be tested for *de novo*
@@ -241,9 +242,10 @@ Additional columns include:
 - **QC_fail_step**, which describes the specific QC step that variants
   that didn’t pass QC failed (NA for variants that passed QC)
 - **supporting_hamming_distance**, an integer corresponding to the
-  minimum of the two Hamming distances between proband haplotype block
-  not containing the candidate variant and the two parental haplotype
-  block. This supports the non-IBD status of these haplotype blocks.
+  minimum of the two Hamming distances between the proband haplotype
+  block not containing the candidate variant and the two parental
+  haplotype blocks. This supports the non-IBD status of these haplotype
+  blocks.
 - **supporting_counts_het_hom**, an integer corresponding to the number
   of positions that went into the Hamming distance calculation where the
   proband is heterozygous and the parent is homozygous (see the Methods

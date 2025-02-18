@@ -98,7 +98,7 @@ duoNovo_results <- duoNovo(
   )
 ```
 
-_duoNovo_ returns a `GRanges` containing all candidate variants tested for _de novo_ status. This `GRanges` is a subset of the `rowRanges` corresponding to the input LRS VCF, but contains additional metadata columns. A column named `duoNovo_classification` provides the classification of each variant as _de novo_, present on the haplotype inherited from the non-sequenced parent, or uncertain. See below for a more detailed description of the output. 
+_duoNovo_ returns a `GRanges` containing all candidate variants tested for _de novo_ status. This `GRanges` is a subset of the `rowRanges` corresponding to the input LRS VCF, but contains additional metadata columns. A column named `duoNovo_classification` provides the classification of each variant as _de novo_, present on the haplotype inherited from the non-sequenced parent, or uncertain. See below for a more detailed description of the output. Optionally, the output is written into a vcf.
 
 The user can optionally provide a vector of coordinates of variants of interest. In this case, only these variants will be tested for _de novo_ status, provided they are appropriate candidates (that is, they are heterozygous in the proband and absent in the parent), and they pass QC. If specific variants of interest are not provided, then _duoNovo_ tests all variants heterozygous in the proband and absent in the parent that pass QC.
 
@@ -176,7 +176,7 @@ options:
 _duoNovo_ outputs a `GRanges` containing all candidate variants tested for _de novo_ status. This `GRanges` is a subset of the `rowRanges` corresponding to the input LRS VCF, but contains additional metadata columns. If an output vcf is written, these columns are part of the vcf INFO. Variant classification by _duoNovo_ (as _de novo_, present on the haplotype inherited from the non-sequenced parent, or uncertain) is provided in a column named `duoNovo_classification`. Some of the other metadata columns are self-explanatory, and provide information about the phasing of the proband and the parent, the sequencing depth, and GQ. Additional columns include:
 
 - **QC_fail_step**, which describes the specific QC step that variants that didn't pass QC failed (NA for variants that passed QC)
-- **supporting_hamming_distance**, an integer corresponding to the minimum of the two Hamming distances between proband haplotype block not containing the candidate variant and the two parental haplotype block. This supports the non-IBD status of these haplotype blocks.
+- **supporting_hamming_distance**, an integer corresponding to the minimum of the two Hamming distances between the proband haplotype block not containing the candidate variant and the two parental haplotype blocks. This supports the non-IBD status of these haplotype blocks.
 - **supporting_counts_het_hom**, an integer corresponding to the number of positions that went into the Hamming distance calculation where the proband is heterozygous and the parent is homozygous (see the Methods section of the preprint for details)
 - **supporting_counts_het_het**, an integer corresponding to the number of positions that went into the Hamming distance calculation where both the proband and the parent heterozygous (see preprint Methods)
 - **supporting_counts_hom_het**, an integer corresponding to the number of positions that went into the Hamming distance calculation where the proband is homozygous and the parent is heterozygous (see preprint Methods)
