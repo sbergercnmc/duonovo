@@ -283,5 +283,6 @@ predictive value of *duoNovo* for these variants is higher.
 
 We systematically evaluated *duoNovo*’s performance on a cohort of 40
 trios which we used to construct 80 duos (40 father-proband and 40
-mother-proband duos). Details about its performance will be posted
-shortly (preprint coming soon).
+mother-proband duos). Details about its performance can be found in our
+preprint
+(<https://www.medrxiv.org/content/10.1101/2025.02.24.25322424v1>).
