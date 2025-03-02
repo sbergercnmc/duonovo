@@ -118,8 +118,9 @@ corresponding to the input LRS VCF, but contains additional metadata
 columns. A column named `duoNovo_classification` provides the
 classification of each variant as *de novo*, present on the haplotype
 inherited from the non-sequenced parent, or uncertain. See below for a
-more detailed description of the output. Optionally, the output is
-written into a vcf.
+more detailed description of the output.
+
+Optionally, the output is written into a vcf.
 
 The user can optionally provide a vector of coordinates of variants of
 interest. In this case, only these variants will be tested for *de novo*
@@ -128,8 +129,6 @@ heterozygous in the proband and absent in the parent), and they pass QC.
 If specific variants of interest are not provided, then *duoNovo* tests
 all variants heterozygous in the proband and absent in the parent that
 pass QC.
-
-Optionally, the output is written into a vcf file.
 
 Below is a description of each argument that `duoNovo()` accepts:
 
@@ -233,12 +232,11 @@ for *de novo* status. This `GRanges` is a subset of the `rowRanges`
 corresponding to the input LRS VCF, but contains additional metadata
 columns. If an output vcf is written, these columns are part of the vcf
 INFO. The column of most interest is named `duoNovo_classification`. It
-provides the classification that each candidate variant received by
-*duoNovo* (*de novo* vs present on the haplotype inherited from the
-non-sequenced parent vs uncertain). Some of the other metadata columns
-are self-explanatory, and provide information about the phasing of the
-proband and the parent, the sequencing depth, and GQ. Additional columns
-include:
+provides the classification of each candidate variant as *de novo* vs
+present on the haplotype inherited from the non-sequenced parent vs
+uncertain. Some of the other metadata columns are self-explanatory, and
+provide information about the phasing of the proband and the parent, the
+sequencing depth, and GQ. Additional columns include:
 
 - **QC_fail_step**, which describes the specific QC step that variants
   that didn’t pass QC failed. Its values are self-explanatory

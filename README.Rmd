@@ -98,11 +98,11 @@ duoNovo_results <- duoNovo(
   )
 ```
 
-_duoNovo_ returns a `GRanges` containing all candidate variants tested for _de novo_ status. This `GRanges` is a subset of the `rowRanges` corresponding to the input LRS VCF, but contains additional metadata columns. A column named `duoNovo_classification` provides the classification of each variant as _de novo_, present on the haplotype inherited from the non-sequenced parent, or uncertain. See below for a more detailed description of the output. Optionally, the output is written into a vcf.
+_duoNovo_ returns a `GRanges` containing all candidate variants tested for _de novo_ status. This `GRanges` is a subset of the `rowRanges` corresponding to the input LRS VCF, but contains additional metadata columns. A column named `duoNovo_classification` provides the classification of each variant as _de novo_, present on the haplotype inherited from the non-sequenced parent, or uncertain. See below for a more detailed description of the output. 
+
+Optionally, the output is written into a vcf.
 
 The user can optionally provide a vector of coordinates of variants of interest. In this case, only these variants will be tested for _de novo_ status, provided they are appropriate candidates (that is, they are heterozygous in the proband and absent in the parent), and they pass QC. If specific variants of interest are not provided, then _duoNovo_ tests all variants heterozygous in the proband and absent in the parent that pass QC.
-
-Optionally, the output is written into a vcf file.
 
 Below is a description of each argument that `duoNovo()` accepts:
 
@@ -173,7 +173,7 @@ options:
 ```
 
 ### The output of  _duoNovo_ 
-`duoNovo()` outputs a `GRanges` containing all candidate variants tested for _de novo_ status. This `GRanges` is a subset of the `rowRanges` corresponding to the input LRS VCF, but contains additional metadata columns. If an output vcf is written, these columns are part of the vcf INFO. The column of most interest is named `duoNovo_classification`. It provides the classification that each candidate variant received by _duoNovo_ (_de novo_ vs present on the haplotype inherited from the non-sequenced parent vs uncertain). Some of the other metadata columns are self-explanatory, and provide information about the phasing of the proband and the parent, the sequencing depth, and GQ. Additional columns include:
+`duoNovo()` outputs a `GRanges` containing all candidate variants tested for _de novo_ status. This `GRanges` is a subset of the `rowRanges` corresponding to the input LRS VCF, but contains additional metadata columns. If an output vcf is written, these columns are part of the vcf INFO. The column of most interest is named `duoNovo_classification`. It provides the classification of each candidate variant as _de novo_ vs present on the haplotype inherited from the non-sequenced parent vs uncertain. Some of the other metadata columns are self-explanatory, and provide information about the phasing of the proband and the parent, the sequencing depth, and GQ. Additional columns include:
 
 - **QC_fail_step**, which describes the specific QC step that variants that didn't pass QC failed. Its values are self-explanatory (e.g. `low_depth`), and are `NA` for variants that passed QC)
 - **supporting_hamming_distance**, which corresponds to the minimum of the two Hamming distances between the proband haplotype block not containing the candidate variant and the two parental haplotype blocks. This supports the non-IBD status of these haplotype blocks.
