@@ -157,7 +157,7 @@ options:
                         haplotype block is not identical by descent. [default
                         40]
   -t, --test_reference_allele
-                        Logical value specifying if positions where the proband is heterozygous and the parent is homozygous for the variant allele should also be tested (the default is `FALSE`) [default FALSE]
+                        Logical value specifying if positions where the proband is heterozygous and the parent is homozygous for the variant allele should also be tested [default FALSE]
   -n coordinates, --candidate_variant_coordinates coordinates
                         Vector of 1-based coordinates of candidate variants, e.g. chr1:12345-12345,chr2:65430-65430.
                         [Optional]
@@ -173,22 +173,23 @@ options:
 ```
 
 ### The output of  _duoNovo_ 
-_duoNovo_ outputs a `GRanges` containing all candidate variants tested for _de novo_ status. This `GRanges` is a subset of the `rowRanges` corresponding to the input LRS VCF, but contains additional metadata columns. If an output vcf is written, these columns are part of the vcf INFO. Variant classification by _duoNovo_ (as _de novo_, present on the haplotype inherited from the non-sequenced parent, or uncertain) is provided in a column named `duoNovo_classification`. Some of the other metadata columns are self-explanatory, and provide information about the phasing of the proband and the parent, the sequencing depth, and GQ. Additional columns include:
+`duoNovo()` outputs a `GRanges` containing all candidate variants tested for _de novo_ status. This `GRanges` is a subset of the `rowRanges` corresponding to the input LRS VCF, but contains additional metadata columns. If an output vcf is written, these columns are part of the vcf INFO. The column of most interest is named `duoNovo_classification`. It provides the classification that each candidate variant received by _duoNovo_ (_de novo_ vs present on the haplotype inherited from the non-sequenced parent vs uncertain). Some of the other metadata columns are self-explanatory, and provide information about the phasing of the proband and the parent, the sequencing depth, and GQ. Additional columns include:
 
-- **QC_fail_step**, which describes the specific QC step that variants that didn't pass QC failed (NA for variants that passed QC)
-- **supporting_hamming_distance**, an integer corresponding to the minimum of the two Hamming distances between the proband haplotype block not containing the candidate variant and the two parental haplotype blocks. This supports the non-IBD status of these haplotype blocks.
-- **supporting_counts_het_hom**, an integer corresponding to the number of positions that went into the Hamming distance calculation where the proband is heterozygous and the parent is homozygous (see the Methods section of the preprint for details)
-- **supporting_counts_het_het**, an integer corresponding to the number of positions that went into the Hamming distance calculation where both the proband and the parent heterozygous (see preprint Methods)
-- **supporting_counts_hom_het**, an integer corresponding to the number of positions that went into the Hamming distance calculation where the proband is homozygous and the parent is heterozygous (see preprint Methods)
-- **n_de_novo_left_orientation_same_PS**, an integer corresponding to the total number of _de novo_ variants in the left orientation and same haplotype block (NA for non- _de novo_ variants or _de novo_ variants in the right orientation). 
-- **n_de_novo_right_orientation_same_PS**, an integer corresponding to the total number of _de novo_ variants in the right orientation and same haplotype block (NA for non- _de novo_ variants or _de novo_ variants in the left orientation). 
+- **QC_fail_step**, which describes the specific QC step that variants that didn't pass QC failed. Its values are self-explanatory (e.g. `low_depth`), and are `NA` for variants that passed QC)
+- **supporting_hamming_distance**, which corresponds to the minimum of the two Hamming distances between the proband haplotype block not containing the candidate variant and the two parental haplotype blocks. This supports the non-IBD status of these haplotype blocks.
+- **supporting_counts_het_hom**, which corresponds to the number of positions that went into the Hamming distance calculation where the proband is heterozygous and the parent is homozygous (see the Methods section of the preprint for details)
+- **supporting_counts_het_het**, which corresponds to the number of positions that went into the Hamming distance calculation where both the proband and the parent are heterozygous (see preprint Methods)
+- **supporting_counts_hom_het**, which corresponds to the number of positions that went into the Hamming distance calculation where the proband is homozygous and the parent is heterozygous (see preprint Methods)
+- **n_de_novo_left_orientation_same_PS**, which corresponds to the total number of _de novo_ variants in the left orientation and same haplotype block (NA for non- _de novo_ variants or _de novo_ variants in the right orientation). 
+- **n_de_novo_right_orientation_same_PS**, which corresponds to the total number of _de novo_ variants in the right orientation and same haplotype block (NA for non- _de novo_ variants or _de novo_ variants in the left orientation). 
 
 
 ### Interpretation of _duoNovo_ results
-Classifications generated by _duoNovo_ should be evaluated according to variant quality, sequence quality, and regional quality.  
-In our testing, we used GQ > 40. We recommend excluding variants within "Genome in a Bottle" annotated "Problematic Regions", as these have higher false positive rates in our evaluation.
-We also recommend careful evaluation of variants in haplotype blocks with more than 1 _de novo_ variant classification as we have found that these also tend to be false positives.
-Finally, we note that variants which are absent from gnomAD have a higher prior probability of being _de novo_ and thus the positive predictive value of _duoNovo_ for these variants is higher.
+Classifications generated by _duoNovo_ should be evaluated according to variant quality, sequence quality, and regional quality. In our testing, we used GQ > 40. We recommend excluding variants within "Genome in a Bottle" annotated "Problematic Regions", as these have higher false positive rates in our evaluation.
+
+We also recommend careful evaluation of variants in haplotype blocks with more than 1 _de novo_ variant classification in the same phasing orientation, as we have found that these also tend to be false positives. This is why, as described above, the output of `duoNovo()` includes the columns `n_de_novo_left_orientation_same_PS`, and `n_de_novo_right_orientation_same_PS`.
+
+Finally, we note that, as is true for any classifier, the prior probability of each variant being _de novo_ affects the predictive value of _duoNovo_'s classifications. For instance, variants absent from gnomAD have a higher prior probability of being _de novo_ (and pathogenic) and thus the positive predictive value of _duoNovo_ for these variants is higher. In our evaluations, _duoNovo_ achieved perfect accuracy among these variants.
 
 
 ### _duoNovo_ performance
