@@ -3,7 +3,7 @@ Title: DuoNovo: Identifying De Novo Variants from Single Parent-Proband Duos Usi
 Version: 0.1.0
 Authors@R: 
     c(person("Leandros", "Boukas", email = "leandrosboukas@gmail.com", role = c("aut", "cre"))
-     , person("Seth", "Ian", "Berger", role = c("aut", "cre")))
+     , person("Seth", "Berger", role = c("aut", "cre")))
 Description: DuoNovo identifies de novo variants from single parent-proband duos using long-read sequencing data. 
     By reconstructing haplotypes and detecting identical-by-descent blocks, DuoNovo classifies candidate variants 
     (heterozygous in the proband; absent in the parent) as de novo or inherited from the non-sequenced parent.
