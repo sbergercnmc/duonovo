@@ -85,8 +85,18 @@ if (length(denovo_indices_sibling_trio) > 0){
   false_positive_rate <- NA
 }
 
-### save results
-save(sensitivity_duo_only, sensitivity_duo_plus_sibling, false_positive_rate, parental_origin, 
-     file = "sensitivity_sibling.rda")
+duo_basename_pm    <- basename(duoNovo_output_filepath)
+output_filename_pm <- paste0(
+  sub("\\.annovar\\.rda$", "", duo_basename_pm),  
+  ".rda"
+)
 
+### save results
+save(
+  sensitivity_duo_only,
+  sensitivity_duo_plus_sibling,
+  false_positive_rate,
+  parental_origin,
+  file = paste0("sib_sensitivity_", output_filename_pm)
+)
 
