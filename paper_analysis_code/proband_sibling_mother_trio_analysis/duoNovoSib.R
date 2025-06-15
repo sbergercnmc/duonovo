@@ -368,35 +368,6 @@ duoNovoSib <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 
     S4Vectors::metadata(vcf_out)$header <- vcf_header
     writeVcf(vcf_out, output_vcf_path, index = compress_output)  
   }
-  
-  ###Also give a verbose summary of results
-  # Generate the table of counts for each classification
-  classification_counts <- table(output_sorted$duoNovo_classification)
-  
-  # Define the expected classification categories
-  expected_classes <- c("de_novo", "uncertain", "failed_QC")
-  
-  # Add missing classes if they are not present in the table (to ensure all classes are covered)
-  for (class in expected_classes) {
-    if (!class %in% names(classification_counts)) {
-      classification_counts[class] <- 0
-    }
-  }
-  
-  # Sort the counts in the expected order
-  classification_counts <- classification_counts[expected_classes]
-  
-  # Create a verbose summary
-  verbose_summary <- paste0(
-    "Variant Classification Summary:\n",
-    "--------------------------------\n",
-    "Number of de novo variants: ", classification_counts["de_novo"], "\n",
-    "Number of uncertain variants: ", classification_counts["uncertain"], "\n",
-    "Number of variants that failed QC: ", classification_counts["failed_QC"], "\n",
-    "--------------------------------"
-  )
-  # Print the verbose summary
-  cat(verbose_summary)
   return(output_sorted)
 }
 

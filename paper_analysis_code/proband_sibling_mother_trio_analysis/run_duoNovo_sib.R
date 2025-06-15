@@ -80,11 +80,13 @@ if (length(denovo_indices_sibling_trio) > 0){
   denovo_sibling_false <- unique(queryHits(findOverlaps(denovo_sibling, 
                                                         duoNovo_ranges[grep("1", duoNovo_ranges$parentValidation_gt)])))
   false_positive_rate <- length(denovo_sibling_false)/length(denovo_sibling)
+  parental_origin <- table(denovo_sibling$parent_origin)
 } else {
   false_positive_rate <- NA
 }
 
 ### save results
-save(sensitivity_duo_only, sensitivity_duo_plus_sibling, false_positive_rate, file = "sensitivity_sibling.rda")
+save(sensitivity_duo_only, sensitivity_duo_plus_sibling, false_positive_rate, parental_origin, 
+     file = "sensitivity_sibling.rda")
 
 
