@@ -28,6 +28,8 @@ actual_trio_denovo_filepath <- actual_trio_denovo_filepaths[dir_index]
 ### use duoNovo output from the mother-proband duo to separate candidate variants based on classification
 load(file = duoNovo_output_filepath) 
 duoNovo_ranges <- dn_granges_pm
+duoNovo_ranges$giab_problematic <- unlist(duoNovo_ranges$giab_problematic)
+duoNovo_ranges <- duoNovo_ranges[which(duoNovo_ranges$giab_problematic == ".")]
 
 classified_denovo_indices <- which(duoNovo_ranges$duoNovo_classification == "de_novo" & 
                          (duoNovo_ranges$n_de_novo_left_orientation_same_PS == 1 | 
@@ -55,6 +57,15 @@ denovo_indices_sibling_trio <- which(sibling_trio_output$duoNovo_classification 
                                       sibling_trio_output$n_de_novo_right_orientation_same_PS == 1))
 if (length(denovo_indices_sibling_trio) > 0){
   denovo_sibling <- sibling_trio_output[denovo_indices_sibling_trio]
+  
+  ### can optionally exclude de novos that are present in gnomAD
+  # duoNovo_ranges$gnomad41_genome_AF <- as.numeric(unlist(duoNovo_ranges$gnomad41_genome_AF))
+  # overlapping_indices <- unique(queryHits(findOverlaps(denovo_sibling, 
+  #                                         duoNovo_ranges[which(duoNovo_ranges$gnomad41_genome_AF > 0)])))
+  # if (length(overlapping_indices) > 0){
+  # denovo_sibling <- denovo_sibling[-overlapping_indices]
+  #}
+  ###
 } else {
   denovo_sibling <- GRanges()
 }
@@ -85,13 +96,13 @@ if (length(denovo_indices_sibling_trio) > 0){
   false_positive_rate <- NA
 }
 
+### save results
 duo_basename_pm    <- basename(duoNovo_output_filepath)
 output_filename_pm <- paste0(
   sub("\\.annovar\\.rda$", "", duo_basename_pm),  
   ".rda"
 )
 
-### save results
 save(
   sensitivity_duo_only,
   sensitivity_duo_plus_sibling,
