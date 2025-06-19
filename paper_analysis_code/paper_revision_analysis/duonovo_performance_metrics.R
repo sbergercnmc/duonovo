@@ -106,7 +106,7 @@ getDuoNovoPerformanceMetric <- function(duoNovo_granges_output_filepath, duo_typ
       dn_granges <- dn_granges[which(dn_granges$phasing_parent == "1/1" & dn_granges$GQ_parent >= 40)]
     }
     dn_granges <- dn_granges[dn_granges$duoNovo_classification != "failed_QC"]
-    dn_granges$problematic_region <- unlist(dn_granges$problematic_region)
+    dn_granges$problematic_region <- as.logical(dn_granges$problematic_region)
     dn_granges <- dn_granges[which(dn_granges$problematic_region == FALSE)]
     
     classified_dn <- which(dn_granges$duoNovo_classification == "de_novo" & 
