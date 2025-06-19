@@ -65,7 +65,7 @@ getDuoNovoPerformanceMetric <- function(duoNovo_granges_output_filepath, duo_typ
     duonovo_npv <- 1 - length(true_dn)/length(classified_ndn_granges)
 
     npv <- c(duonovo_npv, naive_npv, length(classified_ndn_granges))
-    names(npv) <- c("duonovo_NPV", "naive_NPV")
+    names(npv) <- c("duonovo_NPV", "naive_NPV", "n_other_parent")
     out <- npv
   } else if (metric == "false positive rate"){
     
