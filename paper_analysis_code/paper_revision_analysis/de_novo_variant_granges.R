@@ -1,14 +1,17 @@
 getDeNovoVariantGRanges <- function(duoNovo_granges_output_filepath, duo_type = c("PM", "PF"), 
                                     filter_problematic_regions = TRUE, 
                                     exclude_clustered_denovos = TRUE,
-                                    genomic_annotation = NULL){
+                                    genomic_annotation = NULL, 
+                                    validation_GQ_cutoff = NULL){
   load(file = duoNovo_granges_output_filepath)
+  
   if (duo_type == "PF"){
     dn_granges <- dn_granges_pf
   } else if (duo_type == "PM"){
     dn_granges <- dn_granges_pm
   }
-  dn_granges <- dn_granges[which(dn_granges$phasing_parent == "0/0" & dn_granges$GQ_parent >= 40)]
+  
+  dn_granges <- dn_granges[which(dn_granges$phasing_parent == "0/0" & dn_granges$GQ_parent >= validation_GQ_cutoff)]
   if (filter_problematic_regions == TRUE){
     dn_granges$problematic_region <- as.logical(dn_granges$problematic_region)
     dn_granges <- dn_granges[which(dn_granges$problematic_region == FALSE)]

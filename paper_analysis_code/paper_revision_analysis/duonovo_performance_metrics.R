@@ -1,34 +1,37 @@
 getDuoNovoPerformanceMetric <- function(duoNovo_granges_output_filepath, duo_type = c("PM", "PF"), 
                    include_gnomad = c(TRUE, FALSE), allele_type = c("ALT", "REF"),
                    metric = c("PPV", "NPV", "false positive rate", 
-                              "de novo call rate", "n of total variants classified")){
+                              "de novo call rate", "n of total variants classified"), 
+                   validation_GQ_cutoff = 30){
   load(file = duoNovo_granges_output_filepath)
+  
   if (duo_type == "PF"){
     dn_granges <- dn_granges_pf
   } else if (duo_type == "PM"){
     dn_granges <- dn_granges_pm
   }
+  
   if (metric == "PPV"){
+    
     if (include_gnomad == FALSE){
-      
       dn_granges$gnomad41_genome_AF <- as.numeric(unlist(dn_granges$gnomad41_genome_AF))
       dn_granges <- dn_granges[-which(dn_granges$gnomad41_genome_AF > 0)]
     }
     dn_granges$problematic_region <- as.logical(dn_granges$problematic_region)
     dn_granges <- dn_granges[which(dn_granges$problematic_region == FALSE)]
-    dn_granges <- dn_granges[which(dn_granges$phasing_parent == "0/0" & dn_granges$GQ_parent >= 40)]
+    dn_granges <- dn_granges[which(dn_granges$phasing_parent == "0/0" & dn_granges$GQ_parent >= validation_GQ_cutoff)]
     dn_granges <- dn_granges[!grepl("\\.", dn_granges$parentValidation_gt)]
     all_candidates <- length(dn_granges)
     
     classified_dn <- which(dn_granges$duoNovo_classification == "de_novo" & 
-                             dn_granges$GQ_proband >= 40 &
+                             dn_granges$GQ_proband >= validation_GQ_cutoff &
                              (dn_granges$n_de_novo_left_orientation_same_PS == 1 | 
                                 dn_granges$n_de_novo_right_orientation_same_PS == 1))
     if (length(classified_dn) > 0){
       dn_granges <- dn_granges[classified_dn]
       total <- length(dn_granges)
       assessed_indices <- which(dn_granges$parentValidation_depth >= 20 & 
-                                  dn_granges$parentValidation_GQ >= 40)
+                                  dn_granges$parentValidation_GQ >= validation_GQ_cutoff)
       if (length(assessed_indices) > 0){
         assessed <- length(assessed_indices)
         dn_granges <- dn_granges[assessed_indices]
@@ -47,13 +50,13 @@ getDuoNovoPerformanceMetric <- function(duoNovo_granges_output_filepath, duo_typ
     out <- ppv
   } else if (metric == "NPV"){
     
-    dn_granges <- dn_granges[which(dn_granges$phasing_parent == "0/0" & dn_granges$GQ_parent >= 40)]
+    dn_granges <- dn_granges[which(dn_granges$phasing_parent == "0/0" & dn_granges$GQ_parent >= validation_GQ_cutoff)]
     dn_granges <- dn_granges[!(dn_granges$QC_fail_step %in% 
                                       c("low_depth", "low_GQ", "low_depth_and_GQ"))] #this is because the naive approach would discard these as well
     dn_granges$problematic_region <- as.logical(dn_granges$problematic_region)
     dn_granges <- dn_granges[which(dn_granges$problematic_region == FALSE)]
     dn_granges <- dn_granges[which(dn_granges$parentValidation_depth >= 20 & 
-                                     dn_granges$parentValidation_GQ >= 40)]
+                                     dn_granges$parentValidation_GQ >= validation_GQ_cutoff)]
     dn_granges <- dn_granges[!grepl("\\.", dn_granges$parentValidation_gt)]
     
     true_dn <- grep("1", dn_granges$parentValidation_gt, invert = TRUE)
@@ -69,7 +72,7 @@ getDuoNovoPerformanceMetric <- function(duoNovo_granges_output_filepath, duo_typ
     out <- npv
   } else if (metric == "false positive rate"){
     
-    dn_granges <- dn_granges[which(dn_granges$phasing_parent == "0/0" & dn_granges$GQ_parent >= 40)]
+    dn_granges <- dn_granges[which(dn_granges$phasing_parent == "0/0" & dn_granges$GQ_parent >= validation_GQ_cutoff)]
     inherited_from_missing_parent <- grep("1", dn_granges$parentValidation_gt)
     all_inherited <- dn_granges[inherited_from_missing_parent]
     all_inherited <- all_inherited[all_inherited$duoNovo_classification != "failed_QC"]
@@ -77,10 +80,10 @@ getDuoNovoPerformanceMetric <- function(duoNovo_granges_output_filepath, duo_typ
     all_inherited <- all_inherited[which(all_inherited$problematic_region == FALSE)]
     
     all_inherited <- all_inherited[which(all_inherited$parentValidation_depth >= 20 & 
-                                           all_inherited$parentValidation_GQ >= 40)]
+                                           all_inherited$parentValidation_GQ >= validation_GQ_cutoff)]
     
     classified_dn <- which(all_inherited$duoNovo_classification == "de_novo" & 
-                             all_inherited$GQ_proband >= 40 &
+                             all_inherited$GQ_proband >= validation_GQ_cutoff &
                              (all_inherited$n_de_novo_left_orientation_same_PS == 1 | 
                                 all_inherited$n_de_novo_right_orientation_same_PS == 1))
     dn <- length(classified_dn)
@@ -90,7 +93,7 @@ getDuoNovoPerformanceMetric <- function(duoNovo_granges_output_filepath, duo_typ
     
     uncertain <- length(which(dn_granges$duoNovo_classification == "uncertain"))
     uncertain2 <- length(which(all_inherited$duoNovo_classification == "de_novo" & 
-                                 all_inherited$GQ_proband < 40 & 
+                                 all_inherited$GQ_proband < validation_GQ_cutoff & 
                                  (all_inherited$n_de_novo_left_orientation_same_PS == 1 | 
                                     all_inherited$n_de_novo_right_orientation_same_PS == 1)))
     
@@ -100,17 +103,17 @@ getDuoNovoPerformanceMetric <- function(duoNovo_granges_output_filepath, duo_typ
   } else if (metric == "de novo call rate"){
     if (allele_type == "ALT"){
       
-      dn_granges <- dn_granges[which(dn_granges$phasing_parent == "0/0" & dn_granges$GQ_parent >= 40)]
+      dn_granges <- dn_granges[which(dn_granges$phasing_parent == "0/0" & dn_granges$GQ_parent >= validation_GQ_cutoff)]
     } else if (allele_type == "REF"){
       
-      dn_granges <- dn_granges[which(dn_granges$phasing_parent == "1/1" & dn_granges$GQ_parent >= 40)]
+      dn_granges <- dn_granges[which(dn_granges$phasing_parent == "1/1" & dn_granges$GQ_parent >= validation_GQ_cutoff)]
     }
     dn_granges <- dn_granges[dn_granges$duoNovo_classification != "failed_QC"]
     dn_granges$problematic_region <- as.logical(dn_granges$problematic_region)
     dn_granges <- dn_granges[which(dn_granges$problematic_region == FALSE)]
     
     classified_dn <- which(dn_granges$duoNovo_classification == "de_novo" & 
-                             dn_granges$GQ_proband >= 40 &
+                             dn_granges$GQ_proband >= validation_GQ_cutoff &
                              (dn_granges$n_de_novo_left_orientation_same_PS == 1 | 
                                 dn_granges$n_de_novo_right_orientation_same_PS == 1))
     
@@ -120,10 +123,10 @@ getDuoNovoPerformanceMetric <- function(duoNovo_granges_output_filepath, duo_typ
   } else if (metric == "n of total variants classified"){
     dn_granges$problematic_region <- unlist(dn_granges$problematic_region)
     dn_granges <- dn_granges[which(dn_granges$problematic_region == FALSE)]
-    dn_granges <- dn_granges[which(dn_granges$phasing_parent == "0/0" & dn_granges$GQ_parent >= 40)]
+    dn_granges <- dn_granges[which(dn_granges$phasing_parent == "0/0" & dn_granges$GQ_parent >= validation_GQ_cutoff)]
     dn_granges <- dn_granges[which(dn_granges$duoNovo_classification %in% 
                                      c("de_novo", "on_other_parent_haplotype") & 
-                                     dn_granges$GQ_proband >= 40)]
+                                     dn_granges$GQ_proband >= validation_GQ_cutoff)]
     clustered <- which(dn_granges$n_de_novo_left_orientation_same_PS > 1 | 
                          dn_granges$n_de_novo_right_orientation_same_PS > 1)
     if (length(clustered) > 0){
