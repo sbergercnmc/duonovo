@@ -1,7 +1,7 @@
 getDeNovoVariantGRanges <- function(duoNovo_granges_output_filepath, duo_type = c("PM", "PF"), 
                                     filter_problematic_regions = TRUE, 
                                     exclude_clustered_denovos = TRUE,
-                                    genomic_context = NULL){
+                                    genomic_annotation = NULL){
   load(file = duoNovo_granges_output_filepath)
   if (duo_type == "PF"){
     dn_granges <- dn_granges_pf
@@ -27,10 +27,10 @@ getDeNovoVariantGRanges <- function(duoNovo_granges_output_filepath, duo_type = 
   } else {
     dn_granges <- GRanges()
   }
-  if (!is.null(genomic_context)){
-    variants_in_genomic_context <- which(dn_granges$Func.refGeneWithVer %in% genomic_context)
-    if (length(variants_in_genomic_context) > 0){
-      dn_granges <- dn_granges[variants_in_genomic_context]
+  if (!is.null(genomic_annotation)){
+    variants_in_annotation <- which(dn_granges$Func.refGeneWithVer %in% genomic_context)
+    if (length(variants_in_annotation) > 0){
+      dn_granges <- dn_granges[variants_in_annotation]
     } else {
       dn_granges <- GRanges()
     }
