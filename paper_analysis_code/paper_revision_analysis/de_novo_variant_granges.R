@@ -2,7 +2,7 @@ getDeNovoVariantGRanges <- function(duoNovo_granges_output_filepath, duo_type = 
                                     filter_problematic_regions = TRUE, 
                                     exclude_clustered_denovos = TRUE,
                                     genomic_annotation = NULL, 
-                                    validation_GQ_cutoff = NULL){
+                                    validation_GQ_cutoff = 30){
   load(file = duoNovo_granges_output_filepath)
   
   if (duo_type == "PF"){
