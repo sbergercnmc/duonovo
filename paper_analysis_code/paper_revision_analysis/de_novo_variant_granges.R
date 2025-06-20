@@ -28,7 +28,7 @@ getDeNovoVariantGRanges <- function(duoNovo_granges_output_filepath, duo_type = 
     dn_granges <- GRanges()
   }
   if (!is.null(genomic_annotation)){
-    variants_in_annotation <- which(dn_granges$Func.refGeneWithVer %in% genomic_context)
+    variants_in_annotation <- which(dn_granges$Func.refGeneWithVer %in% genomic_annotation)
     if (length(variants_in_annotation) > 0){
       dn_granges <- dn_granges[variants_in_annotation]
     } else {
