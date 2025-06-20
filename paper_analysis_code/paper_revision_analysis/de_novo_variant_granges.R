@@ -73,7 +73,6 @@ de_novos_pf_with_giab_problematic <- getDeNovoVariantGRanges(duoNovo_output_file
 de_novos_pf_with_clustered <- getDeNovoVariantGRanges(duoNovo_output_filepath_pf, duo_type = "PF", 
                                                              exclude_clustered_denovos = FALSE)
 de_novos_pf_exonic_intronic_only <- getDeNovoVariantGRanges(duoNovo_output_filepath_pf, duo_type = "PF", 
-                                                            exclude_clustered_denovos = FALSE, 
                                                             genomic_annotation = c("exonic", "intronic", "ncRNA_exonic", "ncRNA_intronic", 
                                                                                    "UTR3", "UTR5"))
 
@@ -84,7 +83,6 @@ de_novos_pm_with_giab_problematic <- getDeNovoVariantGRanges(duoNovo_output_file
 de_novos_pm_with_clustered <- getDeNovoVariantGRanges(duoNovo_output_filepath_pm, duo_type = "PM", 
                                                       exclude_clustered_denovos = FALSE)
 de_novos_pm_exonic_intronic_only <- getDeNovoVariantGRanges(duoNovo_output_filepath_pm, duo_type = "PM", 
-                                                            exclude_clustered_denovos = FALSE, 
                                                             genomic_annotation = c("exonic", "intronic", "ncRNA_exonic", "ncRNA_intronic", 
                                                                                    "UTR3", "UTR5"))
 
