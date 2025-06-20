@@ -12,4 +12,9 @@ INDEX=$SLURM_ARRAY_TASK_ID
 module load r
 
 
-Rscript process_duoNovo_output.R $( head -n $INDEX | tail -n 1)
+
+RUNDIR=$( head -n $INDEX | tail -n 1)
+
+Rscript process_duoNovo_output.R $RUNDIR
+Rscript duonovo_performance_metrics.R $RUNDIR
+Rscript de_novo_variant_granges.R $RUNDIR
