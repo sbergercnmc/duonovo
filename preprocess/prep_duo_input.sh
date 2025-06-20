@@ -18,6 +18,14 @@ if [[ -z $(which hiphase 2> /dev/null) ]]; then
    exit
 fi
 
+echo "1 is $1"
+echo "2 is $2"
+echo "3 is $3"
+echo "4 is $4"
+echo "5 is $5"
+echo "6 is $6"
+echo "7 is $7"
+
 
 if [[ -z "$6" ]]; then #allows a task ID to be passed to command line if not run as an array
   echo Usage: prep_duo_input.sh PROBAND_GVCF PROBAND_BAM PARENT_GVCF PARENT_BAM REFERENCE_FASTA OUTPUT_VCF [THREADS:default nproc]

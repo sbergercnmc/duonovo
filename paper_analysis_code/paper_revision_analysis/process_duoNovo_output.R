@@ -39,7 +39,7 @@ getDuoNovoOutputGRanges <- function(duoNovo_file_path){
     "ANNOVAR_DATE",
     "Func.refGeneWithVer", "Gene.refGeneWithVer", "GeneDetail.refGeneWithVer",
     "ExonicFunc.refGeneWithVer", "AAChange.refGeneWithVer",
-    "CpG",
+    "cpg",
     "problematic_region",
     "gnomad41_genome_AF", "gnomad41_genome_AF_raw", "gnomad41_genome_AF_XX",
     "gnomad41_genome_AF_XY", "gnomad41_genome_AF_grpmax",
@@ -81,7 +81,7 @@ if (dir_index < 1L || dir_index > length(dirs))
 current_dir <- dirs[dir_index]
 setwd(current_dir)
 
-duonovo_vcf_output_filepaths <- list.files(pattern = "PF\\.duonovo\\.addedParent\\.dnm2|PM\\.duonovo\\.addedParent\\.dnm2")
+duonovo_vcf_output_filepaths <- list.files(pattern = "PF\\.duonovo\\.annovar\\.addedParent\\.dnm2|PM\\.duonovo\\.annovar\\.addedParent\\.dnm2")
 dn_granges_pf <- getDuoNovoOutputGRanges(duonovo_vcf_output_filepaths[1])
 dn_granges_pm <- getDuoNovoOutputGRanges(duonovo_vcf_output_filepaths[2])
 

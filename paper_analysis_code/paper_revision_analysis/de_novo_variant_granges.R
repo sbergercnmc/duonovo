@@ -24,7 +24,7 @@ getDeNovoVariantGRanges <- function(duoNovo_granges_output_filepath, duo_type = 
     }
   }
   classified_dn <- which(dn_granges$duoNovo_classification == "de_novo" & 
-                           dn_granges$GQ_proband >= 40)
+                           dn_granges$GQ_proband >= validation_GQ_cutoff)
   if (length(classified_dn) > 0){
     dn_granges <- dn_granges[classified_dn]
   } else {
@@ -57,7 +57,7 @@ if (dir_index < 1L || dir_index > length(dirs))
 current_dir <- dirs[dir_index]
 setwd(current_dir)
 
-duonovo_granges_output_filepaths <- list.files(pattern = "PF\\.duonovo\\.addedParent\\.dnm2.rda$|PM\\.duonovo\\.addedParent\\.dnm2.rda$")
+duonovo_granges_output_filepaths <- list.files(pattern = "PF\\.duonovo\\.annovar\\.addedParent\\.dnm2.rda$|PM\\.duonovo\\.annovar\\.addedParent\\.dnm2.rda$")
 duoNovo_output_filepath_pm <- grep("^.*\\.PM\\.", duonovo_granges_output_filepaths, value = TRUE)
 duoNovo_output_filepath_pf <- grep("^.*\\.PF\\.", duonovo_granges_output_filepaths, value = TRUE)
 

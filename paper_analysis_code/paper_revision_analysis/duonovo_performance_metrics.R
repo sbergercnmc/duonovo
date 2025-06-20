@@ -154,7 +154,7 @@ if (dir_index < 1L || dir_index > length(dirs))
 current_dir <- dirs[dir_index]
 setwd(current_dir)
 
-duonovo_granges_output_filepaths <- list.files(pattern = "PF\\.duonovo\\.addedParent\\.dnm2.rda$|PM\\.duonovo\\.addedParent\\.dnm2.rda$")
+duonovo_granges_output_filepaths <- list.files(pattern = "PF\\.duonovo\\.annovar\\.addedParent\\.dnm2.rda$|PM\\.duonovo\\.annovar\\.addedParent\\.dnm2.rda$")
 duoNovo_output_filepath_pm <- grep("^.*\\.PM\\.", duonovo_granges_output_filepaths, value = TRUE)
 duoNovo_output_filepath_pf <- grep("^.*\\.PF\\.", duonovo_granges_output_filepaths, value = TRUE)
 
