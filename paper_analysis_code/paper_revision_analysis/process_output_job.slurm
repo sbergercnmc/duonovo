@@ -8,7 +8,8 @@
 #SBATCH --array=1-100
 
 DIR_FILE="trio_directories.txt"  
-INDEX=$SLURM_ARRAY_TASK_ID   
-module load r     
+INDEX=$SLURM_ARRAY_TASK_ID
+module load r
 
-Rscript process_duoNovo_output.R "$DIR_FILE" "$INDEX" 
+
+Rscript process_duoNovo_output.R $( head -n $INDEX | tail -n 1)
