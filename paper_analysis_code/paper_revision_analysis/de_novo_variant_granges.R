@@ -8,8 +8,6 @@ getDeNovoVariantGRanges <- function(duoNovo_granges_output_filepath, duo_type = 
   dn_granges$problematic_region <- as.logical(dn_granges$problematic_region)
   dn_granges <- dn_granges[which(dn_granges$problematic_region == FALSE)]
   dn_granges <- dn_granges[which(dn_granges$phasing_parent == "0/0" & dn_granges$GQ_parent >= 40)]
-  dn_granges <- dn_granges[which(dn_granges$n_de_novo_left_orientation_same_PS == 1 | 
-                                   dn_granges$n_de_novo_right_orientation_same_PS == 1)]
   
   classified_dn <- which(dn_granges$duoNovo_classification == "de_novo" & 
                            dn_granges$GQ_proband >= 40 &
