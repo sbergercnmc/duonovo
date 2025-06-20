@@ -70,15 +70,8 @@ if (length(args) < 2L) {
   stop("Usage: process_duoNovo_output.R <trio_directories.txt> <index>")
 }
 
-dir_file   <- args[1]
-dir_index  <- as.integer(args[2])
-
 ## read directory list
-dirs <- trimws(readLines(dir_file))
-if (dir_index < 1L || dir_index > length(dirs))
-  stop("Index ", dir_index, " is out of range 1–", length(dirs))
-
-current_dir <- dirs[dir_index]
+current_dir <- args[1]
 setwd(current_dir)
 
 duonovo_vcf_output_filepaths <- list.files(pattern = "PF\\.duonovo\\.annovar\\.addedParent\\.dnm2|PM\\.duonovo\\.annovar\\.addedParent\\.dnm2")
