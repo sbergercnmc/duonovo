@@ -65,12 +65,30 @@ if (length(duoNovo_output_filepath_pf) != 1L ||
 
 ### --- father-proband duos
 de_novos_pf <- getDeNovoVariantGRanges(duoNovo_output_filepath_pf, duo_type = "PF")
+de_novos_pf_with_giab_problematic <- getDeNovoVariantGRanges(duoNovo_output_filepath_pf, duo_type = "PF", 
+                                                             filter_problematic_regions = FALSE)
+de_novos_pf_with_clustered <- getDeNovoVariantGRanges(duoNovo_output_filepath_pf, duo_type = "PF", 
+                                                             exclude_clustered_denovos = FALSE)
+de_novos_pf_exonic_intronic_only <- getDeNovoVariantGRanges(duoNovo_output_filepath_pf, duo_type = "PF", 
+                                                            exclude_clustered_denovos = FALSE, 
+                                                            genomic_annotation = c("exonic", "intronic", "ncRNA_exonic", "ncRNA_intronic", 
+                                                                                   "UTR3", "UTR5"))
 
 ### --- mother-proband duos
-de_novos_pm <- getDeNovoVariantGRanges(duoNovo_output_filepath_pm, duo_type = "PF")
+de_novos_pm <- getDeNovoVariantGRanges(duoNovo_output_filepath_pm, duo_type = "PM")
+de_novos_pm_with_giab_problematic <- getDeNovoVariantGRanges(duoNovo_output_filepath_pm, duo_type = "PM", 
+                                                             filter_problematic_regions = FALSE)
+de_novos_pm_with_clustered <- getDeNovoVariantGRanges(duoNovo_output_filepath_pm, duo_type = "PM", 
+                                                      exclude_clustered_denovos = FALSE)
+de_novos_pm_exonic_intronic_only <- getDeNovoVariantGRanges(duoNovo_output_filepath_pm, duo_type = "PM", 
+                                                            exclude_clustered_denovos = FALSE, 
+                                                            genomic_annotation = c("exonic", "intronic", "ncRNA_exonic", "ncRNA_intronic", 
+                                                                                   "UTR3", "UTR5"))
+
 
 ### save
 sample_id <- sub("\\..*$", "", duoNovo_output_filepath_pf)
-save(de_novos_pf, de_novos_pm, 
+save(de_novos_pf, de_novos_pf_with_giab_problematic, de_novos_pf_with_clustered, de_novos_pf_exonic_intronic_only,
+     de_novos_pm, de_novos_pm_with_giab_problematic, de_novos_pm_with_clustered, de_novos_pm_exonic_intronic_only,
      file = paste0(sample_id, "_de_novo_variant_granges.rda"))
 
