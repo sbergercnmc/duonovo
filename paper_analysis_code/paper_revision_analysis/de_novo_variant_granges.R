@@ -12,15 +12,16 @@ getDeNovoVariantGRanges <- function(duoNovo_granges_output_filepath, duo_type = 
   }
   
   dn_granges <- dn_granges[which(dn_granges$phasing_parent == "0/0" & dn_granges$GQ_parent >= validation_GQ_cutoff)]
-  if (filter_problematic_regions == TRUE){
-    dn_granges$problematic_region <- as.logical(dn_granges$problematic_region)
-    dn_granges <- dn_granges[which(dn_granges$problematic_region == FALSE)]
+  if (filter_problematic_regions == FALSE){
+    indices <- grep("de_novo", dn_granges$QC_fail_step)
+    if (length(indices) > 0){
+      dn_granges$duoNovo_classification[indices] <- "de_novo"
+    }
   }
-  if (exclude_clustered_denovos == TRUE){
-    clustered <- which(dn_granges$n_de_novo_left_orientation_same_PS > 1 | 
-                         dn_granges$n_de_novo_right_orientation_same_PS > 1)
-    if(length(clustered) > 0){
-      dn_granges <- dn_granges[-clustered]
+  if (exclude_clustered_denovos == FALSE){
+    indices <- which(dn_granges$duoNovo_classification == "on_multi_denovo_haplotype")
+    if (length(indices) > 0){
+      dn_granges$duoNovo_classification[indices] <- "de_novo"
     }
   }
   classified_dn <- which(dn_granges$duoNovo_classification == "de_novo" & 

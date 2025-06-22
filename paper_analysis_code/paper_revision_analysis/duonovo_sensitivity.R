@@ -7,7 +7,7 @@ getSensitivity <- function(trio_denovo_filepath, duoNovo_granges_output_filepath
                                        trio_de_novo$parent1_GQ >= validation_GQ_cutoff & 
                                        trio_de_novo$parent2_GQ >= validation_GQ_cutoff)]
   
-  all <- length(trio_de_novo)
+  total <- length(trio_de_novo)
   
   if (duo_type == "PF"){
     
@@ -32,8 +32,8 @@ getSensitivity <- function(trio_denovo_filepath, duoNovo_granges_output_filepath
     } else {
       uncertain <- 0
     }
-    sens <- c(dn, ndn, uncertain, all)
-    names(sens) <- c("de_novo", "on_other_parent_haplotype", "uncertain", "all")
+    sens <- c(dn, ndn, uncertain, total)
+    names(sens) <- c("de_novo", "on_other_parent_haplotype", "uncertain", "total")
     out <- sens
   } else if (duo_type == "PM"){
     
@@ -58,24 +58,28 @@ getSensitivity <- function(trio_denovo_filepath, duoNovo_granges_output_filepath
     } else {
       uncertain <- 0
     }
-    sens <- c(dn, ndn, uncertain, all)
-    names(sens) <- c("de_novo", "on_other_parent_haplotype", "uncertain", "all")
+    sens <- c(dn, ndn, uncertain, total)
+    names(sens) <- c("de_novo", "on_other_parent_haplotype", "uncertain", "total")
     out <- sens
   } else if (duo_type == "both"){
     
     load(file = duoNovo_granges_output_filepath_pf)
     load(file = duoNovo_granges_output_filepath_pm)
     
-    dn_f <- unique(queryHits(trio_de_novo, dn_granges_pf[dn_granges_pf$duoNovo_classification == "de_novo"]))
-    dn_m <- unique(queryHits(trio_de_novo, dn_granges_pm[dn_granges_pm$duoNovo_classification == "de_novo"]))
+    dn_f <- unique(queryHits(findOverlaps(trio_de_novo, 
+                                          dn_granges_pf[dn_granges_pf$duoNovo_classification == "de_novo"])))
+    dn_m <- unique(queryHits(findOverlaps(trio_de_novo, 
+                                          dn_granges_pm[dn_granges_pm$duoNovo_classification == "de_novo"])))
     dn_both <- intersect(dn_f, dn_m)
     dn_either <- union(dn_f, dn_m)
     
-    ndn_f <- unique(queryHits(trio_de_novo, dn_granges_pf[dn_granges_pf$duoNovo_classification == "on_other_parent_haplotype"]))
-    ndn_m <- unique(queryHits(trio_de_novo, dn_granges_pm[dn_granges_pm$duoNovo_classification == "on_other_parent_haplotype"]))
+    ndn_f <- unique(queryHits(findOverlaps(trio_de_novo, 
+                                           dn_granges_pf[dn_granges_pf$duoNovo_classification == "on_other_parent_haplotype"])))
+    ndn_m <- unique(queryHits(findOverlaps(trio_de_novo, 
+                                           dn_granges_pm[dn_granges_pm$duoNovo_classification == "on_other_parent_haplotype"])))
     ndn_both <- intersect(ndn_f, ndn_m)
-    sens <- c(length(dn_either), length(dn_both), length(ndn_both), all)
-    names(sens) <- c("de_novo_either", "de_novo_both", "non_denovo_both", "all")
+    sens <- c(length(dn_either), length(dn_both), length(ndn_both), total)
+    names(sens) <- c("de_novo_either", "de_novo_both", "non_denovo_both", "total")
     out <- sens
   }
   out
@@ -83,7 +87,7 @@ getSensitivity <- function(trio_denovo_filepath, duoNovo_granges_output_filepath
 
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) != 1L) {
-  stop("Usage: process_duoNovo_output.R <run_directory>")
+  stop("Usage: duonovo_sensitivity.R <run_directory>")
 }
 
 ## set directory
@@ -94,7 +98,15 @@ duonovo_granges_output_filepaths <- list.files(pattern = "PF\\.duonovo\\.annovar
 duoNovo_output_filepath_pm <- grep("^.*\\.PM\\.", duonovo_granges_output_filepaths, value = TRUE)
 duoNovo_output_filepath_pf <- grep("^.*\\.PF\\.", duonovo_granges_output_filepaths, value = TRUE)
 
+if (length(duoNovo_output_filepath_pf) != 1L ||
+    length(duoNovo_output_filepath_pm) != 1L) {
+  stop("Couldn’t unambiguously detect PF vs PM GRanges files")
+}
+
 trio_denovo_filepath <- list.files(pattern = "PFM\\.annovar\\.dnm2\\.rda$")
+if (length(trio_denovo_filepath) != 1L ) {
+  stop("Couldn’t unambiguously detect trio de novo GRanges file")
+}
 
 ### --- father-proband duo
 sens_pf <- getSensitivity(trio_denovo_filepath, duoNovo_output_filepath_pf, duo_type = "PF")
