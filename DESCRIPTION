@@ -20,4 +20,5 @@ Imports:
     GenomicRanges,
     IRanges,
     S4Vectors,
+    rtracklayer,
     utils

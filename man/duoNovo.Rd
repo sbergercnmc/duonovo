@@ -16,6 +16,7 @@ duoNovo(
   SRS_vcf_file_path = NULL,
   test_reference_allele = FALSE,
   candidate_variant_coordinates = NULL,
+  problematic_regions = NULL,
   output_vcf_path = NULL,
   compress_output = TRUE
 )
@@ -43,6 +44,8 @@ duoNovo(
 
 \item{candidate_variant_coordinates}{Vector of coordinates for specific variants of interest (of the form c(chr1:1000, chr2:2000)).}
 
+\item{problematic_regions}{BED file with coordinates of problematic regions (e.g. as defined by Genome-in-a-Bottle)}
+
 \item{output_vcf_path}{File path for output vcf.}
 
 \item{compress_output}{Logical value specifying if output_vcf should be compressed and indexed. appended .bgz to filename (default is \code{TRUE}).}
@@ -61,6 +64,6 @@ The function ultimately works by detecting identical by descent haplotype blocks
 # duoNovo(LRS_phased_vcf_file_path = my_LRS_file_path, depth_cutoff = 20, GQ_cutoff = 30,
 #          proband_column_identifier = my_proband_identifier,
 #          PS_width_cutoff = 10000, boundary_cutoff = 2000, distance_cutoff = 40,
-#          candidate_variants_concordant_with_SRS = TRUE,
+#          candidate_variants_concordant_with_SRS = FALSE,
 #          SRS_vcf_file_path = my_SRS_file_path)
 }

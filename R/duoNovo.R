@@ -14,17 +14,19 @@
 #' @param SRS_vcf_file_path File path to the vcf containing variant calls from short-read sequencing of the duo.
 #' @param test_reference_allele Logical value specifying if positions where the proband is heterozygous and the parent is homozygous for the variant allele (not the reference) should be tested (default is `FALSE`).
 #' @param candidate_variant_coordinates Vector of coordinates for specific variants of interest (of the form c(chr1:1000, chr2:2000)).
+#' @param problematic_regions BED file with coordinates of problematic regions (e.g. as defined by Genome-in-a-Bottle)
 #' @param output_vcf_path File path for output vcf.
 #' @param compress_output Logical value specifying if output_vcf should be compressed and indexed. appended .bgz to filename (default is `TRUE`).
 #'
 #' @return A `GRanges` containing additional columns for the variant classifications as well as supporting information.
 #' @details The function ultimately works by detecting identical by descent haplotype blocks, to determine whether each candidate variant of interest is de novo, using the genotype of only one parent. If requested, concordance with short-read sequencing can be checked.
 #'
-#' @importFrom matrixStats colMins 
+#' @importFrom matrixStats colMins rowMaxs
 #' @importFrom S4Vectors queryHits subjectHits DataFrame metadata append
 #' @importFrom SummarizedExperiment rowRanges colData 
 #' @import GenomicRanges
 #' @import IRanges
+#' @importFrom rtracklayer import
 #' @import VariantAnnotation
 #' @importFrom utils packageVersion
 #' @export
@@ -33,14 +35,14 @@
 #' # duoNovo(LRS_phased_vcf_file_path = my_LRS_file_path, depth_cutoff = 20, GQ_cutoff = 30,
 #' #          proband_column_identifier = my_proband_identifier,
 #' #          PS_width_cutoff = 10000, boundary_cutoff = 2000, distance_cutoff = 40,
-#' #          candidate_variants_concordant_with_SRS = TRUE,
+#' #          candidate_variants_concordant_with_SRS = FALSE,
 #' #          SRS_vcf_file_path = my_SRS_file_path)
 duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                     proband_column_identifier,
                     PS_width_cutoff = 10000, boundary_cutoff = 2000, distance_cutoff = 40,
                     candidate_variants_concordant_with_SRS = FALSE, SRS_vcf_file_path = NULL, 
                     test_reference_allele = FALSE, 
-                    candidate_variant_coordinates = NULL, 
+                    candidate_variant_coordinates = NULL, problematic_regions = NULL,
                     output_vcf_path = NULL, compress_output = TRUE) {
   if (!file.exists(LRS_phased_vcf_file_path)) {
     stop("The LRS VCF file path does not exist: ", LRS_phased_vcf_file_path)
@@ -390,6 +392,38 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     counts_right <- rep(n_dn_in_ps_right, n_dn_in_ps_right)
     output_sorted$n_de_novo_right_orientation_same_PS[de_novo_indices_right[indices_right]] <- counts_right
   }
+  multi_denovo_haplotype_indices <- which(output_sorted$n_de_novo_left_orientation_same_PS > 1 | 
+                                               output_sorted$n_de_novo_right_orientation_same_PS > 1)
+  if (length(multi_denovo_haplotype_indices) > 0){
+    output_sorted$duoNovo_classification[multi_denovo_haplotype_indices] <- "on_multi_denovo_haplotype"
+  }
+  multi_denovo_mat <- as.matrix(
+    mcols(output_sorted)[, c("n_de_novo_left_orientation_same_PS",
+                  "n_de_novo_right_orientation_same_PS")]
+  )
+  max_count <- rowMaxs(multi_denovo_mat, na.rm = TRUE)
+  max_count[is.infinite(max_count)] <- NA
+  
+  output_sorted$n_de_novo_same_orientation_same_PS <- max_count
+  mcols(output_sorted)$n_de_novo_left_orientation_same_PS  <- NULL
+  mcols(output_sorted)$n_de_novo_right_orientation_same_PS <- NULL
+  
+  if (!is.null(problematic_regions)){
+    problematic_regions <- import(problematic_regions, format = "BED")
+    problematic_region_overlap_indices <- unique(queryHits(findOverlaps(output_sorted, problematic_regions)))
+    if (length(problematic_region_overlap_indices) > 0){
+      output_sorted$QC_fail_step[problematic_region_overlap_indices] <- paste0("classified_", 
+                                                                               output_sorted$duoNovo_classification, 
+                                                                               "_in_problematic_region")
+      output_sorted$duoNovo_classification[problematic_region_overlap_indices] <- "failed_QC"
+    }
+  }
+  output_sorted$tested_allele <- 1
+  if (test_reference_allele == TRUE){
+    which(output_sorted$phasing)
+  }
+  output_sorted$tested_allele[which(output_sorted$phasing1 %in% c("0|1", "1|0") & 
+                                      output_sorted$phasing2 == "1/1")] <- 0
   
   if (!is.null(output_vcf_path)){
     message("Writing classified variants into VCF...")
@@ -418,6 +452,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
       paste0( ifelse(is.null(test_reference_allele), "NA", test_reference_allele)),
       paste0( ifelse(is.null(SRS_vcf_file_path), "NA", SRS_vcf_file_path)),
       paste0( ifelse(is.null(candidate_variant_coordinates), "NA", candidate_variant_coordinates)),
+      paste0( ifelse(is.null(problematic_regions), "NA", problematic_regions)),
       paste0( ifelse(is.null(output_vcf_path), "NA", output_vcf_path)),
       paste0( ifelse(is.null(compress_output), "NA", compress_output))
     )
@@ -436,6 +471,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                     "test_reference_allele",
                     "SRS_vcf_file_path",
                     "candidate_variant_coordinates",
+                    "problematic_regions",
                     "output_vcf_path",
                     "compress_output")
     )
@@ -451,7 +487,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                     "GQ_proband", "GQ_parent", "duoNovo_classification",
                     "supporting_hamming_distance", "supporting_counts_het_hom",
                     "supporting_counts_het_het", "supporting_counts_hom_het",
-                    "QC_fail_step", "n_de_novo_left_orientation_same_PS", "n_de_novo_right_orientation_same_PS"),
+                    "QC_fail_step", "tested_allele", "n_de_novo_same_orientation_same_PS"),
       Number = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
       Type = c("String", "String", "Integer", "Integer", "Integer", "Integer", "String",
                "Integer", "Integer", "Integer", "Integer", "String", "Integer", "Integer"),
@@ -461,8 +497,8 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                       "Supporting Hamming distance", "Supporting counts (het-hom)",
                       "Supporting counts (het-het)", "Supporting counts (hom-het)",
                       "QC fail step (NA for variants that passed QC)", 
-                      "Total number of de novo variants in left orientation and same phasing set (NA for non-de novo variants or de novo variants in right orientation)", 
-                      "Total number of de novo variants in right orientation and same phasing set (NA for non-de novo variants or de novo variants in left orientation)")
+                      "Allele tested for de novo status (1 for ALT, 0 for REF)", 
+                      "Total number of de novo variants in same orientation and same phasing set (NA for non-de novo variants)")
     )
     
     # Add each new INFO field to the header
@@ -485,8 +521,8 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
       supporting_counts_het_het = output_sorted$supporting_counts_het_het,
       supporting_counts_hom_het = output_sorted$supporting_counts_hom_het,
       QC_fail_step = output_sorted$QC_fail_step, 
-      n_de_novo_left_orientation_same_PS = output_sorted$n_de_novo_left_orientation_same_PS,
-      n_de_novo_right_orientation_same_PS = output_sorted$n_de_novo_right_orientation_same_PS
+      tested_allele = output_sorted$tested_allele,
+      n_de_novo_right_orientation_same_PS = output_sorted$n_de_novo_same_orientation_same_PS
     )
     info <- cbind(info(vcf)[names(output_sorted), ], info_new)
     

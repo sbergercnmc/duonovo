@@ -1,17 +1,13 @@
-setwd("C:/Users/lboukas/duoNovo_results/PF")
-all_duonovo_outputs <- list.files()
-all_duonovo_outputs_pass_QC <- all_duonovo_outputs[pass_QC]
-
-false_pos_pf <- matrix(NA, nrow = 3, ncol = length(all_duonovo_outputs_pass_QC))
-colnames(false_pos_pf) <- sub(".*PF_([^_]+)_.*", "\\1", all_duonovo_outputs_pass_QC)
-rownames(false_pos_pf) <- c("dn", "ndn", "uncertain")
-
-for (i in 1:length(all_duonovo_outputs_pass_QC)){
-  load(file = all_duonovo_outputs_pass_QC[i])
-  dn_granges <- dn_granges_pf
+getFalsePositives <- function(duoNovo_granges_output_filepath, duo_type = c("PM", "PF")){
+  load(file = duoNovo_granges_output_filepath)
+  if (duo_type == "PF"){
+    dn_granges <- dn_granges_pf
+  } else if (duo_type == "PM"){
+    dn_granges <- dn_granges_pm
+  }
   dn_granges <- dn_granges[which(dn_granges$phasing_parent == "0/0" & dn_granges$GQ_parent >= 40)]
-  inherited_from_mother <- grep("1", dn_granges$parentValidation_gt)
-  all_inherited <- dn_granges[inherited_from_mother]
+  inherited_from_missing_parent <- grep("1", dn_granges$parentValidation_gt)
+  all_inherited <- dn_granges[inherited_from_missing_parent]
   all_inherited <- all_inherited[-which(all_inherited$duoNovo_classification == "failed_QC")]
   all_inherited$giab_problematic <- unlist(all_inherited$giab_problematic)
   all_inherited <- all_inherited[which(all_inherited$giab_problematic == ".")]
@@ -20,8 +16,8 @@ for (i in 1:length(all_duonovo_outputs_pass_QC)){
   
   classified_dn <- which(all_inherited$duoNovo_classification == "de_novo" & 
                            all_inherited$GQ_proband >= 40 &
-                         (all_inherited$n_de_novo_left_orientation_same_PS == 1 | 
-                             all_inherited$n_de_novo_right_orientation_same_PS == 1))
+                           (all_inherited$n_de_novo_left_orientation_same_PS == 1 | 
+                              all_inherited$n_de_novo_right_orientation_same_PS == 1))
   dn <- length(classified_dn)
   
   classified_ndn <- which(all_inherited$duoNovo_classification == "on_other_parent_haplotype")
@@ -31,68 +27,54 @@ for (i in 1:length(all_duonovo_outputs_pass_QC)){
                          all_inherited$n_de_novo_right_orientation_same_PS > 1)
   ndn <- length(classified_ndn)
   
-  uncertain <- length(which(dn_granges$duoNovo_classification == "uncertain"))
-  uncertain2 <- length(which(all_inherited$duoNovo_classification == "de_novo" & 
-                        all_inherited$GQ_proband < 40 & 
-                      (all_inherited$n_de_novo_left_orientation_same_PS == 1 | 
-                          all_inherited$n_de_novo_right_orientation_same_PS == 1)))
-  
-  false_pos_pf[, i] <- c(dn, ndn, uncertain + uncertain2)
-  false_pos_pf
-}
-
-###
-
-setwd("C:/Users/lboukas/duoNovo_results/PM")
-all_duonovo_outputs <- list.files()
-all_duonovo_outputs_pass_QC <- all_duonovo_outputs[pass_QC]
-
-false_pos_pm <- matrix(NA, nrow = 3, ncol = length(all_duonovo_outputs_pass_QC))
-colnames(false_pos_pm) <- sub(".*PF_([^_]+)_.*", "\\1", all_duonovo_outputs_pass_QC)
-rownames(false_pos_pm) <- c("dn", "ndn", "uncertain")
-
-for (i in 1:length(all_duonovo_outputs_pass_QC)){
-  load(file = all_duonovo_outputs_pass_QC[i])
-  dn_granges <- dn_granges_pm
-  dn_granges <- dn_granges[which(dn_granges$phasing_parent == "0/0" & dn_granges$GQ_parent >= 40)]
-  inherited_from_father <- grep("1", dn_granges$parentValidation_gt)
-  all_inherited <- dn_granges[inherited_from_father]
-  all_inherited <- all_inherited[-which(all_inherited$duoNovo_classification == "failed_QC")]
-  all_inherited$giab_problematic <- unlist(all_inherited$giab_problematic)
-  all_inherited <- all_inherited[which(all_inherited$giab_problematic == ".")]
-  
-  all_inherited <- all_inherited[which(all_inherited$parentValidation_GQ >= 40)]
-  
-  classified_dn <- which(all_inherited$duoNovo_classification == "de_novo" & 
-                           all_inherited$GQ_proband >= 40 & all_inherited$GQ_parent >= 40 &
-                           (all_inherited$n_de_novo_left_orientation_same_PS == 1 | 
-                              all_inherited$n_de_novo_right_orientation_same_PS == 1))
-  dn <- length(classified_dn)
-  
-  classified_ndn <- which(all_inherited$duoNovo_classification == "on_other_parent_haplotype")
-  clustered_1 <- which(all_inherited$duoNovo_classification == "de_novo" & 
-                              all_inherited$n_de_novo_left_orientation_same_PS > 1)
-  clustered_2 <- which(all_inherited$duoNovo_classification == "de_novo" & 
-                              all_inherited$n_de_novo_right_orientation_same_PS > 1)
-  ndn <- length(classified_ndn)
-  
-  uncertain <- length(which(dn_granges$duoNovo_classification == "uncertain"))
+  uncertain <- length(which(all_inherited$duoNovo_classification == "uncertain"))
   uncertain2 <- length(which(all_inherited$duoNovo_classification == "de_novo" & 
                                all_inherited$GQ_proband < 40 & 
                                (all_inherited$n_de_novo_left_orientation_same_PS == 1 | 
-                                  all_inherited$n_de_novo_right_orientation_same_PS == 1)))  
-  false_pos_pm[, i] <- c(dn, ndn, uncertain + uncertain2)
-  false_pos_pm
+                                  all_inherited$n_de_novo_right_orientation_same_PS == 1)))
+  
+  false_pos <- c(dn, ndn, uncertain + uncertain2)
+  names(false_pos) <- c("dn", "ndn", "uncertain")
+  false_pos
 }
 
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) < 2L) {
+  stop("Usage: duonovo_ppv.R <dir_list.txt> <index>")
+}
 
-aggregate_transmitted_f <- rowSums(false_pos_pf)
-percentages_transmitted_f <- aggregate_transmitted_f/sum(aggregate_transmitted_f)
-per_sample_false_pos_rate_f <- apply(false_pos_pf, 2, function(xx) xx[1]/sum(xx))
+dir_file   <- args[1]
+dir_index  <- as.integer(args[2])
 
-aggregate_transmitted_m <- rowSums(false_pos_pm)
-percentages_transmitted_m <- aggregate_transmitted_m/sum(aggregate_transmitted_m)
-per_sample_false_pos_rate_m <- apply(false_pos_pm, 2, function(xx) xx[1]/sum(xx))
+## read directory list
+dirs <- scan(dir_file, what = character(), sep = "\n", quiet = TRUE)
+if (dir_index < 1L || dir_index > length(dirs))
+  stop("Index ", dir_index, " is out of range 1–", length(dirs))
+
+current_dir <- dirs[dir_index]
+setwd(current_dir)
+
+duoNovo_output_filepath_pm <- list.files(
+  pattern = "^duo_pm.*\\.rda$",   # prefix + anything + .rda
+  ignore.case = TRUE,             # make it case-insensitive if you wish
+  full.names = FALSE)
+duoNovo_output_filepath_pf <- list.files(
+  pattern = "^duo_pf.*\\.rda$",   # prefix + anything + .rda
+  ignore.case = TRUE,             # make it case-insensitive if you wish
+  full.names = FALSE)
+
+
+### --- father-proband duos
+false_pos_pf <- getFalsePositives(duoNovo_output_filepath_pf, duo_type = "PF")
+
+### --- mother-proband duos
+false_pos_pm <- getFalsePositives(duoNovo_output_filepath_pm, duo_type = "PM")
+
+dir_tag <- basename(current_dir)
+save(false_pos_pf, false_pos_pm, 
+     file = paste0(dir_tag, "_false_pos_pm_and_pf.rda"))
+
+
 
 
 
