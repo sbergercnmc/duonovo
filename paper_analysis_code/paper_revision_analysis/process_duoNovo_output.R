@@ -66,17 +66,25 @@ getDuoNovoOutputGRanges <- function(duoNovo_file_path){
 
 library(VariantAnnotation)
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) < 2L) {
-  stop("Usage: process_duoNovo_output.R <trio_directories.txt> <index>")
+if (length(args) != 1L) {
+  stop("Usage: process_duoNovo_output.R <run_directory>")
 }
 
-## read directory list
+## set directory
 current_dir <- args[1]
 setwd(current_dir)
 
-duonovo_vcf_output_filepaths <- list.files(pattern = "PF\\.duonovo\\.annovar\\.addedParent\\.dnm2|PM\\.duonovo\\.annovar\\.addedParent\\.dnm2")
-dn_granges_pf <- getDuoNovoOutputGRanges(duonovo_vcf_output_filepaths[1])
-dn_granges_pm <- getDuoNovoOutputGRanges(duonovo_vcf_output_filepaths[2])
+duonovo_vcf_output_filepaths <- list.files(pattern = "PF\\.duonovo\\.annovar\\.addedParent\\.dnm2\\.vcf\\.gz$|PM\\.duonovo\\.annovar\\.addedParent\\.dnm2\\.vcf\\.gz$")
+duonovo_vcf_output_filepath_pm <- grep("^.*\\.PM\\.", duonovo_vcf_output_filepaths, value = TRUE)
+duonovo_vcf_output_filepath_pf <- grep("^.*\\.PF\\.", duonovo_vcf_output_filepaths, value = TRUE)
+
+if (length(duonovo_vcf_output_filepath_pf) != 1L ||
+    length(duonovo_vcf_output_filepath_pm) != 1L) {
+  stop("Couldn’t unambiguously detect PF vs PM vcf files")
+}
+
+dn_granges_pf <- getDuoNovoOutputGRanges(duonovo_vcf_output_filepath_pf)
+dn_granges_pm <- getDuoNovoOutputGRanges(duonovo_vcf_output_filepath_pm)
 
 duo_basename_pf <- basename(duonovo_vcf_output_filepaths[1])
 duo_basename_pm <- basename(duonovo_vcf_output_filepaths[2])

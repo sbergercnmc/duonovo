@@ -139,11 +139,11 @@ getDuoNovoPerformanceMetric <- function(duoNovo_granges_output_filepath, duo_typ
 
 
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) < 2L) {
-  stop("Usage: duonovo_performance_metrics.R <trio_directories.txt> <index>")
+if (length(args) != 1L) {
+  stop("Usage: process_duoNovo_output.R <run_directory>")
 }
 
-## read directory list
+## set directory
 current_dir <- args[1]
 setwd(current_dir)
 
