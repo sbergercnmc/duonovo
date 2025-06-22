@@ -413,7 +413,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     problematic_region_overlap_indices <- unique(queryHits(findOverlaps(output_sorted, problematic_regions)))
     if (length(problematic_region_overlap_indices) > 0){
       output_sorted$QC_fail_step[problematic_region_overlap_indices] <- paste0("classified_", 
-                                                                               output_sorted$duoNovo_classification, 
+                                            output_sorted$duoNovo_classification[problematic_region_overlap_indices], 
                                                                                "_in_problematic_region")
       output_sorted$duoNovo_classification[problematic_region_overlap_indices] <- "failed_QC"
     }
