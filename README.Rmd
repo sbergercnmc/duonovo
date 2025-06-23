@@ -114,6 +114,7 @@ Below is a description of each argument that `duoNovo()` accepts:
 - **boundary_cutoff**: A numeric value indicating the minimum distance from a haplotype block boundary (either start or end coordinate) for candidate variants to be evaluated. The default is 2000.
 - **distance_cutoff**: A numeric value specifying the minimum Hamming distance cutoff to determine that a proband-parent haplotype block is not identical by descent. The default is 40.
 - **candidate_variants_concordant_with_SRS**: Logical value specifying if candidate variant genotype calls should be concordant with short-read sequencing (the default is `FALSE`).
+- **problematic_regions**: Bed file with regions to exclude from candidates and data (the default is empty).
 - **SRS_vcf_file_path**: Path to the VCF containing variant calls from short-read sequencing of the duo.
 - **test_reference_allele**: Logical value specifying if positions where the proband is heterozygous and the parent is homozygous for the variant allele should also be tested (the default is `FALSE`).
 - **candidate_variant_coordinates**: A vector of 1-based coordinates (e.g. `c("chr1:1000", "chr2:2000")`) of candidate variants of interest.
@@ -161,6 +162,8 @@ options:
   -n coordinates, --candidate_variant_coordinates coordinates
                         Vector of 1-based coordinates of candidate variants, e.g. chr1:12345-12345,chr2:65430-65430.
                         [Optional]
+  -x BED_FILE, --exclude_regions_bed_path BED_FILE
+                        Path to bedfile for regions to exclude [Optional]
   -s FILE, --SRS_vcf_file_path FILE
                         Path to short read duo vcf [Optional]
   -o FILE, --output_vcf FILE
