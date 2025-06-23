@@ -51,8 +51,7 @@ getDuoNovoPerformanceMetric <- function(duoNovo_granges_output_filepath, duo_typ
     ## -- QC fails that naive approach would discard as well
     dn_granges <- dn_granges[!(dn_granges$QC_fail_step %in% 
                                       c("low_depth", "low_GQ", "low_depth_and_GQ"))] 
-    problematic <- grep("problematic_region", dn_granges$QC_fail_step)
-    dn_granges  <- dn_granges[-problematic]
+    dn_granges  <- dn_granges[!grepl("problematic_region", dn_granges$QC_fail_step)]
     ##
     
     dn_granges <- dn_granges[which(dn_granges$parentValidation_depth >= 20 & 
@@ -63,7 +62,7 @@ getDuoNovoPerformanceMetric <- function(duoNovo_granges_output_filepath, duo_typ
     naive_npv <- 1 - length(true_dn)/length(dn_granges)
     
     classified_ndn <- which(dn_granges$duoNovo_classification == "on_other_parent_haplotype")
-    classified_ndn_granges <- dn_granges[c(classified_ndn)]
+    classified_ndn_granges <- dn_granges[classified_ndn]
     true_dn <- grep("1", classified_ndn_granges$parentValidation_gt, invert = TRUE)
     duonovo_npv <- 1 - length(true_dn)/length(classified_ndn_granges)
 
