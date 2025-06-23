@@ -47,8 +47,14 @@ getDuoNovoPerformanceMetric <- function(duoNovo_granges_output_filepath, duo_typ
   } else if (metric == "NPV"){
     
     dn_granges <- dn_granges[which(dn_granges$phasing_parent == "0/0" & dn_granges$GQ_parent >= validation_GQ_cutoff)]
+    
+    ## -- QC fails that naive approach would discard as well
     dn_granges <- dn_granges[!(dn_granges$QC_fail_step %in% 
-                                      c("low_depth", "low_GQ", "low_depth_and_GQ"))] #this is because the naive approach would discard these as well
+                                      c("low_depth", "low_GQ", "low_depth_and_GQ"))] 
+    problematic <- grep("problematic_region", dn_granges$QC_fail_step)
+    dn_granges  <- dn_granges[-problematic]
+    ##
+    
     dn_granges <- dn_granges[which(dn_granges$parentValidation_depth >= 20 & 
                                      dn_granges$parentValidation_GQ >= validation_GQ_cutoff)]
     dn_granges <- dn_granges[!grepl("\\.", dn_granges$parentValidation_gt)]
