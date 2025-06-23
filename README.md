@@ -1,4 +1,3 @@
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # *duoNovo*: Identification of *de novo* variants from single parent-proband duos
@@ -23,34 +22,32 @@ not possible).
 
 *duoNovo* can be installed as follows:
 
-``` r
-# Step 1: Install Bioconductor dependencies
-if (!requireNamespace("BiocManager", quietly = TRUE)) {
-    install.packages("BiocManager")
-}
-BiocManager::install(c("VariantAnnotation", "GenomicRanges", "IRanges", "S4Vectors"))
+    # Step 1: Install Bioconductor dependencies
+    if (!requireNamespace("BiocManager", quietly = TRUE)) {
+        install.packages("BiocManager")
+    }
+    BiocManager::install(c("VariantAnnotation", "GenomicRanges", "IRanges", "S4Vectors"))
 
-# Step 2: Install devtools if not already installed
-if (!requireNamespace("devtools", quietly = TRUE)) {
-    install.packages("devtools")
-}
+    # Step 2: Install devtools if not already installed
+    if (!requireNamespace("devtools", quietly = TRUE)) {
+        install.packages("devtools")
+    }
 
-# Or alternatively install remotes
-if (!requireNamespace("remotes", quietly = TRUE)) {
-    install.packages("remotes")
-}
+    # Or alternatively install remotes
+    if (!requireNamespace("remotes", quietly = TRUE)) {
+        install.packages("remotes")
+    }
 
-# Step 3: Install duoNovo from GitHub using devtools
-devtools::install_github("sbergercnmc/duoNovo", dependencies = TRUE)
+    # Step 3: Install duoNovo from GitHub using devtools
+    devtools::install_github("sbergercnmc/duoNovo", dependencies = TRUE)
 
-# Or alternatively using remotes
-remotes::install_github("sbergercnmc/duoNovo", dependencies = TRUE)
+    # Or alternatively using remotes
+    remotes::install_github("sbergercnmc/duoNovo", dependencies = TRUE)
 
-# Step 4: Optionally, to use the duoNovo command line interface, install argparse
-if (!requireNamespace("argparse", quietly = TRUE)) {
-    install.packages("argparse")
-}
-```
+    # Step 4: Optionally, to use the duoNovo command line interface, install argparse
+    if (!requireNamespace("argparse", quietly = TRUE)) {
+        install.packages("argparse")
+    }
 
 ## Run *duoNovo*
 
@@ -102,15 +99,14 @@ processing steps above for the long-read sequencing duos.
 ### Classify candidate variants with *duoNovo*
 
 The following shows how to run duoNovo within R, assuming we have a VCF
-“duo_proband_father.longread.hiphase.vcf.gz” from long-read sequencing.
+“duo\_proband\_father.longread.hiphase.vcf.gz” from long-read
+sequencing.
 
-``` r
-library(duoNovo)
-duoNovo_results <- duoNovo(
-  LRS_phased_vcf_file_path = "duo_proband_father.longread.hiphase.vcf.gz", 
-  proband_column_identifier = "-0$"
-  )
-```
+    library(duoNovo)
+    duoNovo_results <- duoNovo(
+      LRS_phased_vcf_file_path = "duo_proband_father.longread.hiphase.vcf.gz", 
+      proband_column_identifier = "-0$"
+      )
 
 *duoNovo* returns a `GRanges` containing all candidate variants tested
 for *de novo* status. This `GRanges` is a subset of the `rowRanges`
@@ -132,42 +128,44 @@ pass QC.
 
 Below is a description of each argument that `duoNovo()` accepts:
 
-- **LRS_phased_vcf_file_path**: Required input. Path to the VCF
+- **LRS\_phased\_vcf\_file\_path**: Required input. Path to the VCF
   containing phased variant calls from long-read sequencing of the duo.
-- **depth_cutoff**: A numeric value specifying the minimum sequencing
+- **depth\_cutoff**: A numeric value specifying the minimum sequencing
   depth for variants to be included in the analysis. The same cutoff
   applies to both proband and parent variants, for both LRS and SRS (if
   used). The default is 20.
-- **GQ_cutoff**: A numeric value specifying the minimum GQ (PHRED
+- **GQ\_cutoff**: A numeric value specifying the minimum GQ (PHRED
   quality) for variants to be included in the analysis. The same cutoff
   applies to both proband and parent variants, for both LRS and SRS (if
   used). The default is 30.
-- **proband_column_identifier**: Required input. A character
+- **proband\_column\_identifier**: Required input. A character
   corresponding to an identifier for the proband column in the metadata
   matrices of the VCF. Should be the same for both the LRS VCF and (if
   used) the SRS VCF.
-- **PS_width_cutoff**: A numeric value specifying the minimum width of
+- **PS\_width\_cutoff**: A numeric value specifying the minimum width of
   haplotype blocks used in the analysis. The default is 10000.
-- **boundary_cutoff**: A numeric value indicating the minimum distance
+- **boundary\_cutoff**: A numeric value indicating the minimum distance
   from a haplotype block boundary (either start or end coordinate) for
   candidate variants to be evaluated. The default is 2000.
-- **distance_cutoff**: A numeric value specifying the minimum Hamming
+- **distance\_cutoff**: A numeric value specifying the minimum Hamming
   distance cutoff to determine that a proband-parent haplotype block is
   not identical by descent. The default is 40.
-- **candidate_variants_concordant_with_SRS**: Logical value specifying
-  if candidate variant genotype calls should be concordant with
-  short-read sequencing (the default is `FALSE`).
-- **SRS_vcf_file_path**: Path to the VCF containing variant calls from
-  short-read sequencing of the duo.
-- **test_reference_allele**: Logical value specifying if positions where
-  the proband is heterozygous and the parent is homozygous for the
+- **candidate\_variants\_concordant\_with\_SRS**: Logical value
+  specifying if candidate variant genotype calls should be concordant
+  with short-read sequencing (the default is `FALSE`).
+- **problematic\_regions**: Bed file with regions to exclude from
+  candidates and data (the default is empty).
+- **SRS\_vcf\_file\_path**: Path to the VCF containing variant calls
+  from short-read sequencing of the duo.
+- **test\_reference\_allele**: Logical value specifying if positions
+  where the proband is heterozygous and the parent is homozygous for the
   variant allele should also be tested (the default is `FALSE`).
-- **candidate_variant_coordinates**: A vector of 1-based coordinates
+- **candidate\_variant\_coordinates**: A vector of 1-based coordinates
   (e.g. `c("chr1:1000", "chr2:2000")`) of candidate variants of
   interest.
-- **output_vcf_path**: Path to write an output VCF file. Optional. If
+- **output\_vcf\_path**: Path to write an output VCF file. Optional. If
   used, by default it appends \_duoNovo to input vcf file path.
-- **compress_output**: Logical value specifying whether to compress the
+- **compress\_output**: Logical value specifying whether to compress the
   output VCF file, append .bgz to file name, and tabix index. The
   default is `TRUE`
 
@@ -216,6 +214,8 @@ Below is the output of `Rscript duoNovo_cli.R -h`.
       -n coordinates, --candidate_variant_coordinates coordinates
                             Vector of 1-based coordinates of candidate variants, e.g. chr1:12345-12345,chr2:65430-65430.
                             [Optional]
+      -x BED_FILE, --exclude_regions_bed_path BED_FILE
+                            Path to bedfile for regions to exclude [Optional]
       -s FILE, --SRS_vcf_file_path FILE
                             Path to short read duo vcf [Optional]
       -o FILE, --output_vcf FILE
@@ -238,38 +238,38 @@ uncertain. Some of the other metadata columns are self-explanatory, and
 provide information about the phasing of the proband and the parent, the
 sequencing depth, and GQ. Additional columns include:
 
-- **QC_fail_step**, which describes the specific QC step that variants
+- **QC\_fail\_step**, which describes the specific QC step that variants
   that didn’t pass QC failed. Its values are self-explanatory
   (e.g. `low_depth`), and are `NA` for variants that passed QC)
-- **supporting_hamming_distance**, which corresponds to the minimum of
+- **supporting\_hamming\_distance**, which corresponds to the minimum of
   the two Hamming distances between the proband haplotype block not
   containing the candidate variant and the two parental haplotype
   blocks. This supports the non-IBD status of these haplotype blocks.
-- **supporting_counts_het_hom**, which corresponds to the number of
+- **supporting\_counts\_het\_hom**, which corresponds to the number of
   positions that went into the Hamming distance calculation where the
   proband is heterozygous and the parent is homozygous (see the Methods
   section of the preprint for details)
-- **supporting_counts_het_het**, which corresponds to the number of
+- **supporting\_counts\_het\_het**, which corresponds to the number of
   positions that went into the Hamming distance calculation where both
   the proband and the parent are heterozygous (see preprint Methods)
-- **supporting_counts_hom_het**, which corresponds to the number of
+- **supporting\_counts\_hom\_het**, which corresponds to the number of
   positions that went into the Hamming distance calculation where the
   proband is homozygous and the parent is heterozygous (see preprint
   Methods)
-- **n_de_novo_left_orientation_same_PS**, which corresponds to the total
-  number of *de novo* variants in the left orientation and same
+- **n\_de\_novo\_left\_orientation\_same\_PS**, which corresponds to the
+  total number of *de novo* variants in the left orientation and same
   haplotype block (NA for non- *de novo* variants or *de novo* variants
   in the right orientation).
-- **n_de_novo_right_orientation_same_PS**, which corresponds to the
-  total number of *de novo* variants in the right orientation and same
-  haplotype block (NA for non- *de novo* variants or *de novo* variants
-  in the left orientation).
+- **n\_de\_novo\_right\_orientation\_same\_PS**, which corresponds to
+  the total number of *de novo* variants in the right orientation and
+  same haplotype block (NA for non- *de novo* variants or *de novo*
+  variants in the left orientation).
 
 ### Interpretation of *duoNovo* results
 
 Classifications generated by *duoNovo* should be evaluated according to
 variant quality, sequence quality, and regional quality. In our testing,
-we used GQ \> 40. We recommend excluding variants within “Genome in a
+we used GQ &gt; 40. We recommend excluding variants within “Genome in a
 Bottle” annotated “Problematic Regions”, as these have higher false
 positive rates in our evaluation.
 

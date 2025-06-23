@@ -29,6 +29,7 @@ parser$add_argument("-c", "--distance_cutoff", type="integer", default=40,
 parser$add_argument("-t", "--test_reference_allele", action="store_true",  default=FALSE,  help="Test for deNovo Reference reversions (parent is hom_var, proband is het) [default FALSE]")
 parser$add_argument("-n", "--candidate_variant_coordinates", metavar="coordinates", 
                      help= "1-based list of chromosome ranges to evaluate for variants, e.g.  chr1:12345-12345,chr2:65430-65430. [Optional]")
+parser$add_argument("-x", "--exclude_regions_bed_path",  metavar="BED_FILE", help = "Path to bedfile for regions to exclude [Optional]")
 parser$add_argument("-s", "--SRS_vcf_file_path",  metavar="FILE", help = "Path to short read duo vcf [Optional]")
 parser$add_argument("-o", "--output_vcf",  metavar="FILE", help = "Path to file to write output vcf [Optional: Default appends _duoNovo to input vcf]")
 parser$add_argument("-z", "--compress_output", action="store_true",  default=FALSE,  help="Compress output, append .bgz to filename, and tabix index [default FALSE]")
@@ -74,5 +75,6 @@ duoNovo_results <- duoNovo(
   test_reference_allele = args$test_reference_allele,
   candidate_variant_coordinates=candidateCoords,
   output_vcf_path=args$output_vcf,
+  problematic_regions = args$exclude_regions_bed_path, 
   compress_output=args$compress_output
 )
