@@ -42,6 +42,7 @@ getDeNovoVariantGRanges <- function(duoNovo_granges_output_filepath, duo_type = 
   dn_granges
 }
 
+library(VariantAnnotation)
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) != 1L) {
   stop("Usage: process_duoNovo_output.R <run_directory>")

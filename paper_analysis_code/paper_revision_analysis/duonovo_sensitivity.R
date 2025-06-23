@@ -85,6 +85,7 @@ getSensitivity <- function(trio_denovo_filepath, duoNovo_granges_output_filepath
   out
 }
 
+library(VariantAnnotation)
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) != 1L) {
   stop("Usage: duonovo_sensitivity.R <run_directory>")

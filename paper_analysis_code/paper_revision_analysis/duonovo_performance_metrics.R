@@ -119,7 +119,7 @@ getDuoNovoPerformanceMetric <- function(duoNovo_granges_output_filepath, duo_typ
   out
 }
 
-
+library(VariantAnnotation)
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) != 1L) {
   stop("Usage: process_duoNovo_output.R <run_directory>")
