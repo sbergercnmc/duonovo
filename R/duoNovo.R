@@ -420,10 +420,9 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   }
   output_sorted$tested_allele <- 1
   if (test_reference_allele == TRUE){
-    which(output_sorted$phasing)
+    output_sorted$tested_allele[which(output_sorted$phasing1 %in% c("0|1", "1|0") & 
+                                        output_sorted$phasing2 == "1/1")] <- 0
   }
-  output_sorted$tested_allele[which(output_sorted$phasing1 %in% c("0|1", "1|0") & 
-                                      output_sorted$phasing2 == "1/1")] <- 0
   
   if (!is.null(output_vcf_path)){
     message("Writing classified variants into VCF...")
