@@ -521,7 +521,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
       supporting_counts_hom_het = output_sorted$supporting_counts_hom_het,
       QC_fail_step = output_sorted$QC_fail_step, 
       tested_allele = output_sorted$tested_allele,
-      n_de_novo_right_orientation_same_PS = output_sorted$n_de_novo_same_orientation_same_PS
+      n_de_novo_same_orientation_same_PS = output_sorted$n_de_novo_same_orientation_same_PS
     )
     info <- cbind(info(vcf)[names(output_sorted), ], info_new)
     
@@ -554,7 +554,8 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   classification_counts <- table(output_sorted$duoNovo_classification)
   
   # Define the expected classification categories
-  expected_classes <- c("de_novo", "on_other_parent_haplotype", "uncertain", "failed_QC")
+  expected_classes <- c("de_novo", "on_other_parent_haplotype", "uncertain", 
+                        "failed_QC", "on_multi_denovo_haplotype")
   
   # Add missing classes if they are not present in the table (to ensure all classes are covered)
   for (class in expected_classes) {
@@ -573,6 +574,7 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     "Number of de novo variants: ", classification_counts["de_novo"], "\n",
     "Number of variants present on haplotype inherited from non-sequenced parent: ", classification_counts["on_other_parent_haplotype"], "\n",
     "Number of uncertain variants: ", classification_counts["uncertain"], "\n",
+    "Number of variants on multi-denovo haplotypes: ", classification_counts["on_multi_denovo_haplotype"], "\n",
     "Number of variants that failed QC: ", classification_counts["failed_QC"], "\n",
     "--------------------------------"
   )
@@ -580,4 +582,3 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   cat(verbose_summary)
   return(output_sorted)
 }
-v
