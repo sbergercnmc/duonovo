@@ -409,8 +409,8 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   mcols(output_sorted)$n_de_novo_right_orientation_same_PS <- NULL
   
   if (!is.null(problematic_regions)){
-    problematic_regions <- rtracklayer::import(problematic_regions, format = "BED")
-    problematic_region_overlap_indices <- unique(queryHits(findOverlaps(output_sorted, problematic_regions)))
+    problematic_regions_bed <- rtracklayer::import(problematic_regions, format = "BED")
+    problematic_region_overlap_indices <- unique(queryHits(findOverlaps(output_sorted, problematic_regions_bed)))
     if (length(problematic_region_overlap_indices) > 0){
       output_sorted$QC_fail_step[problematic_region_overlap_indices] <- paste0("classified_", 
                                             output_sorted$duoNovo_classification[problematic_region_overlap_indices], 
@@ -580,3 +580,4 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   cat(verbose_summary)
   return(output_sorted)
 }
+v
