@@ -32,6 +32,7 @@ getDeNovoVariantGRanges <- function(duoNovo_granges_output_filepath, duo_type = 
     dn_granges <- GRanges()
   }
   if (!is.null(genomic_annotation)){
+    dn_granges$Func.refGeneWithVer <- unlist(dn_granges$Func.refGeneWithVer)
     variants_in_annotation <- which(dn_granges$Func.refGeneWithVer %in% genomic_annotation)
     if (length(variants_in_annotation) > 0){
       dn_granges <- dn_granges[variants_in_annotation]
@@ -62,21 +63,29 @@ if (length(duoNovo_output_filepath_pf) != 1L ||
 }
 
 ### --- father-proband duos
+message("getting variants classified de novo from PF duo...")
 de_novos_pf <- getDeNovoVariantGRanges(duoNovo_output_filepath_pf, duo_type = "PF")
+message("getting variants classified de novo from PF duo without excluding problematic regions...")
 de_novos_pf_with_giab_problematic <- getDeNovoVariantGRanges(duoNovo_output_filepath_pf, duo_type = "PF", 
                                                              filter_problematic_regions = FALSE)
+message("getting variants classified de novo from PF duo without excluding those on multi-denovo haplotype...")
 de_novos_pf_with_clustered <- getDeNovoVariantGRanges(duoNovo_output_filepath_pf, duo_type = "PF", 
                                                              exclude_clustered_denovos = FALSE)
+message("getting variants classified de novo from PF duo in exonic/intronic regions...")
 de_novos_pf_exonic_intronic_only <- getDeNovoVariantGRanges(duoNovo_output_filepath_pf, duo_type = "PF", 
                                                             genomic_annotation = c("exonic", "intronic", "ncRNA_exonic", "ncRNA_intronic", 
                                                                                    "UTR3", "UTR5"))
 
 ### --- mother-proband duos
+message("getting variants classified de novo from PM duo...")
 de_novos_pm <- getDeNovoVariantGRanges(duoNovo_output_filepath_pm, duo_type = "PM")
+message("getting variants classified de novo from PM duo without excluding problematic regions...")
 de_novos_pm_with_giab_problematic <- getDeNovoVariantGRanges(duoNovo_output_filepath_pm, duo_type = "PM", 
                                                              filter_problematic_regions = FALSE)
+message("getting variants classified de novo from PM duo without excluding those on multi-denovo haplotype...")
 de_novos_pm_with_clustered <- getDeNovoVariantGRanges(duoNovo_output_filepath_pm, duo_type = "PM", 
                                                       exclude_clustered_denovos = FALSE)
+message("getting variants classified de novo from PM duo in exonic/intronic regions...")
 de_novos_pm_exonic_intronic_only <- getDeNovoVariantGRanges(duoNovo_output_filepath_pm, duo_type = "PM", 
                                                             genomic_annotation = c("exonic", "intronic", "ncRNA_exonic", "ncRNA_intronic", 
                                                                                    "UTR3", "UTR5"))
