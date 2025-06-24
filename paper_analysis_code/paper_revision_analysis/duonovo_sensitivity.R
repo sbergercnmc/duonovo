@@ -1,12 +1,45 @@
 getSensitivity <- function(trio_denovo_filepath, duoNovo_granges_output_filepath_pm, duoNovo_granges_output_filepath_pf, 
-                           duo_type = c("PM", "PF", "both"), validation_GQ_cutoff = 30){
+                           duo_type = c("PM", "PF", "both"), validation_GQ_cutoff = 30, 
+                           allele_depth_filter = TRUE){
   load(file = trio_denovo_filepath)
   trio_de_novo$problematic_region <- unlist(trio_de_novo$problematic_region)
   trio_de_novo <- trio_de_novo[which(trio_de_novo$problematic_region == "." & 
                                        trio_de_novo$proband_GQ >= validation_GQ_cutoff & 
                                        trio_de_novo$parent1_GQ >= validation_GQ_cutoff & 
-                                       trio_de_novo$parent2_GQ >= validation_GQ_cutoff)]
+                                       trio_de_novo$parent2_GQ >= validation_GQ_cutoff & 
+                                       trio_de_novo$proband_dp >= 20 & 
+                                       trio_de_novo$parent1_dp >= 20 & 
+                                       trio_de_novo$parent2_dp >= 20 & 
+                                       trio_de_novo$proband_gt %in% c("0|1", "1|0") & 
+                                       trio_de_novo$parent1_gt == "0/0" & 
+                                       trio_de_novo$parent2_gt == "0/0")]
+  if (length(trio_de_novo) == 0) {
+    stop("No variant allele de novos from the trio vcf pass GQ and depth filters")
+  }
   
+  if (allele_depth_filter == TRUE){
+    allele_depth_mat_1 <- matrix(
+      unlist(trio_de_novo$parent1_AD, use.names = FALSE),
+      ncol    = 2,      # two columns: ref, alt
+      byrow   = TRUE
+    )
+    colnames(allele_depth_mat_1) <- c("AD_ref", "AD_alt")
+    max_depth_parent1 <- rowMaxs(allele_depth_mat_1)
+    
+    allele_depth_mat_2 <- matrix(
+      unlist(trio_de_novo$parent2_AD, use.names = FALSE),
+      ncol    = 2,      # two columns: ref, alt
+      byrow   = TRUE
+    )
+    colnames(allele_depth_mat_2) <- c("AD_ref", "AD_alt")
+    max_depth_parent2 <- rowMaxs(allele_depth_mat_2)
+    
+    de_novos_to_keep <- which(max_depth_parent1 == 0 & max_depth_parent2 == 0)
+    if (length(de_novos_to_keep) == 0) {
+      stop("No variant allele de novos from the trio vcf pass allele depth filter")
+    }
+    trio_de_novo <- trio_de_novo[de_novos_to_keep]
+  }
   total <- length(trio_de_novo)
   
   if (duo_type == "PF"){
@@ -110,20 +143,34 @@ if (length(trio_denovo_filepath) != 1L ) {
 }
 
 ### --- father-proband duo
+message("getting sensitivity from PF duo...")
 sens_pf <- getSensitivity(trio_denovo_filepath, duoNovo_granges_output_filepath_pf = duoNovo_output_filepath_pf, 
                           duo_type = "PF")
+message("getting sensitivity from PF duo without allele depth filter...")
+sens_pf_no_ad_filter <- getSensitivity(trio_denovo_filepath, duoNovo_granges_output_filepath_pf = duoNovo_output_filepath_pf, 
+                          duo_type = "PF", allele_depth_filter = FALSE)
 ### --- mother-proband duo
+message("getting sensitivity from PM duo...")
 sens_pm <- getSensitivity(trio_denovo_filepath, duoNovo_granges_output_filepath_pm = duoNovo_output_filepath_pm, 
                           duo_type = "PM")
+message("getting sensitivity from PM duo without allele depth filter...")
+sens_pm_no_ad_filter <- getSensitivity(trio_denovo_filepath, duoNovo_granges_output_filepath_pm = duoNovo_output_filepath_pm, 
+                          duo_type = "PM", allele_depth_filter = FALSE)
+
 ### --- both duos
+message("getting sensitivity when combining both duos...")
 sens_both <- getSensitivity(trio_denovo_filepath, duoNovo_granges_output_filepath_pm = duoNovo_output_filepath_pm, 
                             duoNovo_granges_output_filepath_pf = duoNovo_output_filepath_pf, duo_type = "both")
+message("getting sensitivity when combining both duos without allele depth filter...")
+sens_both_no_ad_filter <- getSensitivity(trio_denovo_filepath, duoNovo_granges_output_filepath_pm = duoNovo_output_filepath_pm, 
+                            duoNovo_granges_output_filepath_pf = duoNovo_output_filepath_pf, duo_type = "both", 
+                            allele_depth_filter = FALSE)
 
 
 ### --- save results
 ###
 sample_id <- sub("\\..*$", "", duoNovo_output_filepath_pf)
-save(sens_pf, sens_pm, sens_both,
+save(sens_pf, sens_pm, sens_both, sens_pf_no_ad_filter, sens_pm_no_ad_filter, sens_both_no_ad_filter,
      file = paste0(sample_id, "_sensitivity.rda"))
 
 
