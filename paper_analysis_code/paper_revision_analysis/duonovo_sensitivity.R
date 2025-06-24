@@ -1,8 +1,8 @@
 getSensitivity <- function(trio_denovo_filepath, duoNovo_granges_output_filepath_pm, duoNovo_granges_output_filepath_pf, 
                            duo_type = c("PM", "PF", "both"), validation_GQ_cutoff = 30){
   load(file = trio_denovo_filepath)
-  trio_de_novo$problematic_region <- as.logical(trio_de_novo$problematic_region)
-  trio_de_novo <- trio_de_novo[which(trio_de_novo$problematic_region == FALSE & 
+  trio_de_novo$problematic_region <- unlist(trio_de_novo$problematic_region)
+  trio_de_novo <- trio_de_novo[which(trio_de_novo$problematic_region == "." & 
                                        trio_de_novo$proband_GQ >= validation_GQ_cutoff & 
                                        trio_de_novo$parent1_GQ >= validation_GQ_cutoff & 
                                        trio_de_novo$parent2_GQ >= validation_GQ_cutoff)]
@@ -116,8 +116,8 @@ sens_pf <- getSensitivity(trio_denovo_filepath, duoNovo_granges_output_filepath_
 sens_pm <- getSensitivity(trio_denovo_filepath, duoNovo_granges_output_filepath_pm = duoNovo_output_filepath_pm, 
                           duo_type = "PM")
 ### --- both duos
-sens_both <- getSensitivity(trio_denovo_filepath, duoNovo_output_filepath_pm, 
-                            duoNovo_output_filepath_pf, duo_type = "both")
+sens_both <- getSensitivity(trio_denovo_filepath, duoNovo_granges_output_filepath_pm = duoNovo_output_filepath_pm, 
+                            duoNovo_granges_output_filepath_pf = duoNovo_output_filepath_pf, duo_type = "both")
 
 
 ### --- save results
