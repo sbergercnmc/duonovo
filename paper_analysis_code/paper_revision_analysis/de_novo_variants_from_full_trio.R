@@ -28,17 +28,17 @@ getDeNovosFromTrio <- function(trio_vcf_filepath){
   
   g <- geno(trio_vcf)
   trio_ranges$proband_gt <- g$GT[, proband_column]
-  trio_ranges$proband_vaf <- g$VAF[, proband_column]
+  trio_ranges$proband_AD <- g$AD[, proband_column]
   trio_ranges$proband_dp <- g$DP[, proband_column]
   trio_ranges$proband_GQ <- g$GQ[, proband_column]
   
   trio_ranges$parent1_gt <- g$GT[, 2]
-  trio_ranges$parent1_vaf <- g$VAF[, 2]
+  trio_ranges$parent1_AD <- g$AD[, 2]
   trio_ranges$parent1_dp <- g$DP[, 2]
   trio_ranges$parent1_GQ <- g$GQ[, 2]
   
   trio_ranges$parent2_gt <- g$GT[, 3]
-  trio_ranges$parent2_vaf <- g$VAF[, 3]
+  trio_ranges$parent2_AD <- g$AD[, 3]
   trio_ranges$parent2_dp <- g$DP[, 3]
   trio_ranges$parent2_GQ <- g$GQ[, 3]
   
