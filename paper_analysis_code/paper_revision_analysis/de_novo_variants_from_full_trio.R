@@ -57,7 +57,7 @@ library(VariantAnnotation)
 
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) != 1L) {
-  stop("Usage: process_duoNovo_output.R <run_directory>")
+  stop("Usage: de_novo_variants_from_full_trio.R <run_directory>")
 }
 
 ## set directory
