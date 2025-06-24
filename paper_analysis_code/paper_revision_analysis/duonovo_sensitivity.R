@@ -110,9 +110,11 @@ if (length(trio_denovo_filepath) != 1L ) {
 }
 
 ### --- father-proband duo
-sens_pf <- getSensitivity(trio_denovo_filepath, "", duoNovo_output_filepath_pf, duo_type = "PF")
-### --- father-proband duo
-sens_pm <- getSensitivity(trio_denovo_filepath, duoNovo_output_filepath_pm, "", duo_type = "PM")
+sens_pf <- getSensitivity(trio_denovo_filepath, duoNovo_granges_output_filepath_pf = duoNovo_output_filepath_pf, 
+                          duo_type = "PF")
+### --- mother-proband duo
+sens_pm <- getSensitivity(trio_denovo_filepath, duoNovo_granges_output_filepath_pm = duoNovo_output_filepath_pm, 
+                          duo_type = "PM")
 ### --- both duos
 sens_both <- getSensitivity(trio_denovo_filepath, duoNovo_output_filepath_pm, 
                             duoNovo_output_filepath_pf, duo_type = "both")
