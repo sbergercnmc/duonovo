@@ -76,14 +76,15 @@ numX=$(cat $GREGOR/data_model/somalier_output.samples.tsv | awk -v P=$PROBAND_ID
 father=$(cat $GREGOR/data_model/somalier_output.samples.tsv | awk -v P=$PROBAND_ID '$2==P {print $3}')
 mother=$(cat $GREGOR/data_model/somalier_output.samples.tsv | awk -v P=$PROBAND_ID '$2==P {print $4}')
 #echo bcftools +trio-dnm2 -p $numX:$PROBAND_ID,$father,$mother --use-NAIVE -Oz -o  $AVOUT.addedParent.dnm2.vcf.gz $AVOUT.with_other_parent.vcf
-bcftools +trio-dnm2 -p $numX:$PROBAND_ID,$father,$mother --use-NAIVE -Oz -o  $AVOUT.addedParent.dnm2.vcf.gz $AVOUT.with_other_parent.vcf
+bcftools +trio-dnm2 -p $numX:$PROBAND_ID,$father,$mother --use-NAIVE -Oz -o $AVOUT.addedParent.dnm2.vcf.gz $AVOUT.with_other_parent.vcf
+bcftools index $AVOUT.addedParent.dnm2.vcf.gz
 fi
 
-echo $(date) :: Writing data table
+echo $(date) :: Cleaning up
 
 if [[ -f $AVOUT.addedParent.dnm2.vcf.gz ]]; then
  rm -f $AVOUT.avinput
  rm -f $AVOUT.hg38_multianno.* $AVOUT.clean.vcf* $AVOUT.otherparent_tmp.$OTHER_PARENT_ID.vcf.gz*
  rm -f $AVOUT.with_other_parent.vcf
-bcftools query -H -f "%CHROM\t%POS\t%REF\t%ALT\t%Func.refGeneWithVer\t[%DNM\t%VA\t]%duoNovo_classification\t%n_de_novo_right_orientation_same_PS\t%n_de_novo_left_orientation_same_PS\t%QC_fail_step\t%cpg\t%problematic_region\t%gnomad41_genome_AF\t[\t%GT\t%GQ\t%DP]"  $AVOUT.addedParent.dnm2.vcf.gz > $AVOUT.datatable.txt
+#bcftools query -H -f "%CHROM\t%POS\t%REF\t%ALT\t%Func.refGeneWithVer\t[%DNM\t%VA\t]%duoNovo_classification\t%n_de_novo_right_orientation_same_PS\t%n_de_novo_left_orientation_same_PS\t%QC_fail_step\t%cpg\t%problematic_region\t%gnomad41_genome_AF\t[\t%GT\t%GQ\t%DP]"  $AVOUT.addedParent.dnm2.vcf.gz > $AVOUT.datatable.txt
 fi
