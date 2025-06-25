@@ -24,17 +24,15 @@ getSensitivity <- function(trio_denovo_filepath, duoNovo_granges_output_filepath
       byrow   = TRUE
     )
     colnames(allele_depth_mat_1) <- c("AD_ref", "AD_alt")
-    max_depth_parent1 <- rowMaxs(allele_depth_mat_1)
-    
+
     allele_depth_mat_2 <- matrix(
       unlist(trio_de_novo$parent2_AD, use.names = FALSE),
       ncol    = 2,      # two columns: ref, alt
       byrow   = TRUE
     )
     colnames(allele_depth_mat_2) <- c("AD_ref", "AD_alt")
-    max_depth_parent2 <- rowMaxs(allele_depth_mat_2)
-    
-    de_novos_to_keep <- which(max_depth_parent1 == 0 & max_depth_parent2 == 0)
+
+    de_novos_to_keep <- which(allele_depth_mat_1[, 'AD_alt'] == 0 & allele_depth_mat_2[, 'AD_alt'] == 0)
     if (length(de_novos_to_keep) == 0) {
       stop("No variant allele de novos from the trio vcf pass allele depth filter")
     }
