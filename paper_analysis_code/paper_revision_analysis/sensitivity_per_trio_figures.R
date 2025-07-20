@@ -23,7 +23,7 @@ trio_dn_count <- sapply(1:length(all_dirs), function(xx) {
   sens_both['total']
 })
 
-problematic_trios <- which(trio_dn_count >= 100)
+problematic_trios <- which(trio_dn_count >= 150)
 all_dirs_no_problematic <- all_dirs[-problematic_trios]
 
 ### Sensitivity
