@@ -14,16 +14,9 @@ if (!dir.exists(data_directory)) {
 setwd(data_directory)
 all_dirs <- list.files()
 
-trio_dn_count <- sapply(1:length(all_dirs), function(xx) {
-  setwd(all_dirs[xx])
-  all_data <- list.files()
-  load(file = all_data[grep("sensitivity", all_data)])
-  setwd(data_directory)
-  
-  sens_both['total']
-})
-
-problematic_trios <- which(trio_dn_count >= 150)
+problematic_trios <- c('25-224964', '25-230606', '24-467599', '25-229554', 
+                       '24-441582', '24-441816', '24-441599', '24-441864', 
+                       'UCI-008', 'UCI-031', '25-224985', '25-224968', '25-224942')
 all_dirs_no_problematic <- all_dirs[-problematic_trios]
 
 sensitivity_mat_pf <- matrix(NA, ncol = length(all_dirs_no_problematic), nrow = 3)
