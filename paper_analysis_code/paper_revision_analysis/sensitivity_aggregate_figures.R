@@ -6,7 +6,7 @@ if (length(args) != 2) {
 data_directory   <- args[1]
 figure_directory <- args[2]
 
-# ensure figure directory exists
+# ensure data directory exists
 if (!dir.exists(data_directory)) {
   stop(sprintf("Data directory not found: '%s'", data_directory))
 }
