@@ -1,23 +1,25 @@
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) != 2) {
-  stop("Usage: Rscript ppv_npv.R <data_directory> <figure_directory>")
+if (length(args) != 3) {
+  stop("Usage: Rscript ppv_npv.R <data_directory> <figure_directory> <trio_info_directory>")
 }
-
 data_directory   <- args[1]
 figure_directory <- args[2]
+trio_info_directory <- args[3]
 
 # ensure data directory exists
 if (!dir.exists(data_directory)) {
   stop(sprintf("Data directory not found: '%s'", data_directory))
 }
 
+setwd(data_directory)
+all_dirs <- list.files()
+
 ## import spreadsheet with parental age info
 library(readr)
-trios <- read_csv('~/Downloads/trio_info_updated.csv')
+trios <- read_csv(trio_info_directory) 
 ##
 
-
-### use the PPV matrix to get total count of de novos
+### form the PPV matrix which contains total count of de novos
 ppv_pf <- matrix(NA, ncol = length(all_dirs), nrow = 3)
 ppv_pm <- matrix(NA, ncol = length(all_dirs), nrow = 3)
 rownames(ppv_pf) <- rownames(ppv_pm) <- c('dn', 'assessed', 'total')

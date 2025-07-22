@@ -1,12 +1,12 @@
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) != 2) {
-  stop("Usage: Rscript sensitivity_aggregate_figures.R <data_directory> <figure_directory>")
+if (length(args) != 3) {
+  stop("Usage: Rscript ppv_npv.R <data_directory> <figure_directory> <trio_info_directory>")
 }
-
 data_directory   <- args[1]
 figure_directory <- args[2]
+trio_info_directory <- args[3]
 
-# ensure figure directory exists
+# ensure data directory exists
 if (!dir.exists(data_directory)) {
   stop(sprintf("Data directory not found: '%s'", data_directory))
 }
@@ -16,7 +16,7 @@ all_dirs <- list.files()
 
 ## import spreadsheet with proband ancestry info
 library(readr)
-trios <- read_csv('~/Downloads/trio_info_updated.csv')
+trios <- read_csv(trio_info_directory) 
 euro_indices <- which(trios$child_ANCESTRY == "EUR")
 eur_ids <- trios$child_SAMPLEID[euro_indices]
 non_eur_ids <- trios$child_SAMPLEID[-euro_indices]
