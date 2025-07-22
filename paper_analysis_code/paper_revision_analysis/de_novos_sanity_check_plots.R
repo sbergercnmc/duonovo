@@ -68,6 +68,8 @@ plot(trios$father_age_at_birth, trios$n_denovo_pf, pch = 19,
      ylab = "# de novo classifications", xlim = c(0, 52), ylim = c(0, 52))
 points(trios$mother_age_at_birth, trios$n_denovo_pm, pch = 2, 
        cex = 1.05, bty = 'l', col = "deep pink")
+legend("topleft", legend = c("father-proband", "mother-proband"), pch = c(19, 2), 
+       bty = 'n', col = c("dark orange", "deep pink"))
 
 fit_f <- glm(n_denovo_pf ~ father_age_at_birth, data = trios, family = poisson(link = "log"))
 fit_m <- glm(n_denovo_pm ~ mother_age_at_birth, data = trios, family = poisson(link = "log"))
