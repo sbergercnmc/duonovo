@@ -1,5 +1,6 @@
-duoNovoSib <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 20,
+duoNovoSib <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                     candidate_variant_coordinates = NULL, candidate_variants_duoNovo_output = NULL,
+                    problematic_regions = NULL,
                     PS_width_cutoff = 10000, boundary_cutoff = 2000, distance_cutoff = 20,
                     output_vcf_path = NULL, compress_output = TRUE) {
 
@@ -248,6 +249,37 @@ duoNovoSib <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 
     indices_right <- unlist(dn_by_ps_right)
     counts_right <- rep(n_dn_in_ps_right, n_dn_in_ps_right)
     output_sorted$n_de_novo_right_orientation_same_PS[de_novo_indices_right[indices_right]] <- counts_right
+  }
+  multi_denovo_haplotype_indices <- which(output_sorted$n_de_novo_left_orientation_same_PS > 1 | 
+                                            output_sorted$n_de_novo_right_orientation_same_PS > 1)
+  if (length(multi_denovo_haplotype_indices) > 0){
+    output_sorted$duoNovo_classification[multi_denovo_haplotype_indices] <- "on_multi_denovo_haplotype"
+  }
+  multi_denovo_mat <- as.matrix(
+    mcols(output_sorted)[, c("n_de_novo_left_orientation_same_PS",
+                             "n_de_novo_right_orientation_same_PS")]
+  )
+  max_count <- rowMaxs(multi_denovo_mat, na.rm = TRUE)
+  max_count[is.infinite(max_count)] <- NA
+  
+  output_sorted$n_de_novo_same_orientation_same_PS <- max_count
+  mcols(output_sorted)$n_de_novo_left_orientation_same_PS  <- NULL
+  mcols(output_sorted)$n_de_novo_right_orientation_same_PS <- NULL
+  
+  if (!is.null(problematic_regions)){
+    problematic_regions_bed <- rtracklayer::import(problematic_regions, format = "BED")
+    problematic_region_overlap_indices <- unique(queryHits(findOverlaps(output_sorted, problematic_regions_bed)))
+    if (length(problematic_region_overlap_indices) > 0){
+      output_sorted$QC_fail_step[problematic_region_overlap_indices] <- paste0("classified_", 
+                                                                               output_sorted$duoNovo_classification[problematic_region_overlap_indices], 
+                                                                               "_in_problematic_region")
+      output_sorted$duoNovo_classification[problematic_region_overlap_indices] <- "failed_QC"
+    }
+  }
+  output_sorted$tested_allele <- 1
+  if (test_reference_allele == TRUE){
+    output_sorted$tested_allele[which(output_sorted$phasing1 %in% c("0|1", "1|0") & 
+                                        output_sorted$phasing2 == "1/1")] <- 0
   }
   
   if (!is.null(output_vcf_path)){
