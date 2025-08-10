@@ -92,7 +92,7 @@ plot_mutation_aggregate_percentages <- function(type_occurrences_df) {
     "C>A" = "skyblue",
     "C>G" = "green",
     "T>A" = "orange",
-    "T>C" = "purple",
+    "T>C" = "forest green",
     "T>G" = "brown",
     "C>T at CpG" = "red",
     "C>T other" = "pink"
@@ -157,7 +157,6 @@ pf_dn_grl <- endoapply(pf_dn_grl, add_ref_alt)
 pf_dn_grl_snvs <- get_mut_type(pf_dn_grl, type = "snv")
 type_occurrences_pf <- mut_type_occurrences(pf_dn_grl_snvs, ref_genome)
 type_occurrences_pf$`C>T` <- NULL
-p1 <- plot_mutation_aggregate_percentages(type_occurrences_pf)
 
 
 genome(pm_dn_grl) <- ref_genome
@@ -168,5 +167,30 @@ pm_dn_grl <- endoapply(pm_dn_grl, add_ref_alt)
 pm_dn_grl_snvs <- get_mut_type(pm_dn_grl, type = "snv")
 type_occurrences_pm <- mut_type_occurrences(pm_dn_grl_snvs, ref_genome)
 type_occurrences_pm$`C>T` <- NULL
-p2 <- plot_mutation_aggregate_percentages(type_occurrences_pm)
 
+pdf(paste0(figure_directory, "/duonovo_mutation_types_pf.pdf"), 
+    height = 2.2, width = 4, pointsize = 8)
+plot_mutation_aggregate_percentages(type_occurrences_pf)
+dev.off()
+
+pdf(paste0(figure_directory, "/duonovo_mutation_types_pm.pdf"), 
+    height = 2.2, width = 4, pointsize = 8)
+plot_mutation_aggregate_percentages(type_occurrences_pm)
+dev.off()
+
+### Plot trinucleotide context instead
+mut_mat <- mut_matrix(vcf_list = pf_dn_grl_snvs, ref_genome = ref_genome)
+mut_mat <- matrix(rowSums(mut_mat), ncol = 1, dimnames = list(rownames(mut_mat), "row_sum"))
+
+pdf(paste0(figure_directory, "/duonovo_mutation_types_pf.pdf"), 
+    height = 2.2, width = 7, pointsize = 8)
+plot_96_profile(mut_mat)
+dev.off()
+
+mut_mat <- mut_matrix(vcf_list = pm_dn_grl_snvs, ref_genome = ref_genome)
+mut_mat <- matrix(rowSums(mut_mat), ncol = 1, dimnames = list(rownames(mut_mat), "row_sum"))
+
+pdf(paste0(figure_directory, "/duonovo_mutation_types_pm.pdf"), 
+    height = 2.2, width = 7, pointsize = 8)
+plot_96_profile(mut_mat)
+dev.off()

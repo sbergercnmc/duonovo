@@ -14,6 +14,8 @@ if (!dir.exists(data_directory)) {
 setwd(data_directory)
 all_dirs <- list.files()
 
+### the following trios are exluded from the sensitivity analysis because the proband and parents were aligned 
+### on different aligners thus generating artifactual de novo calls
 problematic_trios <- c('25-224964', '25-230606', '24-467599', '25-229554', 
                        '24-441582', '24-441816', '24-441599', '24-441864', 
                        'UCI-008', 'UCI-031', '25-224985', '25-224968', '25-224942')

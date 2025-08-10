@@ -71,14 +71,14 @@ ppv_all_pf_non_eur <- sum(ppv_pf_non_eur[1, ], na.rm = TRUE)/sum(ppv_pf_non_eur[
 ppv_all_pm_non_eur <- sum(ppv_pm_non_eur[1, ], na.rm = TRUE)/sum(ppv_pm_non_eur[2, ], na.rm = TRUE)
 
 
-pdf(file = paste0(figure_directory, "/collective_ppv_by_ancestry.pdf"), height = 2.8, width = 2.2, pointsize = 8)
+pdf(file = paste0(figure_directory, "/collective_ppv_by_ancestry.pdf"), height = 3.2, width = 2, pointsize = 8)
 df <- data.frame(
   Condition = factor(c("PF EUR", "PM EUR", "PF non-EUR", "PM non-EUR"),
                      levels = c("PF EUR", "PM EUR", "PF non-EUR", "PM non-EUR")),
   PPV       = c(ppv_all_pf_eur, ppv_all_pm_eur, ppv_all_pf_non_eur, ppv_all_pm_non_eur)
 )
 
-ggplot(df, aes(x = Condition, y = PPV, fill = Condition)) +
+ggplot(df, aes(x = Condition, y = PPV, fill = alpha("red", 0.75))) +
   geom_col() +
   scale_y_continuous(expand = expansion(mult = c(0, .1))) +
   labs(

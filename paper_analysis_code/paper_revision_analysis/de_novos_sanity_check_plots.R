@@ -49,27 +49,27 @@ total_f <- ppv_pf["total", ]
 total_m <- ppv_pm["total", ]
 
 pdf(paste0(figure_directory, "/duo_novo_ratio_father_mother_dnm.pdf"), 
-    height = 2.2, width = 2.2, pointsize = 8)
+    height = 2.2, width = 4.4, pointsize = 8)
 #par(mar = c(4, 4, 1, 1) + 0.1)
 plot(total_f/total_m,  pch = 19, 
-     cex = 1, bty = 'l', col = "dark orange", xlim = c(0.8, 40.2), ylim = c(0, max(total_f/total_m)),
+     cex = 1, bty = 'l', col = "dark orange", xlim = c(0.8, 117.2), ylim = c(0, max(total_f/total_m)),
      xaxt = "n", 
      yaxt = "n", ylab = "ratio of de novo from father-proband to mother-proband", 
      xlab = "All trios")
-axis(2, at = c(0, 4, 8, 12))
+axis(2, at = c(1, 6, 11))
 abline(h = median(total_f/total_m), lty = "longdash", col = rgb(0,0,0,0.7))
 #axis(1, at = c(1:40), cex.axis = 0.3)
 dev.off()
 
 ### de novos vs parent age
 pdf(paste0(figure_directory, "/duo_novo_dnm_vs_age.pdf"), 
-    height = 2.2, width = 2.2, pointsize = 8)
+    height = 3, width = 2.2, pointsize = 8)
 plot(trios$father_age_at_birth, trios$n_denovo_pf, pch = 19, 
-     cex = 1.05, bty = 'l', col = "dark orange",
-     xlab = "parent age at birth", xaxt = 'n', yaxt = 'n',
+     cex = 0.5, bty = 'l', col = "dark orange",
+     xlab = "parent age at birth", 
      ylab = "# de novo classifications", xlim = c(0, 52), ylim = c(0, 52))
 points(trios$mother_age_at_birth, trios$n_denovo_pm, pch = 2, 
-       cex = 1.05, bty = 'l', col = "deep pink")
+       cex = 0.5, bty = 'l', col = "deep pink")
 legend("topleft", legend = c("father-proband", "mother-proband"), pch = c(19, 2), 
        bty = 'n', col = c("dark orange", "deep pink"))
 

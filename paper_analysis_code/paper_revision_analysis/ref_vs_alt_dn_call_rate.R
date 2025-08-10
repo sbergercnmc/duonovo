@@ -32,14 +32,14 @@ for (i in 1:length(all_dirs)){
 }
 
 pdf(file = paste0(figure_directory, "/duo_novo_performance_ref_vs_alt.pdf"), 
-    height = 2.4, width = 7, pointsize = 8)
-par(mfrow = c(1, 2))
+    height = 3.5, width = 5.9, pointsize = 8)
+par(mfrow = c(2, 1))
 plot(1:117, 100*dn_call_rate['pf_alt', ], 
-     pch = 19, col = "salmon", xlab = "father-proband duos", cex = 0.8,
+     pch = 19, col = "salmon", xlab = "father-proband duos", cex = 0.5,
      ylab = "% classified as de novo", 
      bty = 'l', xaxt = 'n', yaxt = 'n', xlim = c(0.8, 117.2), ylim = c(0, 0.012))
 points(1:117, 100*dn_call_rate['pf_ref', ], 
-       pch = 19, col = "gray50", cex = 0.8)
+       pch = 19, col = "gray50", cex = 0.5)
 axis(2, at = c(0, 0.01))
 abline(v = seq(1.5, 116.5, by = 1), lty = "longdash", col = rgb(0,0,0,0.4))
 legend <- legend("topleft", legend = c("ALT allele", "REF allele"), 
@@ -47,11 +47,11 @@ legend <- legend("topleft", legend = c("ALT allele", "REF allele"),
                  col = c('salmon', "gray50"))
 
 plot(1:117, 100*dn_call_rate['pm_alt', ], 
-     pch = 19, col = "salmon", xlab = "father-proband duos", cex = 0.8,
+     pch = 19, col = "salmon", xlab = "mother-proband duos", cex = 0.5,
      ylab = "% classified as de novo", 
      bty = 'l', xaxt = 'n', yaxt = 'n', xlim = c(0.8, 117.2), ylim = c(0, 0.0046))
 points(1:117, 100*dn_call_rate['pm_ref', ], 
-       pch = 19, col = "gray50", cex = 0.8)
+       pch = 19, col = "gray50", cex = 0.5)
 axis(2, at = c(0, 0.004))
 abline(v = seq(1.5, 116.5, by = 1), lty = "longdash", col = rgb(0,0,0,0.4))
 dev.off()
