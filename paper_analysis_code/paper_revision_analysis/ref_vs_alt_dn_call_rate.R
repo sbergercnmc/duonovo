@@ -55,3 +55,33 @@ points(1:117, 100*dn_call_rate['pm_ref', ],
 axis(2, at = c(0, 0.004))
 abline(v = seq(1.5, 116.5, by = 1), lty = "longdash", col = rgb(0,0,0,0.4))
 dev.off()
+
+###
+### Collective stats
+collective_dn_call_rate <- matrix(NA, ncol = length(all_dirs), nrow = 8)
+rownames(collective_dn_call_rate) <- c('pf_alt_dn', 'pf_ref_dn', 'pf_alt_all_candidates', 'pf_ref_all_candidates', 
+                                       'pm_alt_dn', 'pm_ref_dn', 'pm_alt_all_candidates', 'pm_ref_all_candidates')
+
+for (i in 1:length(all_dirs)){
+  setwd(all_dirs[i])
+  all_data <- list.files()
+  load(file = all_data[grep('call_rate', all_data)])
+  
+  collective_dn_call_rate['pf_alt_dn', i] <- dn_call_rate_alt_pf[1]
+  collective_dn_call_rate['pf_ref_dn', i] <- dn_call_rate_ref_pf[1]
+  collective_dn_call_rate['pf_alt_all_candidates', i] <- dn_call_rate_alt_pf[2]
+  collective_dn_call_rate['pf_ref_all_candidates', i] <- dn_call_rate_ref_pf[2]
+  
+  collective_dn_call_rate['pm_alt_dn', i] <- dn_call_rate_alt_pm[1]
+  collective_dn_call_rate['pm_ref_dn', i] <- dn_call_rate_ref_pm[1]
+  collective_dn_call_rate['pm_alt_all_candidates', i] <- dn_call_rate_alt_pm[2]
+  collective_dn_call_rate['pm_ref_all_candidates', i] <- dn_call_rate_ref_pm[2]
+  
+  setwd(data_directory)
+}
+
+aggregate_rate_alt_pf <- sum(collective_dn_call_rate['pf_alt_dn', ]) / sum(collective_dn_call_rate['pf_alt_all_candidates', ])
+aggregate_rate_ref_pf <- sum(collective_dn_call_rate['pf_ref_dn', ]) / sum(collective_dn_call_rate['pf_ref_all_candidates', ])
+aggregate_rate_alt_pm <- sum(collective_dn_call_rate['pm_alt_dn', ]) / sum(collective_dn_call_rate['pm_alt_all_candidates', ])
+aggregate_rate_ref_pm <- sum(collective_dn_call_rate['pm_ref_dn', ]) / sum(collective_dn_call_rate['pm_ref_all_candidates', ])
+

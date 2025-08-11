@@ -23,7 +23,7 @@ all_dirs_no_problematic <- all_dirs[-which(all_dirs %in% problematic_trios)]
 
 # total count of de novo variants
 trio_dn_count <- sapply(1:length(all_dirs_no_problematic), function(xx) {
-  setwd(all_dirs[xx])
+  setwd(all_dirs_no_problematic[xx])
   all_data <- list.files()
   load(file = all_data[grep("sensitivity", all_data)])
   setwd(data_directory)
@@ -47,14 +47,10 @@ for (i in 1:length(all_dirs_no_problematic)){
   setwd(data_directory)
 }
 
-pdf(file = paste0(figure_directory, "/sensitivity.pdf"), height = 2.4, width = 6.5, pointsize = 8)
-par(mfrow = c(1, 3))
+pdf(file = paste0(figure_directory, "/sensitivity_QC.pdf"), height = 2.4, width = 6.5, pointsize = 8)
+par(mfrow = c(1, 2))
 hist(trio_dn_count, breaks = 50, xlim = c(0, 700), col = "red", border = "white", 
      xlab = "# de novos from trio", main = "")
-plot(trio_dn_count, sens, xlab = "# de novos from full trio", ylab = "sensitivity (both duos combined)", 
-     bty = 'l', yaxt = 'n', xaxt = 'n', ylim = c(0, 0.75))
-axis(1, at = seq(100, 600, by = 100))
-axis(2, at = c(0.25, 0.5, 0.75))
 
 plot(sens_no_filter, sens, xlab = "sensitivity (w/out allele depth filter)", 
      ylab = "sensitivity (with allele depth filter)", 
@@ -62,4 +58,11 @@ plot(sens_no_filter, sens, xlab = "sensitivity (w/out allele depth filter)",
 axis(1, at = c(0.25, 0.5, 0.75))
 axis(2, at = c(0.25, 0.5, 0.75))
 abline(0, 1, lwd = 1.75, col = 2)
+dev.off()
+
+pdf(file = paste0(figure_directory, "/sensitivity.pdf"), height = 2.5, width = 3, pointsize = 8)
+plot(trio_dn_count, sens, xlab = "# de novos from full trio", ylab = "sensitivity (both duos combined)", 
+     bty = 'l', yaxt = 'n', xaxt = 'n', ylim = c(0, 0.8))
+axis(1, at = c(0, 35, 70))
+axis(2, at = c(0, 0.25, 0.5, 0.75))
 dev.off()
