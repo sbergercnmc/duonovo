@@ -88,7 +88,7 @@ else
 
    mkdir -p $TMPDIR
    glnexus_cli --config DeepVariant_unfiltered --dir $TMPDIR/tmp_GLNEXUS_$PROBAND\_$PARENT\_$$ --threads $THREADS $PROBANDGVCF $PARENTGVCF | \
-                         bcftools view --write-index -Oz -o $TMPDIR/unphased_duo_$PROBAND\_$PARENT.vcf.gz
+                         bcftools view  -s $PROBAND,$PARENT --write-index -Oz -o $TMPDIR/unphased_duo_$PROBAND\_$PARENT.vcf.gz
 
     # bcftools index /scratch/sberger/pmgrc_lr_data/inputs/$PROBAND/duo_mother.vcf.gz  NOT needed in newer versions of bcftools which accept --write-index parameter
 

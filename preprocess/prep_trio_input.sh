@@ -101,7 +101,8 @@ TMPDIR=$(dirname $OUTPUT)/tmp_trio_$PROBAND\_$PARENT1\_$PARENT2\_$$
 
 mkdir -p $TMPDIR
 glnexus_cli --config DeepVariant_unfiltered --dir $TMPDIR/tmp_GLNEXUS_$PROBAND\_$PARENT1\_$PARENT2_$$ --threads $THREADS $PROBANDGVCF $PARENT1GVCF $PARENT2GVCF | \
-                         bcftools view --write-index -Oz -o $TMPDIR/unphased_tmpTRIO_$PROBAND\_$PARENT1\_$PARENT2\_$$.vcf.gz
+                         bcftools view -s $PROBAND,$PARENT1,$PARENT2 --write-index -Oz -o $TMPDIR/unphased_tmpTRIO_$PROBAND\_$PARENT1\_$PARENT2\_$$.vcf.gz
+
 
 # bcftools index /scratch/sberger/pmgrc_lr_data/inputs/$PROBAND/duo_mother.vcf.gz  # NOT needed in newer versions of bcftools which accept --write-index parameter
 
