@@ -5,7 +5,7 @@ source("classifyVariantsTrio.R")
 library(VariantAnnotation)
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) != 1L) {
-  stop("Usage: run_duoNovo_sib.R <run_directory>")
+  stop("Usage: falsepos_duoNovo_sib.R <run_directory>")
 }
 ## set directory
 current_dir <- args[1]
