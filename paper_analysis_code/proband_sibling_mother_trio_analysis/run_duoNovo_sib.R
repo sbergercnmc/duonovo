@@ -977,7 +977,7 @@ setwd(current_dir)
 
 ### use duoNovo output from duos to separate candidate variants based on classification
 ### PM duo first
-duoNovo_output_filepath_pm <- list.files(pattern = "PM\\.duonovo\\.annovar\\.addedParent\\.dnm2.rda$")
+duoNovo_output_filepath_pm <- list.files(pattern = "PM\\.duonovo\\.addedParent\\.rda$")
 load(file = duoNovo_output_filepath_pm)
 duoNovo_ranges <- dn_granges_pm
 
@@ -994,7 +994,7 @@ classified_other_parent_or_uncertain_pm <- duoNovo_ranges[c(classified_uncertain
 
 ### now PF duo
 ###
-duoNovo_output_filepath_pf <- list.files(pattern = "PF\\.duonovo\\.annovar\\.addedParent\\.dnm2.rda$")
+duoNovo_output_filepath_pf <- list.files(pattern = "PF\\.duonovo\\.addedParent\\.rda$")
 load(file = duoNovo_output_filepath_pf)
 duoNovo_ranges <- dn_granges_pf
 
