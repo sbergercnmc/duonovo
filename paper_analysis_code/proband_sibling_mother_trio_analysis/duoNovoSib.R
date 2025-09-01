@@ -1,7 +1,7 @@
 duoNovoSib <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                     candidate_variant_coordinates = NULL, candidate_variants_duoNovo_output = NULL,
                     problematic_regions = NULL,
-                    PS_width_cutoff = 10000, boundary_cutoff = 2000, distance_cutoff = 20,
+                    PS_width_cutoff = 10000, boundary_cutoff = 2000, distance_cutoff = 40,
                     output_vcf_path = NULL, compress_output = TRUE) {
 
   if (!file.exists(LRS_phased_vcf_file_path)) {
@@ -277,10 +277,6 @@ duoNovoSib <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 
     }
   }
   output_sorted$tested_allele <- 1
-  if (test_reference_allele == TRUE){
-    output_sorted$tested_allele[which(output_sorted$phasing1 %in% c("0|1", "1|0") & 
-                                        output_sorted$phasing2 == "1/1")] <- 0
-  }
   
   if (!is.null(output_vcf_path)){
     message("Writing classified variants into VCF...")

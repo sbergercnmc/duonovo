@@ -4,17 +4,16 @@ source("classifyVariantsTrio.R")
 
 library(VariantAnnotation)
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) != 2L) {
+if (length(args) != 1L) {
   stop("Usage: run_duoNovo_sib.R <run_directory>")
 }
-
-psm_trio_dir <- args[1]
-duo_dir <- args[2]
+## set directory
+current_dir <- args[1]
+setwd(current_dir)
 
 ### use duoNovo output from the mother-proband duo to separate candidate variants based on classification
-setwd(duo_dir)
-duonovo_granges_output_filepath <- list.files(pattern = "PM\\.duonovo\\.annovar\\.addedParent\\.dnm2.rda$")
-load(file = duonovo_granges_output_filepath)
+duoNovo_output_filepath_pm <- list.files(pattern = "PM\\.duonovo\\.annovar\\.addedParent\\.dnm2.rda$")
+load(file = duonovo_granges_output_filepath_pm)
 duoNovo_ranges <- dn_granges_pm
 
 classified_denovo_indices <- which(duoNovo_ranges$duoNovo_classification == "de_novo")
@@ -31,7 +30,6 @@ classified_other_parent_or_uncertain <- duoNovo_ranges[c(classified_uncertain_in
 
 ### Now run duoNovo (trio version) on the joint trio vcf (proband-sibling-mother; samples have to be ordered this way in the vcf) 
 ### to classify the candidate variants labeled as "on other parent haplotype" or uncertain
-setwd(trio_dir)
 surrogate_trio_vcf_filepath <- list.files(pattern = "PSM\\.vcf.gz$")
 sibling_trio_output <- duoNovoSib(surrogate_trio_vcf_filepath, 
                                   candidate_variants_duoNovo_output = classified_other_parent_or_uncertain)
