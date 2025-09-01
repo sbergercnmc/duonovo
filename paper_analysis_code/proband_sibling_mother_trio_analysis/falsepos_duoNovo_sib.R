@@ -1013,7 +1013,7 @@ if (length(denovo_indices_sibling_trio_psf) > 0){
 
 ### use full trio genotypes to assess false pos rate
 ### use duoNovo output from the mother-proband duo to separate candidate variants based on classification
-duoNovo_output_filepath_pm <- list.files(pattern = "PM\\.duonovo\\.addedParent\\.rda$")
+duoNovo_output_filepath_pm <- list.files(pattern = "PM\\.duonovo\\.annovar\\.addedParent\\.dnm2.rda$")
 load(file = duoNovo_output_filepath_pm)
 dn_granges <- dn_granges_pm
 
@@ -1035,7 +1035,7 @@ if (length(queryHits(overlaps)) > 0){
 output_vec_psm <- output_vec
 
 ### now same from father-proband duo 
-duoNovo_output_filepath_pf <- list.files(pattern = "PF\\.duonovo\\.addedParent\\.rda$")
+duoNovo_output_filepath_pf <- list.files(pattern = "PF\\.duonovo\\.annovar\\.addedParent\\.dnm2.rda$")
 load(file = duoNovo_output_filepath_pf)
 dn_granges <- dn_granges_pf
 
