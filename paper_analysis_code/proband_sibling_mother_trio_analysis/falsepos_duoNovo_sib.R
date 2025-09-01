@@ -976,13 +976,19 @@ current_dir <- args[1]
 setwd(current_dir)
 
 
-### run duoNovo (trio version) on the joint trio vcf (proband-sibling-mother; samples have to be ordered this way in the vcf) 
-surrogate_trio_vcf_filepath <- list.files(pattern = "PSM\\.vcf.gz$")
-sibling_trio_output <- duoNovoSib(surrogate_trio_vcf_filepath)
+### run duoNovo (trio version) on the joint trio vcf (proband-sibling-mother and proband-sibling-father; samples have to be ordered this way in the vcf) 
+message("getting de novo variants from PSM trio...")
+surrogate_trio_vcf_filepath_psm <- list.files(pattern = "PSM\\.vcf.gz$")
+sibling_trio_output_psm <- duoNovoSib(surrogate_trio_vcf_filepath_psm)
 
-denovo_indices_sibling_trio <- which(sibling_trio_output$duoNovo_classification == "de_novo")
-if (length(denovo_indices_sibling_trio) > 0){
-  denovo_sibling <- sibling_trio_output[denovo_indices_sibling_trio]
+message("getting de novo variants from PSF trio...")
+surrogate_trio_vcf_filepath_psf <- list.files(pattern = "PSF\\.vcf.gz$")
+sibling_trio_output_psf <- duoNovoSib(surrogate_trio_vcf_filepath_psf)
+
+# PSM
+denovo_indices_sibling_trio_psm <- which(sibling_trio_output_psm$duoNovo_classification == "de_novo")
+if (length(denovo_indices_sibling_trio_psm) > 0){
+  denovo_sibling_psm <- sibling_trio_output_psm[denovo_indices_sibling_trio_psm]
   
   ### can optionally exclude de novos that are present in gnomAD
   # duoNovo_ranges$gnomad41_genome_AF <- as.numeric(unlist(duoNovo_ranges$gnomad41_genome_AF))
@@ -993,7 +999,16 @@ if (length(denovo_indices_sibling_trio) > 0){
   #}
   ###
 } else {
-  denovo_sibling <- GRanges()
+  denovo_sibling_psm <- GRanges()
+}
+
+# PSF
+denovo_indices_sibling_trio_psf <- which(sibling_trio_output_psf$duoNovo_classification == "de_novo")
+if (length(denovo_indices_sibling_trio_psf) > 0){
+  denovo_sibling_psf <- sibling_trio_output_psf[denovo_indices_sibling_trio_psf]
+  
+} else {
+  denovo_sibling_psf <- GRanges()
 }
 
 ### use full trio genotypes to assess false pos rate
@@ -1005,7 +1020,7 @@ dn_granges <- dn_granges_pm
 dn_granges <- dn_granges[which(dn_granges$parentValidation_depth >= 20 & 
                                  dn_granges$parentValidation_GQ >= 30)]
 dn_granges <- dn_granges[!grepl("\\.", dn_granges$parentValidation_gt)]
-overlaps <- findOverlaps(dn_granges, denovo_sibling)
+overlaps <- findOverlaps(dn_granges, denovo_sibling_psm)
 if (length(queryHits(overlaps)) > 0){
   variants_to_assess <- dn_granges[unique(queryHits(overlaps))] 
   
@@ -1017,10 +1032,34 @@ if (length(queryHits(overlaps)) > 0){
 } else {
   output_vec <- NA
 }
+output_vec_psm <- output_vec
+
+### now same from father-proband duo 
+duoNovo_output_filepath_pf <- list.files(pattern = "PF\\.duonovo\\.annovar\\.addedParent\\.dnm2.rda$")
+load(file = duoNovo_output_filepath_pf)
+dn_granges <- dn_granges_pf
+
+dn_granges <- dn_granges[which(dn_granges$parentValidation_depth >= 20 & 
+                                 dn_granges$parentValidation_GQ >= 30)]
+dn_granges <- dn_granges[!grepl("\\.", dn_granges$parentValidation_gt)]
+overlaps <- findOverlaps(dn_granges, denovo_sibling_psf)
+if (length(queryHits(overlaps)) > 0){
+  variants_to_assess <- dn_granges[unique(queryHits(overlaps))] 
+  
+  assessed <- length(variants_to_assess)
+  false_dn <- length(grep("1", variants_to_assess$parentValidation_gt))
+  rate <- false_dn/assessed
+  output_vec <- c(false_dn, assessed, rate)
+  names(output_vec) <- c("false_dn", "assessed", "false_pos_rate")
+} else {
+  output_vec <- NA
+}
+output_vec_psf <- output_vec
+
 
 sample_id <- sub("\\..*$", "", duoNovo_output_filepath_pm)
-save(output_vec, 
-     file = paste0(sample_id, "_psm_falsepos_rate.rda"))
+save(output_vec_psm, output_vec_psf, 
+     file = paste0(sample_id, "_sibling_trio_falsepos_rate.rda"))
 
 
 

@@ -975,7 +975,8 @@ if (length(args) != 1L) {
 current_dir <- args[1]
 setwd(current_dir)
 
-### use duoNovo output from the mother-proband duo to separate candidate variants based on classification
+### use duoNovo output from duos to separate candidate variants based on classification
+### PM duo first
 duoNovo_output_filepath_pm <- list.files(pattern = "PM\\.duonovo\\.annovar\\.addedParent\\.dnm2.rda$")
 load(file = duoNovo_output_filepath_pm)
 duoNovo_ranges <- dn_granges_pm
@@ -988,21 +989,44 @@ if (length(classified_denovo_indices) > 0){
 }
 classified_other_parent_indices <- which(duoNovo_ranges$duoNovo_classification == "on_other_parent_haplotype")
 classified_uncertain_indices <- which(duoNovo_ranges$duoNovo_classification == "uncertain")
-classified_other_parent_or_uncertain <- duoNovo_ranges[c(classified_uncertain_indices, 
+classified_other_parent_or_uncertain_pm <- duoNovo_ranges[c(classified_uncertain_indices, 
                                                          classified_other_parent_indices)]
+
+### now PF duo
+###
+duoNovo_output_filepath_pf <- list.files(pattern = "PF\\.duonovo\\.annovar\\.addedParent\\.dnm2.rda$")
+load(file = duoNovo_output_filepath_pf)
+duoNovo_ranges <- dn_granges_pf
+
+classified_denovo_indices <- which(duoNovo_ranges$duoNovo_classification == "de_novo")
+if (length(classified_denovo_indices) > 0){
+  classified_denovo <- duoNovo_ranges[classified_denovo_indices]
+} else {
+  classified_denovo <- GRanges()
+}
+classified_other_parent_indices <- which(duoNovo_ranges$duoNovo_classification == "on_other_parent_haplotype")
+classified_uncertain_indices <- which(duoNovo_ranges$duoNovo_classification == "uncertain")
+classified_other_parent_or_uncertain_pf <- duoNovo_ranges[c(classified_uncertain_indices, 
+                                                            classified_other_parent_indices)]
 
 
 ### Now run duoNovo (trio version) on the joint trio vcf (proband-sibling-mother; samples have to be ordered this way in the vcf) 
 ### to classify the candidate variants labeled as "on other parent haplotype" or uncertain
 message("getting de novo variants from PSM trio...")
-surrogate_trio_vcf_filepath <- list.files(pattern = "PSM\\.vcf.gz$")
-sibling_trio_output <- duoNovoSib(surrogate_trio_vcf_filepath, 
-                                  candidate_variants_duoNovo_output = classified_other_parent_or_uncertain)
+surrogate_trio_vcf_filepath_psm <- list.files(pattern = "PSM\\.vcf.gz$")
+sibling_trio_output_psm <- duoNovoSib(surrogate_trio_vcf_filepath_psm, 
+                                  candidate_variants_duoNovo_output = classified_other_parent_or_uncertain_pm)
 
-# Obtain de novo variants from the output
-denovo_indices_sibling_trio <- which(sibling_trio_output$duoNovo_classification == "de_novo")
-if (length(denovo_indices_sibling_trio) > 0){
-  denovo_sibling <- sibling_trio_output[denovo_indices_sibling_trio]
+message("getting de novo variants from PSF trio...")
+surrogate_trio_vcf_filepath_psf <- list.files(pattern = "PSF\\.vcf.gz$")
+sibling_trio_output_psf <- duoNovoSib(surrogate_trio_vcf_filepath_psf, 
+                                     candidate_variants_duoNovo_output = classified_other_parent_or_uncertain_pf)
+
+### Obtain de novo variants from the output
+# PSM
+denovo_indices_sibling_trio_psm <- which(sibling_trio_output_psm$duoNovo_classification == "de_novo")
+if (length(denovo_indices_sibling_trio_psm) > 0){
+  denovo_sibling_psm <- sibling_trio_output_psm[denovo_indices_sibling_trio_psm]
   
   ### can optionally exclude de novos that are present in gnomAD
   # duoNovo_ranges$gnomad41_genome_AF <- as.numeric(unlist(duoNovo_ranges$gnomad41_genome_AF))
@@ -1013,12 +1037,22 @@ if (length(denovo_indices_sibling_trio) > 0){
   #}
   ###
 } else {
-  denovo_sibling <- GRanges()
+  denovo_sibling_psm <- GRanges()
+}
+
+# PSF
+denovo_indices_sibling_trio_psf <- which(sibling_trio_output_psf$duoNovo_classification == "de_novo")
+if (length(denovo_indices_sibling_trio_psf) > 0){
+  denovo_sibling_psf <- sibling_trio_output_psf[denovo_indices_sibling_trio_psf]
+  
+} else {
+  denovo_sibling_psf <- GRanges()
 }
 
 ### now calculate sensitivity based on de novo variants identified from PM duo as well as PSM trio
 ###
-getSensitivity <- function(trio_denovo_filepath, duoNovo_granges_output_filepath_pm, denovo_psm_trio, 
+getSensitivity <- function(trio_denovo_filepath, type = c("PSM", "PSF"), 
+                           duoNovo_granges_output_filepath, denovo_sibling_trio, 
                            validation_GQ_cutoff = 30, 
                            allele_depth_filter = TRUE){
   load(file = trio_denovo_filepath)
@@ -1060,8 +1094,12 @@ getSensitivity <- function(trio_denovo_filepath, duoNovo_granges_output_filepath
   }
   total <- length(trio_de_novo)
   
-  load(file = duoNovo_granges_output_filepath_pm)
-  dn_granges <- dn_granges_pm
+  load(file = duoNovo_granges_output_filepath)
+  if (type == "PSM"){
+    dn_granges <- dn_granges_pm
+  } else if (type == "PSF"){
+    dn_granges <- dn_granges_pf
+  }
   
   classified_dn <- which(dn_granges$duoNovo_classification == "de_novo")
   if (length(classified_dn) > 0){
@@ -1069,13 +1107,13 @@ getSensitivity <- function(trio_denovo_filepath, duoNovo_granges_output_filepath
   } else {
     dn_duo <- 0
   }
-  if (length(denovo_psm_trio) > 0){
-    dn_psm_trio <- length(queryHits(findOverlaps(trio_de_novo, denovo_psm_trio)))
+  if (length(denovo_sibling_trio) > 0){
+    dn_sibling_trio <- length(queryHits(findOverlaps(trio_de_novo, denovo_sibling_trio)))
   }  else {
-    dn_psm_trio <- 0
+    dn_sibling_trio <- 0
   }
   
-  sens <- c(dn_duo + dn_psm_trio, total)
+  sens <- c(dn_duo + dn_sibling_trio, total)
   names(sens) <- c("de_novo", "total")
   out <- sens
   out
@@ -1087,12 +1125,16 @@ if (length(trio_denovo_filepath) != 1L ) {
 }
 
 message("calculating updated sensitivity...")
-sens <- getSensitivity(trio_denovo_filepath, duoNovo_granges_output_filepath_pm = duoNovo_output_filepath_pm, 
-                       denovo_psm_trio = denovo_sibling)
+sens_psm <- getSensitivity(trio_denovo_filepath, type = "PSM", 
+                       duoNovo_granges_output_filepath = duoNovo_output_filepath_pm, 
+                       denovo_sibling_trio = denovo_sibling_psm)
+sens_psf <- getSensitivity(trio_denovo_filepath, type = "PSF",
+                       duoNovo_granges_output_filepath = duoNovo_output_filepath_pf, 
+                       denovo_sibling_trio = denovo_sibling_psf)
 
 sample_id <- sub("\\..*$", "", duoNovo_output_filepath_pm)
-save(denovo_sibling, sens,
-     file = paste0(sample_id, "_psm_de_novo_variants.rda"))
+save(denovo_sibling_psm, denovo_sibling_psf, sens_psm, sens_psf,
+     file = paste0(sample_id, "_psm_psf_de_novo_variants.rda"))
 
 
 
