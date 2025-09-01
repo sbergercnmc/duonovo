@@ -13,7 +13,7 @@ setwd(current_dir)
 
 ### use duoNovo output from the mother-proband duo to separate candidate variants based on classification
 duoNovo_output_filepath_pm <- list.files(pattern = "PM\\.duonovo\\.annovar\\.addedParent\\.dnm2.rda$")
-load(file = duonovo_granges_output_filepath_pm)
+load(file = duoNovo_output_filepath_pm)
 duoNovo_ranges <- dn_granges_pm
 
 classified_denovo_indices <- which(duoNovo_ranges$duoNovo_classification == "de_novo")
