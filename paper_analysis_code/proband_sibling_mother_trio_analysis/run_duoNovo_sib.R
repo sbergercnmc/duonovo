@@ -255,14 +255,19 @@ duoNovoSib <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 
   if (length(multi_denovo_haplotype_indices) > 0){
     output_sorted$duoNovo_classification[multi_denovo_haplotype_indices] <- "on_multi_denovo_haplotype"
   }
+  
   multi_denovo_mat <- as.matrix(
     mcols(output_sorted)[, c("n_de_novo_left_orientation_same_PS",
                              "n_de_novo_right_orientation_same_PS")]
   )
-  max_count <- rowMaxs(multi_denovo_mat, na.rm = TRUE)
-  max_count[is.infinite(max_count)] <- NA
+  if (all(is.na(multi_denovo_mat)) == FALSE){
+    max_count <- rowMaxs(multi_denovo_mat, na.rm = TRUE)
+    max_count[is.infinite(max_count)] <- NA
+    output_sorted$n_de_novo_same_orientation_same_PS <- max_count
+  } else {
+    output_sorted$n_de_novo_same_orientation_same_PS <- NA
+  }
   
-  output_sorted$n_de_novo_same_orientation_same_PS <- max_count
   mcols(output_sorted)$n_de_novo_left_orientation_same_PS  <- NULL
   mcols(output_sorted)$n_de_novo_right_orientation_same_PS <- NULL
   
