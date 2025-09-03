@@ -759,7 +759,9 @@ classifyVariantsTrio <- function(candidate_variant_granges, phasing_orientation 
       de_novo22 <- GRanges()
     }
     de_novo <- c(de_novo11, de_novo12, de_novo21, de_novo22)
-    de_novo$duoNovo_classification <- "de_novo"
+    if (length(de_novo) > 0){
+      de_novo$duoNovo_classification <- "de_novo"
+    }
     
     if (!is.null(uncertain)){
       uncertain <- candidate_variant_granges[uncertain]
@@ -799,7 +801,9 @@ classifyVariantsTrio <- function(candidate_variant_granges, phasing_orientation 
       de_novo12 <- GRanges()
     }
     de_novo <- c(de_novo11, de_novo12, de_novo21, de_novo22)
-    de_novo$duoNovo_classification <- "de_novo"
+    if (length(de_novo) > 0){
+      de_novo$duoNovo_classification <- "de_novo"
+    }
     
     if (!is.null(uncertain)){
       uncertain <- candidate_variant_granges[uncertain]
