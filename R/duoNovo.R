@@ -340,7 +340,16 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                                              PS_width_cutoff = PS_width_cutoff, 
                                              QC_fail_variant_granges = QC_fail_variants_left)
   } else {
-    classifications_left <- GRanges()
+    if (length(QC_fail_variants_left) > 0){
+      QC_fail_variants_left$duoNovo_classification <- "failed_QC"
+      QC_fail_variants_left$supporting_hamming_distance <- NA
+      QC_fail_variants_left$supporting_counts_het_hom <- NA
+      QC_fail_variants_left$supporting_counts_het_het <- NA
+      QC_fail_variants_left$supporting_counts_hom_het <- NA
+      classifications_left <- QC_fail_variants_left
+    } else {
+      classifications_left <- GRanges()
+    }
   }
   if (length(candidate_variant_granges_right) > 0){
     classifications_right <- classifyVariants(candidate_variant_granges_right, phasing_orientation = "right", 
@@ -350,7 +359,16 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                                               PS_width_cutoff = PS_width_cutoff,
                                               QC_fail_variant_granges = QC_fail_variants_right)
   } else {
-    classifications_right <- GRanges()
+    if (length(QC_fail_variants_right) > 0){
+      QC_fail_variants_right$duoNovo_classification <- "failed_QC"
+      QC_fail_variants_right$supporting_hamming_distance <- NA
+      QC_fail_variants_right$supporting_counts_het_hom <- NA
+      QC_fail_variants_right$supporting_counts_het_het <- NA
+      QC_fail_variants_right$supporting_counts_hom_het <- NA
+      classifications_right <- QC_fail_variants_right
+    } else {
+      classifications_right <- GRanges()
+    }
   }
   duo_novo_classifications <- c(classifications_left, classifications_right)
   output <- duo_novo_classifications
@@ -401,10 +419,13 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     mcols(output_sorted)[, c("n_de_novo_left_orientation_same_PS",
                   "n_de_novo_right_orientation_same_PS")]
   )
-  max_count <- rowMaxs(multi_denovo_mat, na.rm = TRUE)
-  max_count[is.infinite(max_count)] <- NA
-  
-  output_sorted$n_de_novo_same_orientation_same_PS <- max_count
+  if (all(is.na(multi_denovo_mat)) == FALSE){
+    max_count <- rowMaxs(multi_denovo_mat, na.rm = TRUE)
+    max_count[is.infinite(max_count)] <- NA
+    output_sorted$n_de_novo_same_orientation_same_PS <- max_count
+  } else {
+    output_sorted$n_de_novo_same_orientation_same_PS <- NA
+  }
   mcols(output_sorted)$n_de_novo_left_orientation_same_PS  <- NULL
   mcols(output_sorted)$n_de_novo_right_orientation_same_PS <- NULL
   
