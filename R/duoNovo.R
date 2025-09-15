@@ -9,7 +9,10 @@
 #' @param proband_column_identifier A character corresponding to an identifier for the proband column in the metadata matrices. Should be the same for both the LRS vcf and (if used) the SRS vcf.
 #' @param PS_width_cutoff A numeric value specifying the minimum width of the haplotype blocks included in the analysis.
 #' @param boundary_cutoff A numeric value indicating the minimum distance from a haplotype block boundary (either start or end coordinate) for candidate variants to be analyzed.
-#' @param distance_cutoff A numeric value specifying the minimum hamming distance cutoff to determine that a proband-parent haplotype block are not identical by descent.
+#' @param IBD_distance_cutoff A numeric value specifying the minimum Hamming distance required for inferring
+#'   the non-IBD status of a haplotype pair.
+#' @param non_IBD_distance_cutoff A numeric value specifying the maximum Hamming distance allowed to infer
+#'   the IBD status of a haplotype pair.
 #' @param candidate_variants_concordant_with_SRS Logical value specifying if candidate variants should be concordant with short-read sequencing (default is `FALSE`).
 #' @param SRS_vcf_file_path File path to the vcf containing variant calls from short-read sequencing of the duo.
 #' @param test_reference_allele Logical value specifying if positions where the proband is heterozygous and the parent is homozygous for the variant allele (not the reference) should be tested (default is `FALSE`).
@@ -39,7 +42,8 @@
 #' #          SRS_vcf_file_path = my_SRS_file_path)
 duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                     proband_column_identifier,
-                    PS_width_cutoff = 10000, boundary_cutoff = 2000, distance_cutoff = 40,
+                    PS_width_cutoff = 10000, boundary_cutoff = 2000, 
+                    IBD_distance_cutoff = 0, non_IBD_distance_cutoff = 40,
                     candidate_variants_concordant_with_SRS = FALSE, SRS_vcf_file_path = NULL, 
                     test_reference_allele = FALSE, 
                     candidate_variant_coordinates = NULL, problematic_regions = NULL,
@@ -336,7 +340,9 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     classifications_left <- classifyVariants(candidate_variant_granges_left, phasing_orientation = "left", 
                                              haplotype_granges = hap_granges, 
                                              haplotype_boundary_coordinate_granges = hap_boundary_coordinates, 
-                                             boundary_cutoff = boundary_cutoff, distance_cutoff = distance_cutoff, 
+                                             boundary_cutoff = boundary_cutoff, 
+                                             non_IBD_distance_cutoff = non_IBD_distance_cutoff,
+                                             IBD_distance_cutoff = IBD_distance_cutoff,  
                                              PS_width_cutoff = PS_width_cutoff, 
                                              QC_fail_variant_granges = QC_fail_variants_left)
   } else {
@@ -355,7 +361,9 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     classifications_right <- classifyVariants(candidate_variant_granges_right, phasing_orientation = "right", 
                                               haplotype_granges = hap_granges, 
                                               haplotype_boundary_coordinate_granges = hap_boundary_coordinates, 
-                                              boundary_cutoff = boundary_cutoff, distance_cutoff = distance_cutoff, 
+                                              boundary_cutoff = boundary_cutoff, 
+                                              non_IBD_distance_cutoff = non_IBD_distance_cutoff,
+                                              IBD_distance_cutoff = IBD_distance_cutoff, 
                                               PS_width_cutoff = PS_width_cutoff,
                                               QC_fail_variant_granges = QC_fail_variants_right)
   } else {
@@ -467,7 +475,8 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
       paste0( ifelse(is.null(proband_column_identifier), "NA", proband_column_identifier)),
       paste0( ifelse(is.null(PS_width_cutoff), "NA", PS_width_cutoff)),
       paste0( ifelse(is.null(boundary_cutoff), "NA", boundary_cutoff)),
-      paste0( ifelse(is.null(distance_cutoff), "NA", distance_cutoff)),
+      paste0( ifelse(is.null(non_IBD_distance_cutoff), "NA", non_IBD_distance_cutoff)),
+      paste0( ifelse(is.null(IBD_distance_cutoff), "NA", IBD_distance_cutoff)),
       paste0( ifelse(is.null(candidate_variants_concordant_with_SRS), "NA", candidate_variants_concordant_with_SRS)),
       paste0( ifelse(is.null(test_reference_allele), "NA", test_reference_allele)),
       paste0( ifelse(is.null(SRS_vcf_file_path), "NA", SRS_vcf_file_path)),
@@ -486,7 +495,8 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
                     "proband_column_identifier",
                     "PS_width_cutoff",
                     "boundary_cutoff",
-                    "distance_cutoff",
+                    "IBD_distance_cutoff",
+                    "non_IBD_distance_cutoff",
                     "candidate_variants_concordant_with_SRS",
                     "test_reference_allele",
                     "SRS_vcf_file_path",

@@ -9,8 +9,10 @@
 #' @param haplotype_boundary_coordinate_granges A \code{GRanges} object containing the haplotype block boundaries.
 #' @param boundary_cutoff A numeric value indicating the distance from the boundary of a haplotype block
 #'   within which candidate variants are considered.
-#' @param distance_cutoff A numeric value specifying the minimum Hamming distance required for supporting
-#'   the classification of variants.
+#' @param IBD_distance_cutoff A numeric value specifying the minimum Hamming distance required for inferring
+#'   the non-IBD status of a haplotype pair.
+#' @param non_IBD_distance_cutoff A numeric value specifying the maximum Hamming distance allowed to infer
+#'   the IBD status of a haplotype pair.
 #' @param PS_width_cutoff A numeric value specifying the minimum width for phasing sets to be included in the analysis.
 #' @param QC_fail_variant_granges A \code{GRanges} object containing the candidate variants that have failed QC thus far (e.g. due to low sequencing depth or GQ).
 #'
@@ -33,7 +35,7 @@
 #' @export
 classifyVariants <- function(candidate_variant_granges, phasing_orientation = c("left", "right"),
                              haplotype_granges, haplotype_boundary_coordinate_granges,
-                             boundary_cutoff, distance_cutoff, PS_width_cutoff,
+                             boundary_cutoff, IBD_distance_cutoff, non_IBD_distance_cutoff, PS_width_cutoff,
                              QC_fail_variant_granges){
 
   ###QC steps
@@ -176,14 +178,14 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
   hamming_distance_mins_hap2 <- colMins(hamming_distance_mat[3:4, , drop = FALSE])
 
   all_columns <- 1:dim(hamming_distance_mat)[2]
-  clean_inheritance_hap1vs1 <- which(hamming_distance_mins_1vs1 == 0 & hamming_distance_mins_1vs2 > 0 &
-                                        hamming_distance_mins_hap2 > distance_cutoff)
-  clean_inheritance_hap1vs2 <- which(hamming_distance_mins_1vs1 > 0 & hamming_distance_mins_1vs2 == 0 &
-                                       hamming_distance_mins_hap2 > distance_cutoff)
-  clean_inheritance_hap2vs1 <- which(hamming_distance_mins_2vs1 == 0 & hamming_distance_mins_2vs2 > 0 &
-                                       hamming_distance_mins_hap1 > distance_cutoff)
-  clean_inheritance_hap2vs2 <- which(hamming_distance_mins_2vs1 > 0 & hamming_distance_mins_2vs2 == 0 &
-                                       hamming_distance_mins_hap1 > distance_cutoff)
+  clean_inheritance_hap1vs1 <- which(hamming_distance_mins_1vs1 <= IBD_distance_cutoff & hamming_distance_mins_1vs2 > 0 &
+                                        hamming_distance_mins_hap2 > non_IBD_distance_cutoff)
+  clean_inheritance_hap1vs2 <- which(hamming_distance_mins_1vs1 > 0 & hamming_distance_mins_1vs2 <= IBD_distance_cutoff &
+                                       hamming_distance_mins_hap2 > non_IBD_distance_cutoff)
+  clean_inheritance_hap2vs1 <- which(hamming_distance_mins_2vs1 <= IBD_distance_cutoff & hamming_distance_mins_2vs2 > 0 &
+                                       hamming_distance_mins_hap1 > non_IBD_distance_cutoff)
+  clean_inheritance_hap2vs2 <- which(hamming_distance_mins_2vs1 > 0 & hamming_distance_mins_2vs2 <= IBD_distance_cutoff &
+                                       hamming_distance_mins_hap1 > non_IBD_distance_cutoff)
   clean_inheritance_all <- Reduce(union, list(clean_inheritance_hap1vs1, clean_inheritance_hap1vs2,
                                            clean_inheritance_hap2vs1, clean_inheritance_hap2vs2))
   uncertain_inheritance <- all_columns
