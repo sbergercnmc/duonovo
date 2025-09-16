@@ -1,7 +1,10 @@
 #!/bin/bash -i
 source ~/.bashrc
 
-DN_VCF=$1
+DN_VCFBZ=$1
+
+DN_VCF=$(echo $DN_VCFBZ | sed 's/.bgz$//')
+bcftools view -Ov -o $DN_VCF $DN_VCFBZ
 
 #detect duoNovo proband ID from vcf header
 PROBAND_ID=$( bcftools view -h $DN_VCF | grep duoNovoPARAM | grep proband_column_identifier | cut -d= -f4 | cut -d$">" -f1 )

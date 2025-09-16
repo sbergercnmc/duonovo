@@ -26,6 +26,9 @@ parser$add_argument("-b", "--boundary_cutoff", type="integer", default=2000,
 parser$add_argument("-c", "--distance_cutoff", type="integer", default=40, 
                      help= "A numeric value specifying the minimum Hamming distance cutoff to determine that a proband-parent haplotype block is not identical by descent. [default %(default)d]",
                      metavar="number")
+parser$add_argument("-i", "--IBD_distance_cutoff", type="integer", default=0, 
+                     help= "A numeric value specifying the maximum Hamming distance cutoff to determine that a proband-parent haplotype block is likely identical by descent. [default %(default)d]",
+                     metavar="number")
 parser$add_argument("-t", "--test_reference_allele", action="store_true",  default=FALSE,  help="Test for deNovo Reference reversions (parent is hom_var, proband is het) [default FALSE]")
 parser$add_argument("-n", "--candidate_variant_coordinates", metavar="coordinates", 
                      help= "1-based list of chromosome ranges to evaluate for variants, e.g.  chr1:12345-12345,chr2:65430-65430. [Optional]")
@@ -69,7 +72,8 @@ duoNovo_results <- duoNovo(
   proband_column_identifier = args$proband_id,
   PS_width_cutoff = args$PS_width_cutoff, 
   boundary_cutoff = args$boundary_cutoff, 
-  distance_cutoff = args$distance_cutoff,
+  non_IBD_distance_cutoff = args$distance_cutoff,
+  IBD_distance_cutoff = args$IBD_distance_cutoff,
   candidate_variants_concordant_with_SRS = args$use_SRS,
   SRS_vcf_file_path = args$SRS_vcf_file_path,
   test_reference_allele = args$test_reference_allele,
