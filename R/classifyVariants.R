@@ -176,15 +176,16 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
 
   hamming_distance_mins_hap1 <- colMins(hamming_distance_mat[1:2, , drop = FALSE])
   hamming_distance_mins_hap2 <- colMins(hamming_distance_mat[3:4, , drop = FALSE])
+  best_hamming_distance <- pmin(hamming_distance_mins_hap1, hamming_distance_mins_hap2)
 
   all_columns <- 1:dim(hamming_distance_mat)[2]
-  clean_inheritance_hap1vs1 <- which(hamming_distance_mins_1vs1 <= IBD_distance_cutoff & hamming_distance_mins_1vs2 > 0 &
+  clean_inheritance_hap1vs1 <- which(hamming_distance_mins_1vs1 <= IBD_distance_cutoff & hamming_distance_mins_1vs2 > IBD_distance_cutoff &
                                         hamming_distance_mins_hap2 > non_IBD_distance_cutoff)
-  clean_inheritance_hap1vs2 <- which(hamming_distance_mins_1vs1 > 0 & hamming_distance_mins_1vs2 <= IBD_distance_cutoff &
+  clean_inheritance_hap1vs2 <- which(hamming_distance_mins_1vs1 > IBD_distance_cutoff & hamming_distance_mins_1vs2 <= IBD_distance_cutoff &
                                        hamming_distance_mins_hap2 > non_IBD_distance_cutoff)
-  clean_inheritance_hap2vs1 <- which(hamming_distance_mins_2vs1 <= IBD_distance_cutoff & hamming_distance_mins_2vs2 > 0 &
+  clean_inheritance_hap2vs1 <- which(hamming_distance_mins_2vs1 <= IBD_distance_cutoff & hamming_distance_mins_2vs2 > IBD_distance_cutoff &
                                        hamming_distance_mins_hap1 > non_IBD_distance_cutoff)
-  clean_inheritance_hap2vs2 <- which(hamming_distance_mins_2vs1 > 0 & hamming_distance_mins_2vs2 <= IBD_distance_cutoff &
+  clean_inheritance_hap2vs2 <- which(hamming_distance_mins_2vs1 > IBD_distance_cutoff & hamming_distance_mins_2vs2 <= IBD_distance_cutoff &
                                        hamming_distance_mins_hap1 > non_IBD_distance_cutoff)
   clean_inheritance_all <- Reduce(union, list(clean_inheritance_hap1vs1, clean_inheritance_hap1vs2,
                                            clean_inheritance_hap2vs1, clean_inheritance_hap2vs2))
@@ -247,7 +248,14 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
   }
 
   if (length(uncertain_inheritance) > 0){
-    uncertain <- unlist(overlapping_indices[uncertain_inheritance])
+    uncertain_variants_by_hap_block <- overlapping_indices[uncertain_inheritance]
+    uncertain <- unlist(uncertain_variants_by_hap_block)
+    uncertain_best_hamming_distance <- rep(best_hamming_distance[uncertain_inheritance], 
+                                           lengths(uncertain_variants_by_hap_block))
+    uncertain_supporting_counts_het_hom <- rep(counts_het_hom[uncertain_inheritance], lengths(uncertain_variants_by_hap_block))
+    uncertain_supporting_counts_het_het <- rep(counts_het_het[uncertain_inheritance], lengths(uncertain_variants_by_hap_block))
+    uncertain_supporting_counts_hom_het <- rep(counts_hom_het[uncertain_inheritance], lengths(uncertain_variants_by_hap_block))
+    
   } else {
     uncertain <- NULL
   }
@@ -307,10 +315,10 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     if (!is.null(uncertain)){
       uncertain <- candidate_variant_granges[uncertain]
       uncertain$duoNovo_classification <- "uncertain"
-      uncertain$supporting_hamming_distance <- NA
-      uncertain$supporting_counts_het_hom <- NA
-      uncertain$supporting_counts_het_het <- NA
-      uncertain$supporting_counts_hom_het <- NA
+      uncertain$supporting_hamming_distance <- uncertain_best_hamming_distance
+      uncertain$supporting_counts_het_hom <- uncertain_supporting_counts_het_hom
+      uncertain$supporting_counts_het_het <- uncertain_supporting_counts_het_het
+      uncertain$supporting_counts_hom_het <- uncertain_supporting_counts_hom_het
     } else {
       uncertain <- GRanges()
     }
@@ -370,10 +378,10 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     if (!is.null(uncertain)){
       uncertain <- candidate_variant_granges[uncertain]
       uncertain$duoNovo_classification <- "uncertain"
-      uncertain$supporting_hamming_distance <- NA
-      uncertain$supporting_counts_het_hom <- NA
-      uncertain$supporting_counts_het_het <- NA
-      uncertain$supporting_counts_hom_het <- NA
+      uncertain$supporting_hamming_distance <- uncertain_best_hamming_distance
+      uncertain$supporting_counts_het_hom <- uncertain_supporting_counts_het_hom
+      uncertain$supporting_counts_het_het <- uncertain_supporting_counts_het_het
+      uncertain$supporting_counts_hom_het <- uncertain_supporting_counts_hom_het
     } else {
       uncertain <- GRanges()
     }
