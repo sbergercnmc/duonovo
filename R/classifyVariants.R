@@ -177,6 +177,7 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
   hamming_distance_mins_hap1 <- colMins(hamming_distance_mat[1:2, , drop = FALSE])
   hamming_distance_mins_hap2 <- colMins(hamming_distance_mat[3:4, , drop = FALSE])
   best_hamming_distance <- pmin(hamming_distance_mins_hap1, hamming_distance_mins_hap2)
+  worse_hamming_distance <- pmax(hamming_distance_mins_hap1, hamming_distance_mins_hap2)
 
   all_columns <- 1:dim(hamming_distance_mat)[2]
   clean_inheritance_hap1vs1 <- which(hamming_distance_mins_1vs1 <= IBD_distance_cutoff & hamming_distance_mins_1vs2 > IBD_distance_cutoff &
@@ -201,6 +202,8 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     hap11_inherited <- unlist(hap11_variants_by_hap_block)
     hap11_hamming_distance_other_parent_hap <- rep(hamming_distance_mins_hap2[clean_inheritance_hap1vs1],
                                                    lengths(hap11_variants_by_hap_block))
+    hap11_hamming_distance_this_parent_hap <- rep(hamming_distance_mins_hap1[clean_inheritance_hap1vs1],
+                                                   lengths(hap11_variants_by_hap_block))
     hap11_supporting_counts_het_hom <- rep(counts_het_hom[clean_inheritance_hap1vs1], lengths(hap11_variants_by_hap_block))
     hap11_supporting_counts_het_het <- rep(counts_het_het[clean_inheritance_hap1vs1], lengths(hap11_variants_by_hap_block))
     hap11_supporting_counts_hom_het <- rep(counts_hom_het[clean_inheritance_hap1vs1], lengths(hap11_variants_by_hap_block))
@@ -214,6 +217,8 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     hap12_inherited <- unlist(hap12_variants_by_hap_block)
     hap12_hamming_distance_other_parent_hap <- rep(hamming_distance_mins_hap2[clean_inheritance_hap1vs2],
                                                    lengths(hap12_variants_by_hap_block))
+    hap12_hamming_distance_this_parent_hap <- rep(hamming_distance_mins_hap1[clean_inheritance_hap1vs2],
+                                                  lengths(hap11_variants_by_hap_block))
     hap12_supporting_counts_het_hom <- rep(counts_het_hom[clean_inheritance_hap1vs2], lengths(hap12_variants_by_hap_block))
     hap12_supporting_counts_het_het <- rep(counts_het_het[clean_inheritance_hap1vs2], lengths(hap12_variants_by_hap_block))
     hap12_supporting_counts_hom_het <- rep(counts_hom_het[clean_inheritance_hap1vs2], lengths(hap12_variants_by_hap_block))
@@ -226,6 +231,8 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     hap21_variants_by_hap_block <- overlapping_indices[clean_inheritance_hap2vs1]
     hap21_inherited <- unlist(hap21_variants_by_hap_block)
     hap21_hamming_distance_other_parent_hap <- rep(hamming_distance_mins_hap1[clean_inheritance_hap2vs1],
+                                                   lengths(hap21_variants_by_hap_block))
+    hap21_hamming_distance_this_parent_hap <- rep(hamming_distance_mins_hap2[clean_inheritance_hap2vs1],
                                                    lengths(hap21_variants_by_hap_block))
     hap21_supporting_counts_het_hom <- rep(counts_het_hom[clean_inheritance_hap2vs1], lengths(hap21_variants_by_hap_block))
     hap21_supporting_counts_het_het <- rep(counts_het_het[clean_inheritance_hap2vs1], lengths(hap21_variants_by_hap_block))
@@ -240,6 +247,8 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     hap22_inherited <- unlist(hap22_variants_by_hap_block)
     hap22_hamming_distance_other_parent_hap <- rep(hamming_distance_mins_hap1[clean_inheritance_hap2vs2],
                                                    lengths(hap22_variants_by_hap_block))
+    hap22_hamming_distance_this_parent_hap <- rep(hamming_distance_mins_hap2[clean_inheritance_hap2vs2],
+                                                  lengths(hap22_variants_by_hap_block))
     hap22_supporting_counts_het_hom <- rep(counts_het_hom[clean_inheritance_hap2vs2], lengths(hap22_variants_by_hap_block))
     hap22_supporting_counts_het_het <- rep(counts_het_het[clean_inheritance_hap2vs2], lengths(hap22_variants_by_hap_block))
     hap22_supporting_counts_hom_het <- rep(counts_hom_het[clean_inheritance_hap2vs2], lengths(hap22_variants_by_hap_block))
@@ -251,6 +260,8 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     uncertain_variants_by_hap_block <- overlapping_indices[uncertain_inheritance]
     uncertain <- unlist(uncertain_variants_by_hap_block)
     uncertain_best_hamming_distance <- rep(best_hamming_distance[uncertain_inheritance], 
+                                           lengths(uncertain_variants_by_hap_block))
+    uncertain_worse_hamming_distance <- rep(worse_hamming_distance[uncertain_inheritance], 
                                            lengths(uncertain_variants_by_hap_block))
     uncertain_supporting_counts_het_hom <- rep(counts_het_hom[uncertain_inheritance], lengths(uncertain_variants_by_hap_block))
     uncertain_supporting_counts_het_het <- rep(counts_het_het[uncertain_inheritance], lengths(uncertain_variants_by_hap_block))
@@ -266,7 +277,8 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
       de_novo11 <- candidate_variant_granges[hap11_inherited]
       de_novo11$duoNovo_classification <- "de_novo"
       #add columns for supporting evidence of de novo classification
-      de_novo11$supporting_hamming_distance <- hap11_hamming_distance_other_parent_hap
+      de_novo11$non_IBD_hamming_distance <- hap11_hamming_distance_other_parent_hap
+      de_novo11$IBD_hamming_distance <- hap11_hamming_distance_this_parent_hap
       de_novo11$supporting_counts_het_hom <- hap11_supporting_counts_het_hom
       de_novo11$supporting_counts_het_het <- hap11_supporting_counts_het_het
       de_novo11$supporting_counts_hom_het <- hap11_supporting_counts_hom_het
@@ -278,7 +290,8 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
       de_novo12 <- candidate_variant_granges[hap12_inherited]
       de_novo12$duoNovo_classification <- "de_novo"
       #add columns for supporting evidence of de novo classification
-      de_novo12$supporting_hamming_distance <- hap12_hamming_distance_other_parent_hap
+      de_novo12$non_IBD_hamming_distance <- hap12_hamming_distance_other_parent_hap
+      de_novo12$IBD_hamming_distance <- hap12_hamming_distance_this_parent_hap
       de_novo12$supporting_counts_het_hom <- hap12_supporting_counts_het_hom
       de_novo12$supporting_counts_het_het <- hap12_supporting_counts_het_het
       de_novo12$supporting_counts_hom_het <- hap12_supporting_counts_hom_het
@@ -291,7 +304,8 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
       not_de_novo21 <- candidate_variant_granges[hap21_inherited]
       not_de_novo21$duoNovo_classification <- "on_other_parent_haplotype"
       #add columns for supporting evidence of de novo classification
-      not_de_novo21$supporting_hamming_distance <- hap21_hamming_distance_other_parent_hap
+      not_de_novo21$non_IBD_hamming_distance <- hap21_hamming_distance_other_parent_hap
+      not_de_novo21$IBD_hamming_distance <- hap21_hamming_distance_this_parent_hap
       not_de_novo21$supporting_counts_het_hom <- hap21_supporting_counts_het_hom
       not_de_novo21$supporting_counts_het_het <- hap21_supporting_counts_het_het
       not_de_novo21$supporting_counts_hom_het <- hap21_supporting_counts_hom_het
@@ -303,7 +317,8 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
       not_de_novo22 <- candidate_variant_granges[hap22_inherited]
       not_de_novo22$duoNovo_classification <- "on_other_parent_haplotype"
       #add columns for supporting evidence of de novo classification
-      not_de_novo22$supporting_hamming_distance <- hap22_hamming_distance_other_parent_hap
+      not_de_novo22$non_IBD_hamming_distance <- hap22_hamming_distance_other_parent_hap
+      not_de_novo22$IBD_hamming_distance <- hap22_hamming_distance_this_parent_hap
       not_de_novo22$supporting_counts_het_hom <- hap22_supporting_counts_het_hom
       not_de_novo22$supporting_counts_het_het <- hap22_supporting_counts_het_het
       not_de_novo22$supporting_counts_hom_het <- hap22_supporting_counts_hom_het
@@ -315,7 +330,8 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     if (!is.null(uncertain)){
       uncertain <- candidate_variant_granges[uncertain]
       uncertain$duoNovo_classification <- "uncertain"
-      uncertain$supporting_hamming_distance <- uncertain_best_hamming_distance
+      uncertain$non_IBD_hamming_distance <- uncertain_worse_hamming_distance
+      uncertain$IBD_hamming_distance <- uncertain_best_hamming_distance
       uncertain$supporting_counts_het_hom <- uncertain_supporting_counts_het_hom
       uncertain$supporting_counts_het_het <- uncertain_supporting_counts_het_het
       uncertain$supporting_counts_hom_het <- uncertain_supporting_counts_hom_het
@@ -329,7 +345,8 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
       de_novo21 <- candidate_variant_granges[hap21_inherited]
       de_novo21$duoNovo_classification <- "de_novo"
       #add columns for supporting evidence of de novo classification
-      de_novo21$supporting_hamming_distance <- hap21_hamming_distance_other_parent_hap
+      de_novo21$non_IBD_hamming_distance <- hap21_hamming_distance_other_parent_hap
+      de_novo21$IBD_hamming_distance <- hap21_hamming_distance_this_parent_hap
       de_novo21$supporting_counts_het_hom <- hap21_supporting_counts_het_hom
       de_novo21$supporting_counts_het_het <- hap21_supporting_counts_het_het
       de_novo21$supporting_counts_hom_het <- hap21_supporting_counts_hom_het
@@ -341,7 +358,8 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
       de_novo22 <- candidate_variant_granges[hap22_inherited]
       de_novo22$duoNovo_classification <- "de_novo"
       #add columns for supporting evidence of de novo classification
-      de_novo22$supporting_hamming_distance <- hap22_hamming_distance_other_parent_hap
+      de_novo22$non_IBD_hamming_distance <- hap22_hamming_distance_other_parent_hap
+      de_novo22$IBD_hamming_distance <- hap22_hamming_distance_this_parent_hap
       de_novo22$supporting_counts_het_hom <- hap22_supporting_counts_het_hom
       de_novo22$supporting_counts_het_het <- hap22_supporting_counts_het_het
       de_novo22$supporting_counts_hom_het <- hap22_supporting_counts_hom_het
@@ -354,7 +372,8 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
       not_de_novo11 <- candidate_variant_granges[hap11_inherited]
       not_de_novo11$duoNovo_classification <- "on_other_parent_haplotype"
       #add columns for supporting evidence of de novo classification
-      not_de_novo11$supporting_hamming_distance <- hap11_hamming_distance_other_parent_hap
+      not_de_novo11$non_IBD_hamming_distance <- hap11_hamming_distance_other_parent_hap
+      not_de_novo11$IBD_hamming_distance <- hap11_hamming_distance_this_parent_hap
       not_de_novo11$supporting_counts_het_hom <- hap11_supporting_counts_het_hom
       not_de_novo11$supporting_counts_het_het <- hap11_supporting_counts_het_het
       not_de_novo11$supporting_counts_hom_het <- hap11_supporting_counts_hom_het
@@ -366,7 +385,8 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
       not_de_novo12 <- candidate_variant_granges[hap12_inherited]
       not_de_novo12$duoNovo_classification <- "on_other_parent_haplotype"
       #add columns for supporting evidence of de novo classification
-      not_de_novo12$supporting_hamming_distance <- hap12_hamming_distance_other_parent_hap
+      not_de_novo12$non_IBD_hamming_distance <- hap12_hamming_distance_other_parent_hap
+      not_de_novo12$IBD_hamming_distance <- hap12_hamming_distance_this_parent_hap
       not_de_novo12$supporting_counts_het_hom <- hap12_supporting_counts_het_hom
       not_de_novo12$supporting_counts_het_het <- hap12_supporting_counts_het_het
       not_de_novo12$supporting_counts_hom_het <- hap12_supporting_counts_hom_het
@@ -378,7 +398,8 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     if (!is.null(uncertain)){
       uncertain <- candidate_variant_granges[uncertain]
       uncertain$duoNovo_classification <- "uncertain"
-      uncertain$supporting_hamming_distance <- uncertain_best_hamming_distance
+      uncertain$non_IBD_hamming_distance <- uncertain_worse_hamming_distance
+      uncertain$IBD_hamming_distance <- uncertain_best_hamming_distance
       uncertain$supporting_counts_het_hom <- uncertain_supporting_counts_het_hom
       uncertain$supporting_counts_het_het <- uncertain_supporting_counts_het_het
       uncertain$supporting_counts_hom_het <- uncertain_supporting_counts_hom_het
@@ -391,7 +412,8 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
 
   if (length(QC_fail_variants) > 0){
     QC_fail_variants$duoNovo_classification <- "failed_QC"
-    QC_fail_variants$supporting_hamming_distance <- NA
+    QC_fail_variants$non_IBD_hamming_distance <- NA
+    QC_fail_variants$IBD_hamming_distance <- NA
     QC_fail_variants$supporting_counts_het_hom <- NA
     QC_fail_variants$supporting_counts_het_het <- NA
     QC_fail_variants$supporting_counts_hom_het <- NA
