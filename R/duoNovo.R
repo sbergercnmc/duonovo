@@ -333,7 +333,6 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
     
     if (length(candidate_variant_granges_left) == 0 & length(candidate_variant_granges_right) == 0) {
       warning("No candidate variants passed QC.")
-      return(c(QC_fail_variants_left, QC_fail_variants_right))
     }
   }
   

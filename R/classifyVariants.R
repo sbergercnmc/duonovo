@@ -54,7 +54,6 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     QC_fail_variants$supporting_counts_het_het <- NA
     QC_fail_variants$supporting_counts_hom_het <- NA
     warning(paste0("No candidate variants of ", phasing_orientation, " phasing orientation passed QC."))
-    return(QC_fail_variants)
   }
   if (length(hap_overlap_indices) < length(candidate_variant_granges)){
     QC_fail_variants_no_hap_overlap <- candidate_variant_granges[-hap_overlap_indices]
@@ -79,7 +78,6 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     QC_fail_variants$supporting_counts_het_het <- NA
     QC_fail_variants$supporting_counts_hom_het <- NA
     warning(paste0("No candidate variants of ", phasing_orientation, " phasing orientation passed QC."))
-    return(QC_fail_variants)
   }
   if (length(hap_overlap_indices) < length(candidate_variant_granges)){
     QC_fail_variants_no_hap_overlap <- candidate_variant_granges[-hap_overlap_indices]
@@ -100,7 +98,6 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     QC_fail_variants$supporting_counts_het_het <- NA
     QC_fail_variants$supporting_counts_hom_het <- NA
     warning(paste0("No candidate variants of ", phasing_orientation, " phasing orientation passed QC."))
-    return(QC_fail_variants)
   }
   no_boundary_overlap_indices <- unique(queryHits(overlaps))
   if (length(no_boundary_overlap_indices) < length(candidate_variant_granges)){
