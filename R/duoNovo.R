@@ -216,7 +216,6 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   
   if (length(candidate_variant_granges_left) == 0 & length(candidate_variant_granges_right) == 0) {
     warning("No candidate variants passed QC.")
-    return(c(QC_fail_variants_left, QC_fail_variants_right))
   }
   
   # Optional: Restrict to candidate variants concordant with short-read sequencing
@@ -350,7 +349,8 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   } else {
     if (length(QC_fail_variants_left) > 0){
       QC_fail_variants_left$duoNovo_classification <- "failed_QC"
-      QC_fail_variants_left$supporting_hamming_distance <- NA
+      QC_fail_variants_left$non_IBD_hamming_distance <- NA
+      QC_fail_variants_left$IBD_hamming_distance <- NA
       QC_fail_variants_left$supporting_counts_het_hom <- NA
       QC_fail_variants_left$supporting_counts_het_het <- NA
       QC_fail_variants_left$supporting_counts_hom_het <- NA
@@ -371,7 +371,8 @@ duoNovo <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, GQ_cutoff = 30,
   } else {
     if (length(QC_fail_variants_right) > 0){
       QC_fail_variants_right$duoNovo_classification <- "failed_QC"
-      QC_fail_variants_right$supporting_hamming_distance <- NA
+      QC_fail_variants_right$non_IBD_hamming_distance <- NA
+      QC_fail_variants_right$IBD_hamming_distance <- NA
       QC_fail_variants_right$supporting_counts_het_hom <- NA
       QC_fail_variants_right$supporting_counts_het_het <- NA
       QC_fail_variants_right$supporting_counts_hom_het <- NA

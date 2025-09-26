@@ -49,11 +49,13 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     QC_fail_variants_no_hap_overlap$QC_fail_step <- "no_haplotype_block_overlap"
     QC_fail_variants <- c(QC_fail_variants, QC_fail_variants_no_hap_overlap)
     QC_fail_variants$duoNovo_classification <- "failed_QC"
-    QC_fail_variants$supporting_hamming_distance <- NA
+    QC_fail_variants$non_IBD_hamming_distance <- NA
+    QC_fail_variants$IBD_hamming_distance <- NA
     QC_fail_variants$supporting_counts_het_hom <- NA
     QC_fail_variants$supporting_counts_het_het <- NA
     QC_fail_variants$supporting_counts_hom_het <- NA
     warning(paste0("No candidate variants of ", phasing_orientation, " phasing orientation passed QC."))
+    return(QC_fail_variants)
   }
   if (length(hap_overlap_indices) < length(candidate_variant_granges)){
     QC_fail_variants_no_hap_overlap <- candidate_variant_granges[-hap_overlap_indices]
@@ -73,11 +75,13 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     QC_fail_variants_no_hap_overlap$QC_fail_step <- "in_small_haplotype_block"
     QC_fail_variants <- c(QC_fail_variants, QC_fail_variants_no_hap_overlap)
     QC_fail_variants$duoNovo_classification <- "failed_QC"
-    QC_fail_variants$supporting_hamming_distance <- NA
+    QC_fail_variants$non_IBD_hamming_distance <- NA
+    QC_fail_variants$IBD_hamming_distance <- NA
     QC_fail_variants$supporting_counts_het_hom <- NA
     QC_fail_variants$supporting_counts_het_het <- NA
     QC_fail_variants$supporting_counts_hom_het <- NA
     warning(paste0("No candidate variants of ", phasing_orientation, " phasing orientation passed QC."))
+    return(QC_fail_variants)
   }
   if (length(hap_overlap_indices) < length(candidate_variant_granges)){
     QC_fail_variants_no_hap_overlap <- candidate_variant_granges[-hap_overlap_indices]
@@ -93,11 +97,13 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     QC_fail_variants_boundary_overlap$QC_fail_step <- "in_haplotype_block_boundary"
     QC_fail_variants <- c(QC_fail_variants, QC_fail_variants_boundary_overlap)
     QC_fail_variants$duoNovo_classification <- "failed_QC"
-    QC_fail_variants$supporting_hamming_distance <- NA
+    QC_fail_variants$non_IBD_hamming_distance <- NA
+    QC_fail_variants$IBD_hamming_distance <- NA
     QC_fail_variants$supporting_counts_het_hom <- NA
     QC_fail_variants$supporting_counts_het_het <- NA
     QC_fail_variants$supporting_counts_hom_het <- NA
     warning(paste0("No candidate variants of ", phasing_orientation, " phasing orientation passed QC."))
+    return(QC_fail_variants)
   }
   no_boundary_overlap_indices <- unique(queryHits(overlaps))
   if (length(no_boundary_overlap_indices) < length(candidate_variant_granges)){
@@ -215,7 +221,7 @@ classifyVariants <- function(candidate_variant_granges, phasing_orientation = c(
     hap12_hamming_distance_other_parent_hap <- rep(hamming_distance_mins_hap2[clean_inheritance_hap1vs2],
                                                    lengths(hap12_variants_by_hap_block))
     hap12_hamming_distance_this_parent_hap <- rep(hamming_distance_mins_hap1[clean_inheritance_hap1vs2],
-                                                  lengths(hap11_variants_by_hap_block))
+                                                  lengths(hap12_variants_by_hap_block))
     hap12_supporting_counts_het_hom <- rep(counts_het_hom[clean_inheritance_hap1vs2], lengths(hap12_variants_by_hap_block))
     hap12_supporting_counts_het_het <- rep(counts_het_het[clean_inheritance_hap1vs2], lengths(hap12_variants_by_hap_block))
     hap12_supporting_counts_hom_het <- rep(counts_hom_het[clean_inheritance_hap1vs2], lengths(hap12_variants_by_hap_block))
