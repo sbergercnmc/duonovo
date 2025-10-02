@@ -112,7 +112,7 @@ Below is a description of each argument that `duoNovo()` accepts:
 - **proband_column_identifier**: Required input. A character corresponding to an identifier for the proband column in the metadata matrices of the VCF. Should be the same for both the LRS VCF and (if used) the SRS VCF.
 - **PS_width_cutoff**: A numeric value specifying the minimum width of haplotype blocks used in the analysis. The default is 10000.
 - **boundary_cutoff**: A numeric value indicating the minimum distance from a haplotype block boundary (either start or end coordinate) for candidate variants to be evaluated. The default is 2000.
-- **non_IBD_distance_cutoff**: A numeric value specifying the maximum Hamming distance cutoff to infer that a proband-parent haplotype block is identical by descent. The default is 0.
+- **IBD_distance_cutoff**: A numeric value specifying the maximum Hamming distance cutoff to infer that a proband-parent haplotype block is identical by descent. The default is 0.
 - **non_IBD_distance_cutoff**: A numeric value specifying the minimum Hamming distance cutoff to infer that a proband-parent haplotype block is not identical by descent. The default is 40.
 - **candidate_variants_concordant_with_SRS**: Logical value specifying if candidate variant genotype calls should be concordant with short-read sequencing (the default is `FALSE`).
 - **SRS_vcf_file_path**: Path to the VCF containing variant calls from short-read sequencing of the duo.

@@ -148,7 +148,7 @@ Below is a description of each argument that `duoNovo()` accepts:
 - **boundary_cutoff**: A numeric value indicating the minimum distance
   from a haplotype block boundary (either start or end coordinate) for
   candidate variants to be evaluated. The default is 2000.
-- **non_IBD_distance_cutoff**: A numeric value specifying the maximum
+- **IBD_distance_cutoff**: A numeric value specifying the maximum
   Hamming distance cutoff to infer that a proband-parent haplotype block
   is identical by descent. The default is 0.
 - **non_IBD_distance_cutoff**: A numeric value specifying the minimum
