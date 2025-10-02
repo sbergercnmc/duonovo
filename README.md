@@ -9,7 +9,7 @@
 *duoNovo* is an R package that identifies *de novo* variants from
 parent-proband duos, that is, without requiring sequencing of both
 biological parents. *duoNovo* uses phased variant calls generated via
-long-read sequencing followed read-backed phasing (for example, using
+long-read sequencing followed by read-backed phasing (for example, using
 HiPhase), in order to determine whether candidate variants of interest
 (heterozygous in the proband; absent in the parent) are present on
 haplotypes that are identical by descent between the sequenced parent

@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-_duoNovo_ is an R package that identifies _de novo_ variants from parent-proband duos, that is, without requiring sequencing of both biological parents. _duoNovo_ uses phased variant calls generated via long-read sequencing followed read-backed phasing (for example, using HiPhase), in order to determine whether candidate variants of interest (heterozygous in the proband; absent in the parent) are present on haplotypes that are identical by descent between the sequenced parent and the proband. If that is the case, _duoNovo_ classifies these candidate variants as _de novo_, whereas if that is not the case it infers that they have arisen on the haplotype inherited from the missing parent (thus ascertaining their _de novo_ status is not possible).
+_duoNovo_ is an R package that identifies _de novo_ variants from parent-proband duos, that is, without requiring sequencing of both biological parents. _duoNovo_ uses phased variant calls generated via long-read sequencing followed by read-backed phasing (for example, using HiPhase), in order to determine whether candidate variants of interest (heterozygous in the proband; absent in the parent) are present on haplotypes that are identical by descent between the sequenced parent and the proband. If that is the case, _duoNovo_ classifies these candidate variants as _de novo_, whereas if that is not the case it infers that they have arisen on the haplotype inherited from the missing parent (thus ascertaining their _de novo_ status is not possible).
 
 ## Installation
 
