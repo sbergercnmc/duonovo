@@ -56,9 +56,9 @@ ppv_all_pm <- sum(ppv_pm[1, ], na.rm = TRUE)/sum(ppv_pm[2, ], na.rm = TRUE)
 
 
 ### compute NPV
-npv_pf_mat <- matrix(NA, ncol = length(all_dirs), nrow = 2)
-npv_pm_mat <- matrix(NA, ncol = length(all_dirs), nrow = 2)
-rownames(npv_pf_mat) <- rownames(npv_pm_mat) <- c('duoNovo', 'naive')
+npv_pf_mat <- matrix(NA, ncol = length(all_dirs), nrow = 3)
+npv_pm_mat <- matrix(NA, ncol = length(all_dirs), nrow = 3)
+rownames(npv_pf_mat) <- rownames(npv_pm_mat) <- c('duoNovo', 'naive', 'total_ndn_classifications')
 for (i in 1:length(all_dirs)){
   setwd(all_dirs[i])
   all_data <- list.files()
@@ -66,9 +66,11 @@ for (i in 1:length(all_dirs)){
   
   npv_pf_mat['duoNovo', i] <- npv_pf[1]
   npv_pf_mat['naive', i] <- npv_pf[2]
+  npv_pf_mat['total_ndn_classifications', i] <- npv_pf[3]
   
   npv_pm_mat['duoNovo', i] <- npv_pm[1]
   npv_pm_mat['naive', i] <- npv_pm[2]
+  npv_pm_mat['total_ndn_classifications', i] <- npv_pm[3]
   
   setwd(data_directory)
 }

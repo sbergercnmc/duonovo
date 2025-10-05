@@ -1,4 +1,18 @@
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) != 2) {
+  stop("Usage: Rscript ppv_GQ40.R <data_directory> <figure_directory>")
+}
 
+data_directory   <- args[1]
+figure_directory <- args[2]
+
+# ensure data directory exists
+if (!dir.exists(data_directory)) {
+  stop(sprintf("Data directory not found: '%s'", data_directory))
+}
+
+setwd(data_directory)
+all_dirs <- list.files()
 
 ppv_pf_gq40_no_gnomad <- rep(NA, length(all_dirs))
 for (i in 1:length(all_dirs)){

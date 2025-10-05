@@ -194,3 +194,51 @@ pdf(paste0(figure_directory, "/duonovo_mutation_types_pm.pdf"),
     height = 2.2, width = 7, pointsize = 8)
 plot_96_profile(mut_mat)
 dev.off()
+
+
+###
+### Statistical test for difference in subtype proportions
+###between father-proband duo SNVs and mother-proband duo SNVs
+pf_all <- colSums(type_occurrences_pf, na.rm = TRUE)
+pm_all <- colSums(type_occurrences_pm, na.rm = TRUE)
+data_matrix <- rbind(pf_all, pm_all)
+M <- data_matrix
+
+row_totals <- rowSums(M)
+
+per_type <- lapply(seq_len(ncol(M)), function(j) {
+  x11 <- M["pf_all", j]
+  x21 <- M["pm_all", j]
+  x12 <- row_totals["pf_all"] - x11
+  x22 <- row_totals["pm_all"] - x21
+  tab <- matrix(c(x11, x12, x21, x22), nrow=2, byrow=TRUE,
+                dimnames=list(group=c("pf","pm"), type=c("this","other")))
+  ft <- fisher.test(tab)  # two-sided
+  # proportions within group (this type among all types)
+  p_pf <- x11 / row_totals["pf_all"]
+  p_pm <- x21 / row_totals["pm_all"]
+  data.frame(
+    mutation_type = colnames(M)[j],
+    pf_count = x11,
+    pm_count = x21,
+    pf_total = row_totals["pf_all"],
+    pm_total = row_totals["pm_all"],
+    pf_prop = p_pf,
+    pm_prop = p_pm,
+    prop_diff = p_pf - p_pm,                       # pf - pm
+    odds_ratio = unname(ft$estimate),              # OR for pf vs pm
+    ci_low = ft$conf.int[1],
+    ci_high = ft$conf.int[2],
+    p_value = ft$p.value,
+    stringsAsFactors = FALSE
+  )
+})
+
+res <- do.call(rbind, per_type)
+res$p_adj <- p.adjust(res$p_value, method="bonferroni")
+res <- res[order(res$p_value), ]
+
+print(res, digits=4, row.names=FALSE)
+
+
+
