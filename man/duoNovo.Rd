@@ -11,7 +11,8 @@ duoNovo(
   proband_column_identifier,
   PS_width_cutoff = 10000,
   boundary_cutoff = 2000,
-  distance_cutoff = 40,
+  IBD_distance_cutoff = 0,
+  non_IBD_distance_cutoff = 40,
   candidate_variants_concordant_with_SRS = FALSE,
   SRS_vcf_file_path = NULL,
   test_reference_allele = FALSE,
@@ -34,7 +35,11 @@ duoNovo(
 
 \item{boundary_cutoff}{A numeric value indicating the minimum distance from a haplotype block boundary (either start or end coordinate) for candidate variants to be analyzed.}
 
-\item{distance_cutoff}{A numeric value specifying the minimum hamming distance cutoff to determine that a proband-parent haplotype block are not identical by descent.}
+\item{IBD_distance_cutoff}{A numeric value specifying the minimum Hamming distance required for inferring
+the non-IBD status of a haplotype pair.}
+
+\item{non_IBD_distance_cutoff}{A numeric value specifying the maximum Hamming distance allowed to infer
+the IBD status of a haplotype pair.}
 
 \item{candidate_variants_concordant_with_SRS}{Logical value specifying if candidate variants should be concordant with short-read sequencing (default is \code{FALSE}).}
 

@@ -10,7 +10,8 @@ classifyVariants(
   haplotype_granges,
   haplotype_boundary_coordinate_granges,
   boundary_cutoff,
-  distance_cutoff,
+  IBD_distance_cutoff,
+  non_IBD_distance_cutoff,
   PS_width_cutoff,
   QC_fail_variant_granges
 )
@@ -27,8 +28,11 @@ classifyVariants(
 \item{boundary_cutoff}{A numeric value indicating the distance from the boundary of a haplotype block
 within which candidate variants are considered.}
 
-\item{distance_cutoff}{A numeric value specifying the minimum Hamming distance required for supporting
-the classification of variants.}
+\item{IBD_distance_cutoff}{A numeric value specifying the minimum Hamming distance required for inferring
+the non-IBD status of a haplotype pair.}
+
+\item{non_IBD_distance_cutoff}{A numeric value specifying the maximum Hamming distance allowed to infer
+the IBD status of a haplotype pair.}
 
 \item{PS_width_cutoff}{A numeric value specifying the minimum width for phasing sets to be included in the analysis.}
 
