@@ -140,9 +140,8 @@ Below is a description of each argument that `duoNovo()` accepts:
   applies to both proband and parent variants, for both LRS and SRS (if
   used). The default is 30.
 - **proband_column_identifier**: Required input. A character
-  corresponding to an identifier for the proband column in the metadata
-  matrices of the VCF. Should be the same for both the LRS VCF and (if
-  used) the SRS VCF.
+  corresponding to an identifier for the proband column in the VCF.
+  Should be the same for both the LRS VCF and (if used) the SRS VCF.
 - **PS_width_cutoff**: A numeric value specifying the minimum width of
   haplotype blocks used in the analysis. The default is 10000.
 - **boundary_cutoff**: A numeric value indicating the minimum distance

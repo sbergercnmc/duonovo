@@ -109,7 +109,7 @@ Below is a description of each argument that `duoNovo()` accepts:
 - **LRS_phased_vcf_file_path**: Required input. Path to the VCF containing phased variant calls from long-read sequencing of the duo.
 - **depth_cutoff**: A numeric value specifying the minimum sequencing depth for variants to be included in the analysis. The same cutoff applies to both proband and parent variants, for both LRS and SRS (if used). The default is 20.
 - **GQ_cutoff**: A numeric value specifying the minimum GQ (PHRED quality) for variants to be included in the analysis. The same cutoff applies to both proband and parent variants, for both LRS and SRS (if used). The default is 30.
-- **proband_column_identifier**: Required input. A character corresponding to an identifier for the proband column in the metadata matrices of the VCF. Should be the same for both the LRS VCF and (if used) the SRS VCF.
+- **proband_column_identifier**: Required input. A character corresponding to an identifier for the proband column in the VCF. Should be the same for both the LRS VCF and (if used) the SRS VCF.
 - **PS_width_cutoff**: A numeric value specifying the minimum width of haplotype blocks used in the analysis. The default is 10000.
 - **boundary_cutoff**: A numeric value indicating the minimum distance from a haplotype block boundary (either start or end coordinate) for candidate variants to be evaluated. The default is 2000.
 - **IBD_distance_cutoff**: A numeric value specifying the maximum Hamming distance cutoff to infer that a proband-parent haplotype block is identical by descent. The default is 0.
