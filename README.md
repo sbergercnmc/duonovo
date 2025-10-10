@@ -292,4 +292,4 @@ variants.
 We systematically evaluated *duoNovo*’s performance on a cohort of 117
 trios which we used to construct 234 duos (117 father-proband and 117
 mother-proband duos). Details can be found in our preprint
-(<https://www.medrxiv.org/content/10.1101/2025.02.24.25322424v1>).
+(<https://www.medrxiv.org/content/10.1101/2025.02.24.25322424v2>).
