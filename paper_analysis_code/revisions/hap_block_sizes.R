@@ -155,23 +155,19 @@ calculateHapBlockSize <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, G
   message("Reconstructing haplotypes...")
   hap_granges <- getHaplotypes(vcf_granges)
   
-  low_depth_indices <- which(hap_granges$depth1 < depth_cutoff | hap_granges$depth2 < depth_cutoff)
-  low_GQ_indices <- which(hap_granges$GQ1 < GQ_cutoff | hap_granges$GQ2 < GQ_cutoff)
-  
-  low_depth_or_GQ <- union(low_depth_indices, low_GQ_indices)
-  low_depth_and_GQ <- intersect(low_depth_indices, low_GQ_indices)
-  low_depth_only <- low_depth_indices[-which(low_depth_indices %in% low_GQ_indices)]
-  low_GQ_only <- low_GQ_indices[-which(low_GQ_indices %in% low_depth_indices)]
-  
-  if (length(low_depth_or_GQ) > 0){
-    hap_granges <- hap_granges[-low_depth_or_GQ]
-  }
   message("Calculating cumulative size of haplotype blocks...")
   hap_boundary_coordinate_ranges <- getHaplotypeBlockCoordinates(hap_granges)
   haplotype_boundary_coordinate_granges_filtered <- haplotype_boundary_coordinate_granges[
     which(width(haplotype_boundary_coordinate_granges) > PS_width_cutoff)]
   haplotype_boundary_coordinate_granges_filtered <- haplotype_boundary_coordinate_granges_filtered - boundary_cutoff
-  c(sum(width(hap_boundary_coordinates)), sum(width(haplotype_boundary_coordinate_granges_filtered)))
+  
+  candidate_variant_indices <- which(hap_granges$phasing1 %in% c("1|0", "0|1") & ranges_to_subset$phasing2 == "0/0")
+  candidate_variant_ranges <- hap_granges[candidate_variant_indices]
+  overlaps <- findOverlaps(candidate_variant_indices, hap_boundary_coordinate_ranges)
+  phased_candidates <- length(unique(queryHits(overlaps)))
+
+  c(sum(width(hap_boundary_coordinates)), sum(width(haplotype_boundary_coordinate_granges_filtered)), 
+    length(phased_candidates), length(candidate_variant_indices))
 }
 
 
