@@ -155,13 +155,13 @@ calculateHapBlockSize <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, G
     which(width(haplotype_boundary_coordinate_granges) > PS_width_cutoff)]
   haplotype_boundary_coordinate_granges_filtered <- haplotype_boundary_coordinate_granges_filtered - boundary_cutoff
   
-  candidate_variant_indices <- which(hap_granges$phasing1 %in% c("1|0", "0|1") & ranges_to_subset$phasing2 == "0/0")
+  candidate_variant_indices <- which(hap_granges$phasing1 %in% c("1|0", "0|1") & hap_granges$phasing2 == "0/0")
   candidate_variant_ranges <- hap_granges[candidate_variant_indices]
   overlaps <- findOverlaps(candidate_variant_indices, haplotype_boundary_coordinate_granges)
   phased_candidates <- length(unique(queryHits(overlaps)))
 
   c(sum(width(hap_boundary_coordinates)), sum(width(haplotype_boundary_coordinate_granges_filtered)), 
-    length(phased_candidates), length(candidate_variant_indices))
+    length(phased_candidates), length(candidate_variant_indices), length(candidate_variant_ranges))
 }
 
 
