@@ -184,7 +184,7 @@ hap_block_size_pm <- calculateHapBlockSize(duoNovo_input_filepath_pm)
 
 ### now PF duo
 ###
-duoNovo_intput_filepath_pf <- list.files(pattern = "PF\\.vcf\\.gz$")
+duoNovo_input_filepath_pf <- list.files(pattern = "PF\\.vcf\\.gz$")
 message("calculating haplotype block sizes from PF duo...")
 hap_block_size_pf <- calculateHapBlockSize(duoNovo_input_filepath_pf)
 
