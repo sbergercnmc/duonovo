@@ -100,9 +100,6 @@ calculateHapBlockSize <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, G
   if (!file.exists(LRS_phased_vcf_file_path)) {
     stop("The LRS VCF file path does not exist: ", LRS_phased_vcf_file_path)
   }
-  if (candidate_variants_concordant_with_SRS == TRUE && !file.exists(SRS_vcf_file_path)) {
-    stop("The SRS VCF file path does not exist: ", SRS_vcf_file_path)
-  }
   if (IBD_distance_cutoff >= non_IBD_distance_cutoff) {
     stop("The Hamming distance cutoff for IBD haplotypes exceeds that for non-IBD haplotypes")
   }
