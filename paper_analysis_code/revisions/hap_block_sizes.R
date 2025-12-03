@@ -150,7 +150,7 @@ calculateHapBlockSize <- function(LRS_phased_vcf_file_path, depth_cutoff = 20, G
   hap_granges <- getHaplotypes(vcf_granges)
   
   message("Calculating cumulative size of haplotype blocks...")
-  hap_boundary_coordinate_granges <- getHaplotypeBlockCoordinates(hap_granges)
+  haplotype_boundary_coordinate_granges <- getHaplotypeBlockCoordinates(hap_granges)
   haplotype_boundary_coordinate_granges_filtered <- haplotype_boundary_coordinate_granges[
     which(width(haplotype_boundary_coordinate_granges) > PS_width_cutoff)]
   haplotype_boundary_coordinate_granges_filtered <- haplotype_boundary_coordinate_granges_filtered - boundary_cutoff
