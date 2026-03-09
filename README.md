@@ -1,9 +1,10 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# *duoNovo*: Identification of *de novo* variants from single parent-proband duos
+# *duoNovo*: Identification of *de novo* variants from parent-proband duos
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 *duoNovo* is an R package that identifies *de novo* variants from
@@ -289,7 +290,29 @@ variants.
 
 ### *duoNovo* performance
 
-We systematically evaluated *duoNovo*’s performance on a cohort of 117
-trios which we used to construct 234 duos (117 father-proband and 117
-mother-proband duos). Details can be found in our preprint
-(<https://www.medrxiv.org/content/10.1101/2025.02.24.25322424v2>).
+We systematically evaluated *duoNovo*’s performance on a cohort of 104
+trios which we used to construct 208 duos (104 father-proband and 104
+mother-proband duos). Details can be found in our publication
+(<https://www.sciencedirect.com/science/article/pii/S0002929726000704>).
+
+## Citation
+
+If you use *duoNovo* in your work, please cite:
+
+Boukas L, Délot EC, Pitsava G, Lambert C, Fanslow C, Baybayan P, Belhadj
+S, Losic B, Harting J, Bluske K, LoTempio J, Al-Kouatly HB, Karam R,
+Rowell WJ, Xiao C, Vilain E, Berger SI. Identification of *de novo*
+variants from parent-proband duos via long-read sequencing. *The
+American Journal of Human Genetics*. 2026;113(3):437-452.
+<https://www.sciencedirect.com/science/article/pii/S0002929726000704>
+
+    @article{boukasetal2026duonovo,
+      title={Identification of {\textit{de novo}} variants from parent-proband duos via long-read sequencing},
+      author={Boukas, Leandros and D{\'e}lot, Emmanu{\`e}le C and Pitsava, Georgia and Lambert, Christine and Fanslow, Cairbre and Baybayan, Primo and Belhadj, Sami and Losic, Bojan and Harting, John and Bluske, Krista and LoTempio, Jonathan and Al-Kouatly, Huda B and Karam, Rachid and Rowell, William J and Xiao, Changrui and Vilain, Eric and Berger, Seth I},
+      journal={The American Journal of Human Genetics},
+      volume={113},
+      number={3},
+      pages={437--452},
+      year={2026},
+      url={https://www.sciencedirect.com/science/article/pii/S0002929726000704}
+    }
